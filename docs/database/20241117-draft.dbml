@@ -87,11 +87,6 @@ Ref: users.id < user_competitions.user_id
 
 
 // Basic scoring data tables
-table scoring_data {
-  id integer [primary key]
-  scoring_criteria_group_id integer
-}
-
 table scoring_groups {
   id integer [primary key]
   name varchar
@@ -121,12 +116,12 @@ Ref: scoring_groups.scoring_parent_group_id < scoring_groups.id
 // Scoring history
 table scoring_history {
   id integer [primary key]
-  user_id integer
+  user_competitions_id integer
   scoring_criteria_id integer
   points float
   created_at timestamp
 }
-Ref: users.id < scoring_history.user_id
+Ref: user_competitions.id < scoring_history.user_competitions_id
 Ref: scoring_criteria.id < scoring_history.scoring_criteria_id
 
 // Automatic scoring tables
