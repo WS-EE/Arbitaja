@@ -1,5 +1,9 @@
 // Use DBML to define your database structure
 // Docs: https://dbml.dbdiagram.io/docs
+// 
+// Link to this dbml fail on dbdiagram.io
+// https://dbdiagram.io/d/Arbitaja-6739b785e9daa85acab68596
+//
 
 //User Data
 Table user {
