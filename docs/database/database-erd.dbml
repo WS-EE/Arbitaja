@@ -2,39 +2,48 @@
 // Docs: https://dbml.dbdiagram.io/docs
 
 //User Data
-Table users {
+Table user {
   id integer [primary key]
   username varchar
   salted_password varchar [note: "????? not sure not yet"]
+  personal_data_id integer
+}
+
+table personal_data {
+  id integer [primary key]
   full_name varchar
   email varchar
   alias varchar [note: "For anonymose alias"]
   school_id integer
-  public_display_name_type integer [note: "1 - full_name, 2 - school, 3 - alias"]
   created_at timestamp
 }
+ref: user.personal_data_id - personal_data.id
 
-table schools {
+table school {
   id integer [primary key]
   name varchar
   created_at timestamp
 }
-Ref: schools.id < users.school_id
+Ref: school.id < personal_data.school_id
 
 
 // Permissions tables
 Table roles {
   id integer [primary key]
-  parent_roles_id integer
+  parent_roles_id array
+  child_roles_id array
   name varchar
   created_at timestamp
   changed_at timestamp
 }
+Ref: roles.parent_roles_id <> roles.id
+Ref: roles.child_roles_id <> roles.id
 
-Table permissions {
+Table permission {
   id integer [primary key]
-  permission_name varchar
-  permission_key varchar
+  name varchar
+  key varchar
+  key_object varchar [note: 'Define the object that this key limits. For example: "scoring_criteria"']
 }
 Ref: roles.id < role_permissions.role_id
 
@@ -42,7 +51,7 @@ table role_permissions {
   id integer [primary key]
   permission_id integer
   role_id integer
-  additional_data jsonb [note: "If we want to limit the different skills/competitions seen by role. For example: {\"skill_alias\": \"skill39\"} to limit users view to only skill39 competition."]
+  key_object_acl jsonb [note: 'Limit defined objects within the key span']
 }
 
 table user_roles {
@@ -51,87 +60,106 @@ table user_roles {
   role_id integer
   created_at timestamp
 }
-Ref: permissions.id < role_permissions.permission_id
-Ref: roles.parent_roles_id < roles.id
-Ref: user_roles.user_id > users.id
+Ref: permission.id < role_permissions.permission_id
+Ref: user_roles.user_id > user.id
 Ref: roles.id < user_roles.role_id
 
 
 // Competition tables
-table skills {
-  id integer [primary key]
-  name varchat [note: "Skill39"]
-  alias varchar [note: "IT network and system administrator"]
-}
 table competitions {
   id integer [primary key]
   name varchar
-  created_at timestamp
-}
-table competition_skills {
-  id integer [primary key]
-  skill_id integer
   competition_id integer
-  scoring_criteria_group_id integer
+  scoring_criteria_group_main_id integer
+  start_time time
+  end_time time
 }
 
-table user_competitions {
-  id integer
-  user_id integer
-  competition_skill_id integer
+table competitor {
+  id integer [primary key]
+  public_display_name_type integer [note: "1 - full_name, 2 - school, 3 - alias"]
+  personal_data_id integer
 }
-Ref: skills.id < competition_skills.skill_id
-Ref: competition_skills.id < user_competitions.competition_skill_id
-Ref: competition_skills.competition_id > competitions.id
-Ref: users.id < user_competitions.user_id
+ref: competitor.personal_data_id - personal_data.id
+
+table competitor_competitions {
+  id integer
+  competitor_id integer
+  competition_id integer
+}
+Ref: competitions.id < competitor_competitions.competition_id
+Ref: competitor.id < competitor_competitions.competitor_id
 
 
 // Basic scoring data tables
-table scoring_groups {
+table scoring_groups_structure {
   id integer [primary key]
   name varchar
   description text
   scoring_parent_group_id integer [note: 'This can be also used to generate api endpoint: https://stackoverflow.com/questions/47341764/self-referencing-table-sql-query']
   scoring_criteria_id integer
 }
+
 table scoring_criteria {
   id integer [primary key]
+  scoring_host_id integer
   name varchar [note: 'Give a name to criteria']
   description text [note: 'Custom text to descripe criteria']
   is_manual bool [note: 'If we know a criteria can\'t be done automatically marked this to true.']
-  points float [note: 'Points to give']
+  total_points float [note: 'Points to give']
+  generalized bool [note: "Generlize to specific users during competition timeframe"]
+  expected_result text [note: 'What was the data we checked for']
 }
 
-table scoring_criteria_groups {
+table scoring_host {
   id integer [primary key]
+  ip ip
+  hostname varchar
   scoring_group_id integer
-  scoring_criteria_id integer
 }
-Ref: scoring_groups.id < scoring_criteria_groups.scoring_group_id
-Ref: scoring_criteria.id < scoring_criteria_groups.scoring_criteria_id
-Ref: competition_skills.scoring_criteria_group_id - scoring_groups.id
-Ref: scoring_groups.scoring_parent_group_id < scoring_groups.id
+ref: scoring_criteria.scoring_host_id > scoring_host.id
+Ref: scoring_groups_structure.id < scoring_host.scoring_group_id
+Ref: competitions.scoring_criteria_group_main_id - scoring_groups_structure.id
+Ref: scoring_groups_structure.scoring_parent_group_id < scoring_groups_structure.id
 
+// Create a table for logical groups for scoring
+// These are seprate from the strucure
+table scoring_logical_groups {
+  id integer
+  parent_structure_group_id integer
+  scoring_criteria_ids array
+}
+ref: scoring_logical_groups.parent_structure_group_id > scoring_groups_structure.id
+ref: scoring_logical_groups.scoring_criteria_ids > scoring_criteria.id
 
 // Scoring history
 table scoring_history {
   id integer [primary key]
-  user_competitions_id integer
+  competitor_id integer
+  competition_id integer
+  scoring_host_id integer
   scoring_criteria_id integer
-  points float
+  points_given float
+  result text
   created_at timestamp
+  added_by_user_id integer
 }
-Ref: user_competitions.id < scoring_history.user_competitions_id
+ref: scoring_host.id < scoring_history.scoring_host_id
+Ref: scoring_history.added_by_user_id > user.id
+Ref: competitor.id < scoring_history.competitor_id
+ref: scoring_history.competition_id > competitions.id
 Ref: scoring_criteria.id < scoring_history.scoring_criteria_id
 
 // Automatic scoring tables
 table scoring_agent {
   id integer [primary key]
+  scoring_host_id integer
   scoring_criteria_id integer
   scoring_agent_transport_id integer
   script_type_id integer
   script text
 }
+ref: scoring_agent.scoring_host_id > scoring_host.id
 Ref: scoring_criteria.id < scoring_agent.scoring_criteria_id
 table script_type {
   id integer [primary key]
