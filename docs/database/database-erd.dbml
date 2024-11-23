@@ -1,6 +1,3 @@
-// Use DBML to define your database structure
-// Docs: https://dbml.dbdiagram.io/docs
-// 
 // Link to this dbml fail on dbdiagram.io
 // https://dbdiagram.io/d/Arbitaja-6739b785e9daa85acab68596
 //
@@ -100,9 +97,12 @@ table scoring_groups_structure {
   id integer [primary key]
   name varchar
   description text
+  competitor_id int
   scoring_parent_group_id integer [note: 'This can be also used to generate api endpoint: https://stackoverflow.com/questions/47341764/self-referencing-table-sql-query']
-  scoring_criteria_id integer
+  structure_group_type int [note: '1 - competition parent, 2 - template, 3 - competitior']
+  dynamic_variables jsonb [note: 'To add custom variables that were defined within template and later defined for competitor side.']
 }
+ref: competitor.id < scoring_groups_structure.competitor_id
 
 table scoring_criteria {
   id integer [primary key]
@@ -113,14 +113,20 @@ table scoring_criteria {
   total_points float [note: 'Points to give']
   generalized bool [note: "Generlize to specific users during competition timeframe"]
   expected_result text [note: 'What was the data we checked for']
+  criteria_template_id int
+  is_template bool
 }
+ref: scoring_criteria.id < scoring_criteria.criteria_template_id
 
 table scoring_host {
   id integer [primary key]
   ip ip
   hostname varchar
   scoring_group_id integer
+  host_template_id int
+  is_template bool
 }
+ref: scoring_host.id < scoring_host.host_template_id
 ref: scoring_criteria.scoring_host_id > scoring_host.id
 Ref: scoring_groups_structure.id < scoring_host.scoring_group_id
 Ref: competitions.scoring_criteria_group_main_id - scoring_groups_structure.id
@@ -162,6 +168,9 @@ table scoring_agent {
   scoring_agent_transport_id integer
   script_type_id integer
   script text
+  agent_type int [note: '1 - agent push, 2 - server pull, 3 - api only']
+  agent_proxy_id int [note: 'Maybe we can deploy a proxy']
+  custom_api_endpoint varchar [note: 'possible custom api endpoint']
 }
 ref: scoring_agent.scoring_host_id > scoring_host.id
 Ref: scoring_criteria.id < scoring_agent.scoring_criteria_id
@@ -175,3 +184,12 @@ table scoring_agent_transport {
 }
 Ref: script_type.id < scoring_agent.script_type_id
 Ref: scoring_agent_transport.id < scoring_agent.scoring_agent_transport_id
+
+// Agent Proxy server
+table agent_proxy {
+  id int [primary key]
+  ip ip
+  name varchar
+}
+ref: agent_proxy.id < scoring_agent.agent_proxy_id
+
