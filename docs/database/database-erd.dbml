@@ -5,6 +5,7 @@
 //User Data
 Table user {
   id integer [primary key]
+  default_token_id int
   username varchar
   salted_password varchar [note: "????? not sure not yet"]
   personal_data_id integer
@@ -29,16 +30,22 @@ Ref: school.id < personal_data.school_id
 
 
 // Permissions tables
-Table roles {
+Table role {
   id integer [primary key]
-  parent_roles_id array
-  child_roles_id array
   name varchar
   created_at timestamp
   changed_at timestamp
 }
-Ref: roles.parent_roles_id <> roles.id
-Ref: roles.child_roles_id <> roles.id
+
+table role_relation {
+  id int [primary key]
+  role_id int
+  parent_role_id array
+  child_role_id array
+}
+Ref: role_relation.parent_role_id > role.id
+Ref: role_relation.child_role_id > role.id
+Ref: role_relation.role_id - role.id
 
 Table permission {
   id integer [primary key]
@@ -46,7 +53,7 @@ Table permission {
   key varchar
   key_object varchar [note: 'Define the object that this key limits. For example: "scoring_criteria"']
 }
-Ref: roles.id < role_permissions.role_id
+Ref: role.id < role_permissions.role_id
 
 table role_permissions {
   id integer [primary key]
@@ -55,22 +62,21 @@ table role_permissions {
   key_object_acl jsonb [note: 'Limit defined objects within the key span']
 }
 
-table user_roles {
+table user_role {
   id integer [primary key]
   user_id integer
   role_id integer
   created_at timestamp
 }
 Ref: permission.id < role_permissions.permission_id
-Ref: user_roles.user_id > user.id
-Ref: roles.id < user_roles.role_id
+Ref: user_role.user_id > user.id
+Ref: role.id < user_role.role_id
 
 
 // Competition tables
-table competitions {
+table competition {
   id integer [primary key]
   name varchar
-  competition_id integer
   scoring_criteria_group_main_id integer
   start_time time
   end_time time
@@ -83,13 +89,13 @@ table competitor {
 }
 ref: competitor.personal_data_id - personal_data.id
 
-table competitor_competitions {
+table competitor_competition {
   id integer
   competitor_id integer
   competition_id integer
 }
-Ref: competitions.id < competitor_competitions.competition_id
-Ref: competitor.id < competitor_competitions.competitor_id
+Ref: competition.id < competitor_competition.competition_id
+Ref: competitor.id < competitor_competition.competitor_id
 
 
 // Basic scoring data tables
@@ -129,17 +135,17 @@ table scoring_host {
 ref: scoring_host.id < scoring_host.host_template_id
 ref: scoring_criteria.scoring_host_id > scoring_host.id
 Ref: scoring_groups_structure.id < scoring_host.scoring_group_id
-Ref: competitions.scoring_criteria_group_main_id - scoring_groups_structure.id
+Ref: competition.scoring_criteria_group_main_id - scoring_groups_structure.id
 Ref: scoring_groups_structure.scoring_parent_group_id < scoring_groups_structure.id
 
 // Create a table for logical groups for scoring
 // These are seprate from the strucure
 table scoring_logical_groups {
   id integer
-  parent_structure_group_id integer
+  scoring_host_id integer
   scoring_criteria_ids array
 }
-ref: scoring_logical_groups.parent_structure_group_id > scoring_groups_structure.id
+ref: scoring_logical_groups.scoring_host_id > scoring_host.id
 ref: scoring_logical_groups.scoring_criteria_ids > scoring_criteria.id
 
 // Scoring history
@@ -152,13 +158,24 @@ table scoring_history {
   points_given float
   result text
   created_at timestamp
+  deleted_at timestamp
   added_by_user_id integer
 }
 ref: scoring_host.id < scoring_history.scoring_host_id
 Ref: scoring_history.added_by_user_id > user.id
 Ref: competitor.id < scoring_history.competitor_id
-ref: scoring_history.competition_id > competitions.id
+ref: scoring_history.competition_id > competition.id
 Ref: scoring_criteria.id < scoring_history.scoring_criteria_id
+
+// Create an api tokens for auth
+table api_token {
+  id int [primary key]
+  user_id id
+  name varchar
+  token varchar
+}
+ref: api_token.id - user.default_token_id
+ref: api_token.user_id > user.id 
 
 // Automatic scoring tables
 table scoring_agent {
@@ -166,23 +183,29 @@ table scoring_agent {
   scoring_host_id integer
   scoring_criteria_id integer
   scoring_agent_transport_id integer
-  script_type_id integer
-  script text
+  script_id integer
+  token_id int
+  authentication_type int
   agent_type int [note: '1 - agent push, 2 - server pull, 3 - api only']
   agent_proxy_id int [note: 'Maybe we can deploy a proxy']
   custom_api_endpoint varchar [note: 'possible custom api endpoint']
 }
+ref: scoring_agent.token_id > api_token.token
 ref: scoring_agent.scoring_host_id > scoring_host.id
 Ref: scoring_criteria.id < scoring_agent.scoring_criteria_id
-table script_type {
+table script {
   id integer [primary key]
-  name varchar [note: 'powershell, bash etc.']
+  name varchar
+  type varchar [note: 'powershell, bash etc.']
+  script text
 }
+Ref: script.id < scoring_agent.script_id
 table scoring_agent_transport {
   id integer [primary key]
-  name varchar [note: 'ssh, http, winrm etc.']
+  name varchar [note: 'ssh, http, winrm, bot etc.']
+  tcp_port int
+  ssh_key varchar [note: 'used for ssh']
 }
-Ref: script_type.id < scoring_agent.script_type_id
 Ref: scoring_agent_transport.id < scoring_agent.scoring_agent_transport_id
 
 // Agent Proxy server
@@ -190,6 +213,11 @@ table agent_proxy {
   id int [primary key]
   ip ip
   name varchar
+  competition_id int
+  token_id id [note: 'Will be used for authentication']
+  authentication_type int
 }
+ref: agent_proxy.token_id > api_token.token
+ref: competition.id < agent_proxy.competition_id
 ref: agent_proxy.id < scoring_agent.agent_proxy_id
 
