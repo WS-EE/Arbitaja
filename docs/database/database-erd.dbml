@@ -117,7 +117,7 @@ table scoring_criteria {
   description text [note: 'Custom text to descripe criteria']
   is_manual bool [note: 'If we know a criteria can\'t be done automatically marked this to true.']
   total_points float [note: 'Points to give']
-  generalized bool [note: "Generlize to specific users during competition timeframe"]
+  is_generalized bool [note: "Generlize to specific users during competition timeframe"]
   expected_result text [note: 'What was the data we checked for']
   criteria_template_id int
   is_template bool
@@ -131,6 +131,7 @@ table scoring_host {
   scoring_group_id integer
   host_template_id int
   is_template bool
+  is_generalized bool [note: "Generlize to specific users during competition timeframe"]
 }
 ref: scoring_host.id < scoring_host.host_template_id
 ref: scoring_criteria.scoring_host_id > scoring_host.id
@@ -142,10 +143,12 @@ Ref: scoring_groups_structure.scoring_parent_group_id < scoring_groups_structure
 // These are seprate from the strucure
 table scoring_logical_groups {
   id integer
-  scoring_host_id integer
+  name varchar
+  scoring_host_ids array
   scoring_criteria_ids array
+  is_generalized bool [note: "Generlize to specific users during competition timeframe"]
 }
-ref: scoring_logical_groups.scoring_host_id > scoring_host.id
+ref: scoring_logical_groups.scoring_host_ids > scoring_host.id
 ref: scoring_logical_groups.scoring_criteria_ids > scoring_criteria.id
 
 // Scoring history
