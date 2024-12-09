@@ -1,29 +1,83 @@
 services:
-  frontend:
-    image: dev/arbitaja/frontend
+  # Dev docker compose
+  frontend-dev:
+    image: arbitaja/dev/frontend
+    container_name: dev_frontend
     profiles: [dev]
     restart: always
     build:
-      context: backend/
+      context: frontend/
       dockerfile: ../docker-build/dev/dev-frontend.dockerfile
-  backend:
-    image: dev/arbitaja/backend
+    volumes:
+      - ./frontend:/opt/arbitaja-frontend/
+  backend-dev:
+    image: arbitaja/dev/backend
+    container_name: dev_backend
     profiles: [dev]
     restart: always
+    depends_on:
+     - db
     build:
       context: backend/
       dockerfile: ../docker-build/dev/dev-backend.dockerfile
     volumes:
-      - backend/src/:/opt/arbitaja/src/
+      - ./backend/src:/opt/arbitaja/src
+      - ./backend/target:/opt/arbitaja/target
     env_file:
       - ./.env
-  db:
-    image: postgres
-    restart: always
-    env_file:
-      - ./.env
+
   proxy:
     image: nginx
-    profiles: [dev]
+    container_name: dev_proxy
+    depends_on:
+     - frontend-dev
+     - backend-dev
+    profiles:
+      - dev
+    build:
+      context: docker-build/dev
+      dockerfile: dev-proxy.dockerfile
+    ports:
+      - 80:80
+
+  # Prod docker compose
+  frontend:
+    image: arbitaja/prod/frontend
+    container_name: frontend
+    profiles:
+      - prod
+    restart: always
+    depends_on:
+      - backend
+    build:
+      context: frontend/
+      dockerfile: ../docker-build/prod/prod-frontend.dockerfile
+    ports:
+      - 80:80
+
+  backend:
+    image: arbitaja/prod/backend
+    container_name: backend
+    profiles:
+      - prod
+    restart: always
+    depends_on:
+     - db
+    build:
+      context: backend/
+      dockerfile: ../docker-build/dev/dev-backend.dockerfile
+    env_file:
+      - ./.env
+
+  # Generic Docker compose
+  db:
+    image: postgres:17
+    container_name: postgresql
+    restart: always
+    profiles: 
+      - dev
+      - prod
     volumes:
-      - docker-build/dev/:/etc/nginx/conf.d/
+      - ./database_data:/var/lib/postgresql/data 
+    env_file:
+      - ./.env
