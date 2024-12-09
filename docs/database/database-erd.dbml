@@ -126,7 +126,7 @@ ref: scoring_criteria.id < scoring_criteria.criteria_template_id
 
 table scoring_host {
   id integer [primary key]
-  ip ip
+  ip varchar
   hostname varchar
   scoring_group_id integer
   host_template_id int
@@ -219,7 +219,7 @@ Ref: scoring_agent_transport.id < scoring_agent.scoring_agent_transport_id
 // Agent Proxy server
 table agent_proxy {
   id int [primary key]
-  ip ip
+  ip varchar
   name varchar
   competition_id int
   token_id id [note: 'Will be used for authentication']
