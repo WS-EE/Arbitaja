@@ -198,7 +198,7 @@ table scoring_agent {
   agent_proxy_id int [note: 'Maybe we can deploy a proxy']
   custom_api_endpoint varchar [note: 'possible custom api endpoint']
 }
-ref: scoring_agent.token_id > api_token.token
+ref: scoring_agent.token_id > api_token.id
 ref: scoring_host.id < scoring_agent.scoring_host_id
 Ref: scoring_criteria.id < scoring_agent.scoring_criteria_id
 table script {
@@ -225,6 +225,6 @@ table agent_proxy {
   token_id int [note: 'Will be used for authentication']
   authentication_type int
 }
-ref: agent_proxy.token_id > api_token.token
+ref: agent_proxy.token_id > api_token.id
 ref: competition.id < agent_proxy.competition_id
 ref: agent_proxy.id < scoring_agent.agent_proxy_id
