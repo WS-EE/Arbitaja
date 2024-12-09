@@ -142,7 +142,7 @@ Ref: scoring_groups_structure.id < scoring_groups_structure.scoring_parent_group
 // Create a table for logical groups for scoring
 // These are seprate from the strucure
 table scoring_logical_groups {
-  id integer
+  id integer [primary key]
   name varchar
   is_generalized bool [note: "Generlize to specific users during competition timeframe"]
 }
