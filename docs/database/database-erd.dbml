@@ -222,7 +222,7 @@ table agent_proxy {
   ip varchar
   name varchar
   competition_id int
-  token_id id [note: 'Will be used for authentication']
+  token_id int [note: 'Will be used for authentication']
   authentication_type int
 }
 ref: agent_proxy.token_id > api_token.token
