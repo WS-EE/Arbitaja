@@ -1,0 +1,29 @@
+services:
+  frontend:
+    image: dev/arbitaja/frontend
+    profiles: [dev]
+    restart: always
+    build:
+      context: backend/
+      dockerfile: ../docker-build/dev/dev-frontend.dockerfile
+  backend:
+    image: dev/arbitaja/backend
+    profiles: [dev]
+    restart: always
+    build:
+      context: backend/
+      dockerfile: ../docker-build/dev/dev-backend.dockerfile
+    volumes:
+      - backend/src/:/opt/arbitaja/src/
+    env_file:
+      - ./.env
+  db:
+    image: postgres
+    restart: always
+    env_file:
+      - ./.env
+  proxy:
+    image: nginx
+    profiles: [dev]
+    volumes:
+      - docker-build/dev/:/etc/nginx/conf.d/
