@@ -19,7 +19,7 @@ table personal_data {
   school_id integer
   created_at timestamp
 }
-ref: user.personal_data_id - personal_data.id
+ref: personal_data.id - user.personal_data_id
 
 table school {
   id integer [primary key]
@@ -43,9 +43,9 @@ table role_relation {
   parent_role_id array
   child_role_id array
 }
-Ref: role_relation.parent_role_id > role.id
-Ref: role_relation.child_role_id > role.id
-Ref: role_relation.role_id - role.id
+Ref: role.id < role_relation.parent_role_id
+Ref: role.id < role_relation.child_role_id
+Ref: role.id - role_relation.role_id
 
 Table permission {
   id integer [primary key]
@@ -69,7 +69,7 @@ table user_role {
   created_at timestamp
 }
 Ref: permission.id < role_permissions.permission_id
-Ref: user_role.user_id > user.id
+Ref: user.id < user_role.user_id 
 Ref: role.id < user_role.role_id
 
 
@@ -87,7 +87,7 @@ table competitor {
   public_display_name_type integer [note: "1 - full_name, 2 - school, 3 - alias"]
   personal_data_id integer
 }
-ref: competitor.personal_data_id - personal_data.id
+ref: personal_data.id - competitor.personal_data_id 
 
 table competitor_competition {
   id integer
@@ -134,10 +134,10 @@ table scoring_host {
   is_generalized bool [note: "Generlize to specific users during competition timeframe"]
 }
 ref: scoring_host.id < scoring_host.host_template_id
-ref: scoring_criteria.scoring_host_id > scoring_host.id
+ref: scoring_host.id < scoring_criteria.scoring_host_id 
 Ref: scoring_groups_structure.id < scoring_host.scoring_group_id
-Ref: competition.scoring_criteria_group_main_id - scoring_groups_structure.id
-Ref: scoring_groups_structure.scoring_parent_group_id < scoring_groups_structure.id
+Ref: scoring_groups_structure.id - competition.scoring_criteria_group_main_id
+Ref: scoring_groups_structure.id > scoring_groups_structure.scoring_parent_group_id
 
 // Create a table for logical groups for scoring
 // These are seprate from the strucure
@@ -148,8 +148,8 @@ table scoring_logical_groups {
   scoring_criteria_ids array
   is_generalized bool [note: "Generlize to specific users during competition timeframe"]
 }
-ref: scoring_logical_groups.scoring_host_ids > scoring_host.id
-ref: scoring_logical_groups.scoring_criteria_ids > scoring_criteria.id
+ref: scoring_host.id < scoring_logical_groups.scoring_host_ids
+ref: scoring_criteria.id < scoring_logical_groups.scoring_criteria_ids
 
 // Scoring history
 table scoring_history {
@@ -165,9 +165,9 @@ table scoring_history {
   added_by_user_id integer
 }
 ref: scoring_host.id < scoring_history.scoring_host_id
-Ref: scoring_history.added_by_user_id > user.id
+Ref: user.id < scoring_history.added_by_user_id
 Ref: competitor.id < scoring_history.competitor_id
-ref: scoring_history.competition_id > competition.id
+ref: competition.id < scoring_history.competition_id
 Ref: scoring_criteria.id < scoring_history.scoring_criteria_id
 
 // Create an api tokens for auth
@@ -178,7 +178,7 @@ table api_token {
   token varchar
 }
 ref: api_token.id - user.default_token_id
-ref: api_token.user_id > user.id 
+ref: user.id < api_token.user_id
 
 // Automatic scoring tables
 table scoring_agent {
@@ -194,7 +194,7 @@ table scoring_agent {
   custom_api_endpoint varchar [note: 'possible custom api endpoint']
 }
 ref: scoring_agent.token_id > api_token.token
-ref: scoring_agent.scoring_host_id > scoring_host.id
+ref: scoring_host.id < scoring_agent.scoring_host_id
 Ref: scoring_criteria.id < scoring_agent.scoring_criteria_id
 table script {
   id integer [primary key]
