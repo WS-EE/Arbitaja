@@ -40,8 +40,8 @@ Table role {
 table role_relation {
   id int [primary key]
   role_id int
-  parent_role_id array
-  child_role_id array
+  parent_role_id int
+  child_role_id int
 }
 Ref: role.id < role_relation.parent_role_id
 Ref: role.id < role_relation.child_role_id
@@ -137,7 +137,7 @@ ref: scoring_host.id < scoring_host.host_template_id
 ref: scoring_host.id < scoring_criteria.scoring_host_id 
 Ref: scoring_groups_structure.id < scoring_host.scoring_group_id
 Ref: scoring_groups_structure.id - competition.scoring_criteria_group_main_id
-Ref: scoring_groups_structure.id > scoring_groups_structure.scoring_parent_group_id
+Ref: scoring_groups_structure.id < scoring_groups_structure.scoring_parent_group_id
 
 // Create a table for logical groups for scoring
 // These are seprate from the strucure
@@ -228,4 +228,3 @@ table agent_proxy {
 ref: agent_proxy.token_id > api_token.token
 ref: competition.id < agent_proxy.competition_id
 ref: agent_proxy.id < scoring_agent.agent_proxy_id
-
