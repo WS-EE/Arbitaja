@@ -178,7 +178,7 @@ Ref: scoring_criteria.id < scoring_history.scoring_criteria_id
 // Create an api tokens for auth
 table api_token {
   id int [primary key]
-  user_id id
+  user_id int
   name varchar
   token varchar
 }
