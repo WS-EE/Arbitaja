@@ -144,12 +144,17 @@ Ref: scoring_groups_structure.id > scoring_groups_structure.scoring_parent_group
 table scoring_logical_groups {
   id integer
   name varchar
-  scoring_host_ids array
-  scoring_criteria_ids array
   is_generalized bool [note: "Generlize to specific users during competition timeframe"]
 }
-ref: scoring_host.id < scoring_logical_groups.scoring_host_ids
-ref: scoring_criteria.id < scoring_logical_groups.scoring_criteria_ids
+table logical_group_link {
+  id integer [primary key]
+  logical_group_id int
+  scoring_host_id int
+  scoring_criteria_id int
+}
+ref: scoring_logical_groups.id < logical_group_link.logical_group_id
+ref: scoring_host.id < logical_group_link.scoring_host_id
+ref: scoring_criteria.id < logical_group_link.scoring_criteria_id
 
 // Scoring history
 table scoring_history {
