@@ -8,12 +8,6 @@ Make sure you changes the `POSTGRES_PASSWORD` variable.
 ## Development
 This will consume more resourceses then the Production build.
 
-### Setup Vue
-```
-~$ cd app/frontend
-~$ npm install
-```
-
 ### Start docker compose in dev profile
 #### Linux
 ```

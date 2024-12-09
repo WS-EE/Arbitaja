@@ -9,7 +9,8 @@ services:
       context: frontend/
       dockerfile: ../docker-build/dev/dev-frontend.dockerfile
     volumes:
-      - ./frontend:/opt/arbitaja-frontend/
+      - ./frontend/public:/opt/arbitaja-frontend/public
+      - ./frontend/src:/opt/arbitaja-frontend/src
   backend-dev:
     image: arbitaja/dev/backend
     container_name: dev_backend
