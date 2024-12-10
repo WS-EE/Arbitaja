@@ -48,6 +48,19 @@ public class ScoringHost {
     @OneToMany(mappedBy = "hostTemplate")
     private Set<ScoringHost> scoringHosts = new LinkedHashSet<>();
 
+    public ScoringHost(String ip, String hostname, Scoring_groups_structure scoringGroup, ScoringHost hostTemplate, Boolean isTemplate, Boolean isGeneralized) {
+        this.ip = ip;
+        this.hostname = hostname;
+        this.scoringGroup = scoringGroup;
+        this.hostTemplate = hostTemplate;
+        this.isTemplate = isTemplate;
+        this.isGeneralized = isGeneralized;
+    }
+
+    public ScoringHost() {
+    }
+
+
     public Integer getId() {
         return id;
     }
@@ -144,4 +157,21 @@ public class ScoringHost {
         this.scoringHosts = scoringHosts;
     }
 
+    @Override
+    public String toString() {
+        return "ScoringHost{" +
+                "id=" + id +
+                ", ip='" + ip + '\'' +
+                ", hostname='" + hostname + '\'' +
+                ", scoringGroup=" + scoringGroup +
+                ", hostTemplate=" + hostTemplate +
+                ", isTemplate=" + isTemplate +
+                ", isGeneralized=" + isGeneralized +
+                ", logicalGroupLinks=" + logicalGroupLinks +
+                ", scoringAgents=" + scoringAgents +
+                ", scoringCriteria=" + scoringCriteria +
+                ", scoringHistories=" + scoringHistories +
+                ", scoringHosts=" + scoringHosts +
+                '}';
+    }
 }

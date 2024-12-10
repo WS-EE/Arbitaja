@@ -3,7 +3,8 @@ package com.arbitaja.backend.users.dataobjects;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "\"user\"")
@@ -25,7 +26,7 @@ public class User {
     private Personal_data personal_data;
 
     @OneToMany(mappedBy = "user")
-    private List<Api_token> apiTokens;
+    private Set<Api_token> apiTokens = new LinkedHashSet<>();
 
     public User(Personal_data personal_data, String salted_password, String username, Api_token default_token) {
         this.personal_data = personal_data;

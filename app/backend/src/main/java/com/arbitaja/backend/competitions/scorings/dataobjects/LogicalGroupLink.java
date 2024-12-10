@@ -21,6 +21,15 @@ public class LogicalGroupLink {
     @JoinColumn(name = "scoring_criteria_id")
     private ScoringCriterion scoringCriteria;
 
+    public LogicalGroupLink(ScoringLogicalGroup logicalGroup, ScoringHost scoringHost, ScoringCriterion scoringCriteria) {
+        this.logicalGroup = logicalGroup;
+        this.scoringHost = scoringHost;
+        this.scoringCriteria = scoringCriteria;
+    }
+
+    public LogicalGroupLink() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -53,4 +62,13 @@ public class LogicalGroupLink {
         this.scoringCriteria = scoringCriteria;
     }
 
+    @Override
+    public String toString() {
+        return "LogicalGroupLink{" +
+                "id=" + id +
+                ", logicalGroup=" + logicalGroup +
+                ", scoringHost=" + scoringHost +
+                ", scoringCriteria=" + scoringCriteria +
+                '}';
+    }
 }

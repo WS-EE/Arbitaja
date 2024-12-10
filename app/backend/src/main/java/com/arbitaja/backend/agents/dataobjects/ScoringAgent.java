@@ -45,6 +45,21 @@ public class ScoringAgent {
     @Column(name = "custom_api_endpoint", length = Integer.MAX_VALUE)
     private String customApiEndpoint;
 
+    public ScoringAgent(ScoringHost scoringHost, ScoringCriterion scoringCriteria, ScoringAgentTransport scoringAgentTransport, Script script, Api_token token, Integer authenticationType, Integer agentType, AgentProxy agentProxy, String customApiEndpoint) {
+        this.scoringHost = scoringHost;
+        this.scoringCriteria = scoringCriteria;
+        this.scoringAgentTransport = scoringAgentTransport;
+        this.script = script;
+        this.token = token;
+        this.authenticationType = authenticationType;
+        this.agentType = agentType;
+        this.agentProxy = agentProxy;
+        this.customApiEndpoint = customApiEndpoint;
+    }
+
+    public ScoringAgent() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -124,5 +139,6 @@ public class ScoringAgent {
     public void setCustomApiEndpoint(String customApiEndpoint) {
         this.customApiEndpoint = customApiEndpoint;
     }
+
 
 }

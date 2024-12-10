@@ -7,7 +7,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,10 +26,10 @@ public class Scoring_groups_structure {
     @JoinColumn(name = "competitor_id")
     private Competitor competitor;
     @ManyToOne
-    @JoinColumn(name = "scoring_parent_group_id", referencedColumnName = "id", nullable = true)
+    @JoinColumn(name = "scoring_parent_group_id", referencedColumnName = "id")
     private Scoring_groups_structure parent_scoring_groups_structure;
     @OneToMany(mappedBy = "parent_scoring_groups_structure")
-    private List<Scoring_groups_structure> childGroups;
+    private Set<Scoring_groups_structure> childGroups = new LinkedHashSet<>();
     @Column(name = "structure_group_type")
     private int structure_group_type;
     @Type(JsonBinaryType.class)

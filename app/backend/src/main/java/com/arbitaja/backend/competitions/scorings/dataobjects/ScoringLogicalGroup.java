@@ -21,6 +21,15 @@ public class ScoringLogicalGroup {
     @OneToMany(mappedBy = "logicalGroup")
     private Set<LogicalGroupLink> logicalGroupLinks = new LinkedHashSet<>();
 
+    public ScoringLogicalGroup(String name, Boolean isGeneralized) {
+        this.name = name;
+        this.isGeneralized = isGeneralized;
+    }
+
+    public ScoringLogicalGroup() {
+    }
+
+
     public Integer getId() {
         return id;
     }
@@ -53,4 +62,13 @@ public class ScoringLogicalGroup {
         this.logicalGroupLinks = logicalGroupLinks;
     }
 
+    @Override
+    public String toString() {
+        return "ScoringLogicalGroup{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", isGeneralized=" + isGeneralized +
+                ", logicalGroupLinks=" + logicalGroupLinks +
+                '}';
+    }
 }

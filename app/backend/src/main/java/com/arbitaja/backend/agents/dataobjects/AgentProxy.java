@@ -34,6 +34,17 @@ public class AgentProxy {
     @OneToMany(mappedBy = "agentProxy")
     private Set<ScoringAgent> scoringAgents = new LinkedHashSet<>();
 
+    public AgentProxy(String ip, String name, Competition competition, Api_token token, Integer authenticationType) {
+        this.ip = ip;
+        this.name = name;
+        this.competition = competition;
+        this.token = token;
+        this.authenticationType = authenticationType;
+    }
+
+    public AgentProxy() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -90,4 +101,16 @@ public class AgentProxy {
         this.scoringAgents = scoringAgents;
     }
 
+    @Override
+    public String toString() {
+        return "AgentProxy{" +
+                "id=" + id +
+                ", ip='" + ip + '\'' +
+                ", name='" + name + '\'' +
+                ", competition=" + competition +
+                ", token=" + token +
+                ", authenticationType=" + authenticationType +
+                ", scoringAgents=" + scoringAgents +
+                '}';
+    }
 }

@@ -2,7 +2,8 @@ package com.arbitaja.backend.users.dataobjects;
 
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "permission")
@@ -21,7 +22,7 @@ public class Permission {
     private String key_object;
 
     @OneToMany(mappedBy = "permission")
-    private List<Role_permissions> rolePermissions;
+    private Set<Role_permissions> rolePermissions = new LinkedHashSet<>();
 
     public Permission(String name, String key, String key_object) {
         this.name = name;

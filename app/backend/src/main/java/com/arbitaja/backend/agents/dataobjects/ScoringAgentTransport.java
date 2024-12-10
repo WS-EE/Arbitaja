@@ -24,6 +24,15 @@ public class ScoringAgentTransport {
     @OneToMany(mappedBy = "scoringAgentTransport")
     private Set<ScoringAgent> scoringAgents = new LinkedHashSet<>();
 
+    public ScoringAgentTransport(String name, Integer tcpPort, String sshKey) {
+        this.name = name;
+        this.tcpPort = tcpPort;
+        this.sshKey = sshKey;
+    }
+
+    public ScoringAgentTransport() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -64,4 +73,14 @@ public class ScoringAgentTransport {
         this.scoringAgents = scoringAgents;
     }
 
+    @Override
+    public String toString() {
+        return "ScoringAgentTransport{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", tcpPort=" + tcpPort +
+                ", sshKey='" + sshKey + '\'' +
+                ", scoringAgents=" + scoringAgents +
+                '}';
+    }
 }

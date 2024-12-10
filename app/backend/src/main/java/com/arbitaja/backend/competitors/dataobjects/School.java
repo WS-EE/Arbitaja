@@ -3,7 +3,8 @@ package com.arbitaja.backend.competitors.dataobjects;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "school")
@@ -17,7 +18,7 @@ public class School {
     private Timestamp created_at;
 
     @OneToMany(mappedBy = "school")
-    private List<Personal_data> personalData;
+    private Set<Personal_data> personalData = new LinkedHashSet<>();
 
     public School(String name, Timestamp created_at) {
         this.name = name;

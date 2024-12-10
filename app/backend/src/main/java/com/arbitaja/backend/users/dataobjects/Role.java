@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 
 
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "role")
@@ -22,11 +23,11 @@ public class Role {
     private Timestamp changed_at;
 
     @OneToMany(mappedBy = "role")
-    private List<Role_permissions> rolePermissions;
+    private Set<Role_permissions> rolePermissions = new LinkedHashSet<>();
     @OneToMany(mappedBy = "role")
-    private List<User_role> userRoles;
+    private Set<User_role> userRoles = new LinkedHashSet<>();
     @OneToMany(mappedBy = "role")
-    private List<Role_relation> roleRelations;
+    private Set<Role_relation> roleRelations = new LinkedHashSet<>();
 
 
 

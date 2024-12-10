@@ -46,6 +46,21 @@ public class ScoringHistory {
     @JoinColumn(name = "added_by_user_id")
     private User addedByUser;
 
+    public ScoringHistory(Competitor competitor, Competition competition, ScoringHost scoringHost, ScoringCriterion scoringCriteria, Double pointsGiven, String result, Instant createdAt, Instant deletedAt, User addedByUser) {
+        this.competitor = competitor;
+        this.competition = competition;
+        this.scoringHost = scoringHost;
+        this.scoringCriteria = scoringCriteria;
+        this.pointsGiven = pointsGiven;
+        this.result = result;
+        this.createdAt = createdAt;
+        this.deletedAt = deletedAt;
+        this.addedByUser = addedByUser;
+    }
+
+    public ScoringHistory() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -126,4 +141,19 @@ public class ScoringHistory {
         this.addedByUser = addedByUser;
     }
 
+    @Override
+    public String toString() {
+        return "ScoringHistory{" +
+                "id=" + id +
+                ", competitor=" + competitor +
+                ", competition=" + competition +
+                ", scoringHost=" + scoringHost +
+                ", scoringCriteria=" + scoringCriteria +
+                ", pointsGiven=" + pointsGiven +
+                ", result='" + result + '\'' +
+                ", createdAt=" + createdAt +
+                ", deletedAt=" + deletedAt +
+                ", addedByUser=" + addedByUser +
+                '}';
+    }
 }

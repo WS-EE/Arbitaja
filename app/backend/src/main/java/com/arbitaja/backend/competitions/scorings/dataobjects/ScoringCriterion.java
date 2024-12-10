@@ -54,6 +54,22 @@ public class ScoringCriterion {
     @OneToMany(mappedBy = "scoringCriteria")
     private Set<ScoringHistory> scoringHistories = new LinkedHashSet<>();
 
+    public ScoringCriterion(ScoringHost scoringHost, String name, String description, Boolean isManual, Double totalPoints, Boolean isGeneralized, String expectedResult, ScoringCriterion criteriaTemplate, Boolean isTemplate) {
+        this.scoringHost = scoringHost;
+        this.name = name;
+        this.description = description;
+        this.isManual = isManual;
+        this.totalPoints = totalPoints;
+        this.isGeneralized = isGeneralized;
+        this.expectedResult = expectedResult;
+        this.criteriaTemplate = criteriaTemplate;
+        this.isTemplate = isTemplate;
+    }
+
+    public ScoringCriterion() {
+    }
+
+
     public Integer getId() {
         return id;
     }
@@ -166,4 +182,23 @@ public class ScoringCriterion {
         this.scoringHistories = scoringHistories;
     }
 
+    @Override
+    public String toString() {
+        return "ScoringCriterion{" +
+                "id=" + id +
+                ", scoringHost=" + scoringHost +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", isManual=" + isManual +
+                ", totalPoints=" + totalPoints +
+                ", isGeneralized=" + isGeneralized +
+                ", expectedResult='" + expectedResult + '\'' +
+                ", criteriaTemplate=" + criteriaTemplate +
+                ", isTemplate=" + isTemplate +
+                ", logicalGroupLinks=" + logicalGroupLinks +
+                ", scoringAgents=" + scoringAgents +
+                ", scoringCriteria=" + scoringCriteria +
+                ", scoringHistories=" + scoringHistories +
+                '}';
+    }
 }

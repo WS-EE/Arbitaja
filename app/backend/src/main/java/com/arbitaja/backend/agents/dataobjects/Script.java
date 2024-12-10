@@ -24,6 +24,15 @@ public class Script {
     @OneToMany(mappedBy = "script")
     private Set<ScoringAgent> scoringAgents = new LinkedHashSet<>();
 
+    public Script(String name, String type, String script) {
+        this.name = name;
+        this.type = type;
+        this.script = script;
+    }
+
+    public Script() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -64,4 +73,14 @@ public class Script {
         this.scoringAgents = scoringAgents;
     }
 
+    @Override
+    public String toString() {
+        return "Script{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", script='" + script + '\'' +
+                ", scoringAgents=" + scoringAgents +
+                '}';
+    }
 }

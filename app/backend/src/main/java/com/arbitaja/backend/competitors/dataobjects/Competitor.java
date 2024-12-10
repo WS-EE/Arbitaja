@@ -3,7 +3,8 @@ package com.arbitaja.backend.competitors.dataobjects;
 import com.arbitaja.backend.competitions.scorings.dataobjects.Scoring_groups_structure;
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "competitor")
@@ -20,10 +21,10 @@ public class Competitor {
     private Personal_data personal_data;
 
     @OneToMany(mappedBy = "competitor")
-    private List<Competitor_competition> competitor_competitions;
+    private Set<Competitor_competition> competitor_competitions = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "competitor")
-    private List<Scoring_groups_structure> scoring_groups_structure;
+    private Set<Scoring_groups_structure> scoring_groups_structure = new LinkedHashSet<>();
 
     public Competitor(int public_display_name_type, Personal_data personal_data) {
         this.public_display_name_type = public_display_name_type;
