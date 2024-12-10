@@ -1,0 +1,299 @@
+CREATE TABLE "user" (
+  "id" integer PRIMARY KEY,
+  "default_token_id" int,
+  "username" varchar,
+  "salted_password" varchar,
+  "personal_data_id" integer
+);
+
+CREATE TABLE "personal_data" (
+  "id" integer PRIMARY KEY,
+  "full_name" varchar,
+  "email" varchar,
+  "alias" varchar,
+  "school_id" integer,
+  "created_at" timestamp
+);
+
+CREATE TABLE "school" (
+  "id" integer PRIMARY KEY,
+  "name" varchar,
+  "created_at" timestamp
+);
+
+CREATE TABLE "role" (
+  "id" integer PRIMARY KEY,
+  "name" varchar,
+  "created_at" timestamp,
+  "changed_at" timestamp
+);
+
+CREATE TABLE "role_relation" (
+  "id" int PRIMARY KEY,
+  "role_id" int,
+  "parent_role_id" int,
+  "child_role_id" int
+);
+
+CREATE TABLE "permission" (
+  "id" integer PRIMARY KEY,
+  "name" varchar,
+  "key" varchar,
+  "key_object" varchar
+);
+
+CREATE TABLE "role_permissions" (
+  "id" integer PRIMARY KEY,
+  "permission_id" integer,
+  "role_id" integer,
+  "key_object_acl" jsonb
+);
+
+CREATE TABLE "user_role" (
+  "id" integer PRIMARY KEY,
+  "user_id" integer,
+  "role_id" integer,
+  "created_at" timestamp
+);
+
+CREATE TABLE "competition" (
+  "id" integer PRIMARY KEY,
+  "name" varchar,
+  "scoring_criteria_group_main_id" integer,
+  "start_time" time,
+  "end_time" time
+);
+
+CREATE TABLE "competitor" (
+  "id" integer PRIMARY KEY,
+  "public_display_name_type" integer,
+  "personal_data_id" integer
+);
+
+CREATE TABLE "competitor_competition" (
+  "id" integer,
+  "competitor_id" integer,
+  "competition_id" integer
+);
+
+CREATE TABLE "scoring_groups_structure" (
+  "id" integer PRIMARY KEY,
+  "name" varchar,
+  "description" text,
+  "competitor_id" int,
+  "scoring_parent_group_id" integer,
+  "structure_group_type" int,
+  "dynamic_variables" jsonb
+);
+
+CREATE TABLE "scoring_criteria" (
+  "id" integer PRIMARY KEY,
+  "scoring_host_id" integer,
+  "name" varchar,
+  "description" text,
+  "is_manual" bool,
+  "total_points" float,
+  "is_generalized" bool,
+  "expected_result" text,
+  "criteria_template_id" int,
+  "is_template" bool
+);
+
+CREATE TABLE "scoring_host" (
+  "id" integer PRIMARY KEY,
+  "ip" varchar,
+  "hostname" varchar,
+  "scoring_group_id" integer,
+  "host_template_id" int,
+  "is_template" bool,
+  "is_generalized" bool
+);
+
+CREATE TABLE "scoring_logical_groups" (
+  "id" integer PRIMARY KEY,
+  "name" varchar,
+  "is_generalized" bool
+);
+
+CREATE TABLE "logical_group_link" (
+  "id" integer PRIMARY KEY,
+  "logical_group_id" int,
+  "scoring_host_id" int,
+  "scoring_criteria_id" int
+);
+
+CREATE TABLE "scoring_history" (
+  "id" integer PRIMARY KEY,
+  "competitor_id" integer,
+  "competition_id" integer,
+  "scoring_host_id" integer,
+  "scoring_criteria_id" integer,
+  "points_given" float,
+  "result" text,
+  "created_at" timestamp,
+  "deleted_at" timestamp,
+  "added_by_user_id" integer
+);
+
+CREATE TABLE "api_token" (
+  "id" int PRIMARY KEY,
+  "user_id" int,
+  "name" varchar,
+  "token" varchar
+);
+
+CREATE TABLE "scoring_agent" (
+  "id" integer PRIMARY KEY,
+  "scoring_host_id" integer,
+  "scoring_criteria_id" integer,
+  "scoring_agent_transport_id" integer,
+  "script_id" integer,
+  "token_id" int,
+  "authentication_type" int,
+  "agent_type" int,
+  "agent_proxy_id" int,
+  "custom_api_endpoint" varchar
+);
+
+CREATE TABLE "script" (
+  "id" integer PRIMARY KEY,
+  "name" varchar,
+  "type" varchar,
+  "script" text
+);
+
+CREATE TABLE "scoring_agent_transport" (
+  "id" integer PRIMARY KEY,
+  "name" varchar,
+  "tcp_port" int,
+  "ssh_key" varchar
+);
+
+CREATE TABLE "agent_proxy" (
+  "id" int PRIMARY KEY,
+  "ip" varchar,
+  "name" varchar,
+  "competition_id" int,
+  "token_id" int,
+  "authentication_type" int
+);
+
+COMMENT ON COLUMN "user"."salted_password" IS '????? not sure not yet';
+
+COMMENT ON COLUMN "personal_data"."alias" IS 'For anonymose alias';
+
+COMMENT ON COLUMN "permission"."key_object" IS 'Define the object that this key limits. For example: "scoring_criteria"';
+
+COMMENT ON COLUMN "role_permissions"."key_object_acl" IS 'Limit defined objects within the key span';
+
+COMMENT ON COLUMN "competitor"."public_display_name_type" IS '1 - full_name, 2 - school, 3 - alias';
+
+COMMENT ON COLUMN "scoring_groups_structure"."scoring_parent_group_id" IS 'This can be also used to generate api endpoint: https://stackoverflow.com/questions/47341764/self-referencing-table-sql-query';
+
+COMMENT ON COLUMN "scoring_groups_structure"."structure_group_type" IS '1 - competition parent, 2 - template, 3 - competitior';
+
+COMMENT ON COLUMN "scoring_groups_structure"."dynamic_variables" IS 'To add custom variables that were defined within template and later defined for competitor side.';
+
+COMMENT ON COLUMN "scoring_criteria"."name" IS 'Give a name to criteria';
+
+COMMENT ON COLUMN "scoring_criteria"."description" IS 'Custom text to descripe criteria';
+
+COMMENT ON COLUMN "scoring_criteria"."is_manual" IS 'If we know a criteria can''t be done automatically marked this to true.';
+
+COMMENT ON COLUMN "scoring_criteria"."total_points" IS 'Points to give';
+
+COMMENT ON COLUMN "scoring_criteria"."is_generalized" IS 'Generlize to specific users during competition timeframe';
+
+COMMENT ON COLUMN "scoring_criteria"."expected_result" IS 'What was the data we checked for';
+
+COMMENT ON COLUMN "scoring_host"."is_generalized" IS 'Generlize to specific users during competition timeframe';
+
+COMMENT ON COLUMN "scoring_logical_groups"."is_generalized" IS 'Generlize to specific users during competition timeframe';
+
+COMMENT ON COLUMN "scoring_agent"."agent_type" IS '1 - agent push, 2 - server pull, 3 - api only';
+
+COMMENT ON COLUMN "scoring_agent"."agent_proxy_id" IS 'Maybe we can deploy a proxy';
+
+COMMENT ON COLUMN "scoring_agent"."custom_api_endpoint" IS 'possible custom api endpoint';
+
+COMMENT ON COLUMN "script"."type" IS 'powershell, bash etc.';
+
+COMMENT ON COLUMN "scoring_agent_transport"."name" IS 'ssh, http, winrm, bot etc.';
+
+COMMENT ON COLUMN "scoring_agent_transport"."ssh_key" IS 'used for ssh';
+
+COMMENT ON COLUMN "agent_proxy"."token_id" IS 'Will be used for authentication';
+
+ALTER TABLE "user" ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id");
+
+ALTER TABLE "personal_data" ADD FOREIGN KEY ("school_id") REFERENCES "school" ("id");
+
+ALTER TABLE "role_relation" ADD FOREIGN KEY ("parent_role_id") REFERENCES "role" ("id");
+
+ALTER TABLE "role_relation" ADD FOREIGN KEY ("child_role_id") REFERENCES "role" ("id");
+
+ALTER TABLE "role_relation" ADD FOREIGN KEY ("role_id") REFERENCES "role" ("id");
+
+ALTER TABLE "role_permissions" ADD FOREIGN KEY ("role_id") REFERENCES "role" ("id");
+
+ALTER TABLE "role_permissions" ADD FOREIGN KEY ("permission_id") REFERENCES "permission" ("id");
+
+ALTER TABLE "user_role" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+
+ALTER TABLE "user_role" ADD FOREIGN KEY ("role_id") REFERENCES "role" ("id");
+
+ALTER TABLE "competitor" ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id");
+
+ALTER TABLE "competitor_competition" ADD FOREIGN KEY ("competition_id") REFERENCES "competition" ("id");
+
+ALTER TABLE "competitor_competition" ADD FOREIGN KEY ("competitor_id") REFERENCES "competitor" ("id");
+
+ALTER TABLE "scoring_groups_structure" ADD FOREIGN KEY ("competitor_id") REFERENCES "competitor" ("id");
+
+ALTER TABLE "scoring_criteria" ADD FOREIGN KEY ("criteria_template_id") REFERENCES "scoring_criteria" ("id");
+
+ALTER TABLE "scoring_host" ADD FOREIGN KEY ("host_template_id") REFERENCES "scoring_host" ("id");
+
+ALTER TABLE "scoring_criteria" ADD FOREIGN KEY ("scoring_host_id") REFERENCES "scoring_host" ("id");
+
+ALTER TABLE "scoring_host" ADD FOREIGN KEY ("scoring_group_id") REFERENCES "scoring_groups_structure" ("id");
+
+ALTER TABLE "competition" ADD FOREIGN KEY ("scoring_criteria_group_main_id") REFERENCES "scoring_groups_structure" ("id");
+
+ALTER TABLE "scoring_groups_structure" ADD FOREIGN KEY ("scoring_parent_group_id") REFERENCES "scoring_groups_structure" ("id");
+
+ALTER TABLE "logical_group_link" ADD FOREIGN KEY ("logical_group_id") REFERENCES "scoring_logical_groups" ("id");
+
+ALTER TABLE "logical_group_link" ADD FOREIGN KEY ("scoring_host_id") REFERENCES "scoring_host" ("id");
+
+ALTER TABLE "logical_group_link" ADD FOREIGN KEY ("scoring_criteria_id") REFERENCES "scoring_criteria" ("id");
+
+ALTER TABLE "scoring_history" ADD FOREIGN KEY ("scoring_host_id") REFERENCES "scoring_host" ("id");
+
+ALTER TABLE "scoring_history" ADD FOREIGN KEY ("added_by_user_id") REFERENCES "user" ("id");
+
+ALTER TABLE "scoring_history" ADD FOREIGN KEY ("competitor_id") REFERENCES "competitor" ("id");
+
+ALTER TABLE "scoring_history" ADD FOREIGN KEY ("competition_id") REFERENCES "competition" ("id");
+
+ALTER TABLE "scoring_history" ADD FOREIGN KEY ("scoring_criteria_id") REFERENCES "scoring_criteria" ("id");
+
+ALTER TABLE "user" ADD FOREIGN KEY ("default_token_id") REFERENCES "api_token" ("id");
+
+ALTER TABLE "api_token" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+
+ALTER TABLE "scoring_agent" ADD FOREIGN KEY ("token_id") REFERENCES "api_token" ("id");
+
+ALTER TABLE "scoring_agent" ADD FOREIGN KEY ("scoring_host_id") REFERENCES "scoring_host" ("id");
+
+ALTER TABLE "scoring_agent" ADD FOREIGN KEY ("scoring_criteria_id") REFERENCES "scoring_criteria" ("id");
+
+ALTER TABLE "scoring_agent" ADD FOREIGN KEY ("script_id") REFERENCES "script" ("id");
+
+ALTER TABLE "scoring_agent" ADD FOREIGN KEY ("scoring_agent_transport_id") REFERENCES "scoring_agent_transport" ("id");
+
+ALTER TABLE "agent_proxy" ADD FOREIGN KEY ("token_id") REFERENCES "api_token" ("id");
+
+ALTER TABLE "agent_proxy" ADD FOREIGN KEY ("competition_id") REFERENCES "competition" ("id");
+
+ALTER TABLE "scoring_agent" ADD FOREIGN KEY ("agent_proxy_id") REFERENCES "agent_proxy" ("id");
