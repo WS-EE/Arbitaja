@@ -25,11 +25,12 @@ public class Role {
     private List<Role_permissions> rolePermissions;
     @OneToMany(mappedBy = "role")
     private List<User_role> userRoles;
+    @OneToMany(mappedBy = "role")
+    private List<Role_relation> roleRelations;
 
 
 
-    public Role(int id, String name, Timestamp created_at, Timestamp changed_at) {
-        this.id = id;
+    public Role(String name, Timestamp created_at, Timestamp changed_at) {
         this.name = name;
         this.created_at = created_at;
         this.changed_at = changed_at;

@@ -23,8 +23,7 @@ public class User_role {
     private Timestamp created_at;
 
 
-    public User_role(int id, User user, Role role, Timestamp created_at) {
-        this.id = id;
+    public User_role(User user, Role role, Timestamp created_at) {
         this.user = user;
         this.role = role;
         this.created_at = created_at;

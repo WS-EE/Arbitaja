@@ -23,8 +23,7 @@ public class Permission {
     @OneToMany(mappedBy = "permission")
     private List<Role_permissions> rolePermissions;
 
-    public Permission(int id, String name, String key, String key_object) {
-        this.id = id;
+    public Permission(String name, String key, String key_object) {
         this.name = name;
         this.key = key;
         this.key_object = key_object;

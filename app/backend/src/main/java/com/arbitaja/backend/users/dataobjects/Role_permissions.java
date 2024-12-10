@@ -19,14 +19,13 @@ public class Role_permissions {
     @JoinColumn(name = "permission_id", nullable = false)
     private Permission permission;
     @ManyToOne
-    @JoinColumn(name = "role", nullable = false)
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
     @Type(JsonBinaryType.class)
     @Column(name = "key_object_acl", columnDefinition = "jsonb")
     private Map<String, String> key_object_acl;
 
-    public Role_permissions(int id, Permission permission, Role role, Map<String, String> key_object_acl) {
-        this.id = id;
+    public Role_permissions(Permission permission, Role role, Map<String, String> key_object_acl) {
         this.permission = permission;
         this.role = role;
         this.key_object_acl = key_object_acl;

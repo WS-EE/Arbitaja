@@ -1,0 +1,69 @@
+package com.arbitaja.backend.competitors.dataobjects;
+
+import com.arbitaja.backend.competitions.scorings.dataobjects.Scoring_groups_structure;
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+@Table(name = "competitor")
+public class Competitor {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(name = "public_display_name_type")
+    private int public_display_name_type;
+
+    @OneToOne
+    @JoinColumn(name = "personal_data_id")
+    private Personal_data personal_data;
+
+    @OneToMany(mappedBy = "competitor")
+    private List<Competitor_competition> competitor_competitions;
+
+    @OneToMany(mappedBy = "competitor")
+    private List<Scoring_groups_structure> scoring_groups_structure;
+
+    public Competitor(int public_display_name_type, Personal_data personal_data) {
+        this.public_display_name_type = public_display_name_type;
+        this.personal_data = personal_data;
+    }
+
+
+    public Competitor() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getPublic_display_name_type() {
+        return public_display_name_type;
+    }
+
+    public void setPublic_display_name_type(int public_display_name_type) {
+        this.public_display_name_type = public_display_name_type;
+    }
+
+    public Personal_data getPersonal_data() {
+        return personal_data;
+    }
+
+    public void setPersonal_data(Personal_data personal_data) {
+        this.personal_data = personal_data;
+    }
+
+    @Override
+    public String toString() {
+        return "Competitor{" +
+                "id=" + id +
+                ", public_display_name_type=" + public_display_name_type +
+                ", personal_data=" + personal_data +
+                '}';
+    }
+}
