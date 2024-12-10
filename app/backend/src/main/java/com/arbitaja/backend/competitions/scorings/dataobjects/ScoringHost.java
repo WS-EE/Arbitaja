@@ -10,13 +10,13 @@ import java.util.Set;
 @Table(name = "scoring_host")
 public class ScoringHost {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "ip", length = Integer.MAX_VALUE)
+    @Column(name = "ip")
     private String ip;
 
-    @Column(name = "hostname", length = Integer.MAX_VALUE)
+    @Column(name = "hostname")
     private String hostname;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -11,7 +11,7 @@ import java.time.Instant;
 @Table(name = "scoring_history")
 public class ScoringHistory {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,7 +33,7 @@ public class ScoringHistory {
     @Column(name = "points_given")
     private Double pointsGiven;
 
-    @Column(name = "result", length = Integer.MAX_VALUE)
+    @Column(name = "result")
     private String result;
 
     @Column(name = "created_at")

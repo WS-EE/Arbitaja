@@ -11,13 +11,13 @@ import java.util.Set;
 @Table(name = "agent_proxy")
 public class AgentProxy {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "ip", length = Integer.MAX_VALUE)
+    @Column(name = "ip")
     private String ip;
 
-    @Column(name = "name", length = Integer.MAX_VALUE)
+    @Column(name = "name")
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -10,17 +10,17 @@ import java.util.Set;
 @Table(name = "scoring_criteria")
 public class ScoringCriterion {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scoring_host_id")
     private ScoringHost scoringHost;
 
-    @Column(name = "name", length = Integer.MAX_VALUE)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "is_manual")
@@ -32,7 +32,7 @@ public class ScoringCriterion {
     @Column(name = "is_generalized")
     private Boolean isGeneralized;
 
-    @Column(name = "expected_result", length = Integer.MAX_VALUE)
+    @Column(name = "expected_result")
     private String expectedResult;
 
     @ManyToOne(fetch = FetchType.LAZY)

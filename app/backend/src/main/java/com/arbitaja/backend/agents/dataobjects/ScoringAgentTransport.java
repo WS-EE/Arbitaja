@@ -9,16 +9,16 @@ import java.util.Set;
 @Table(name = "scoring_agent_transport")
 public class ScoringAgentTransport {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", length = Integer.MAX_VALUE)
+    @Column(name = "name")
     private String name;
 
     @Column(name = "tcp_port")
     private Integer tcpPort;
 
-    @Column(name = "ssh_key", length = Integer.MAX_VALUE)
+    @Column(name = "ssh_key")
     private String sshKey;
 
     @OneToMany(mappedBy = "scoringAgentTransport")

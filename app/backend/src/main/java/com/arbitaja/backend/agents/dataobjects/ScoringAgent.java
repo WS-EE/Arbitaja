@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 @Table(name = "scoring_agent")
 public class ScoringAgent {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,7 +42,7 @@ public class ScoringAgent {
     @JoinColumn(name = "agent_proxy_id")
     private AgentProxy agentProxy;
 
-    @Column(name = "custom_api_endpoint", length = Integer.MAX_VALUE)
+    @Column(name = "custom_api_endpoint")
     private String customApiEndpoint;
 
     public ScoringAgent(ScoringHost scoringHost, ScoringCriterion scoringCriteria, ScoringAgentTransport scoringAgentTransport, Script script, Api_token token, Integer authenticationType, Integer agentType, AgentProxy agentProxy, String customApiEndpoint) {

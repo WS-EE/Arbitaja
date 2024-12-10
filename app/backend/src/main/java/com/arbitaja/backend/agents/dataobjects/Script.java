@@ -9,16 +9,16 @@ import java.util.Set;
 @Table(name = "script")
 public class Script {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", length = Integer.MAX_VALUE)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "type", length = Integer.MAX_VALUE)
+    @Column(name = "type")
     private String type;
 
-    @Column(name = "script", length = Integer.MAX_VALUE)
+    @Column(name = "script")
     private String script;
 
     @OneToMany(mappedBy = "script")

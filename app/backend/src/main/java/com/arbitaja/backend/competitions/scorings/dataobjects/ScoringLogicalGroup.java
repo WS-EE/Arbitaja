@@ -9,10 +9,10 @@ import java.util.Set;
 @Table(name = "scoring_logical_groups")
 public class ScoringLogicalGroup {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", length = Integer.MAX_VALUE)
+    @Column(name = "name")
     private String name;
 
     @Column(name = "is_generalized")

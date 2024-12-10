@@ -81,7 +81,6 @@ public class Api_token {
                 ", user=" + user +
                 ", name='" + name + '\'' +
                 ", token='" + token + '\'' +
-                ", scoringAgents=" + scoringAgents +
                 '}';
     }
 }
