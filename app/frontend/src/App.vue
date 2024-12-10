@@ -1,9 +1,13 @@
 <script setup>
 import { RouterView } from 'vue-router';
-import customFooter from './components/customFooter.vue';
+import customFooter from '@/components/customFooter.vue';
 </script>
 
 <template>
-  <RouterView />
-  <customFooter />
+  <div id="page-container">
+    <div id="content-wrap">
+      <RouterView />
+    </div>
+    <customFooter />
+  </div>
 </template>
