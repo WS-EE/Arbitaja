@@ -1,0 +1,20 @@
+input {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+form {
+    align-items: center;
+}
+
+.login-menu {
+    align-items: center;
+    flex-direction: column;
+    display: flex;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 0;
+}
