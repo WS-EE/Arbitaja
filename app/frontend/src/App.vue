@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView } from 'vue-router';
-import customFooter from '@/components/customFooter.vue';
+import customFooter from '@/components/generic/customFooter.vue';
 </script>
 
 <template>
