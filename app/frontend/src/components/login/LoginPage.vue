@@ -46,7 +46,8 @@ form {
 }
 
 .login-block {
-  padding-top: 20%;
+  padding-top: 20vh;
+  padding-bottom: 20vh;
 }
 
 .login-menu {
@@ -55,9 +56,4 @@ form {
   display: flex;
 }
 
-@media (min-aspect-ratio: 21/9) {
-  .login-block {
-    padding-top: 10%;
-  }
-}
 </style>
