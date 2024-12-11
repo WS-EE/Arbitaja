@@ -30,7 +30,7 @@ This will consume more resourceses then the Production build.
 > docker compose restart
 ```
 
-## Production
+## ~~Production~~ needs fixing
 ### Start docker compose in prod profile
 #### Linux
 ```
