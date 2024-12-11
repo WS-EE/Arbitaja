@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 
+import logo from '@/assets/media/logo.svg';
+
 const username = ref("");
 const password = ref("");
 
@@ -12,7 +14,7 @@ const userLogin = () => {
   <div class="container">
     <div class="login-block">
       <div class="row d-flex justify-content-center">
-        <img alt="Vue logo" class="logo" src="/logo.svg" width="125" height="125" />
+        <img alt="Vue logo" class="logo" :src="logo" width="125" height="125" />
         <h1 class="d-flex justify-content-center">Arbitaja</h1>
         
         <div class="form-group form-width text-center">
