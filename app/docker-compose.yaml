@@ -30,6 +30,7 @@ services:
   proxy:
     image: nginx
     container_name: dev_proxy
+    restart: always
     depends_on:
      - frontend-dev
      - backend-dev
