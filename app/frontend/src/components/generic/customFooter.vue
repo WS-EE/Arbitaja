@@ -1,6 +1,6 @@
 <template>
-    <footer id="custom-footer" class="bg-body-tertiary text-center text-lg-start custom-footer">
-        <div class="text-center p-3">
+    <footer>
+        <div class="text-center" id="footer-text">
             <p class="text-body">Copyright (c) 2024 WorldSkills Estonia</p>
         </div>
     </footer>
