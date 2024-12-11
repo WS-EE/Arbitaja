@@ -1,1 +1,25 @@
 @import "footer.css";
+
+:root {
+    --main-background: #cecdcd;
+    --button-dark: #9b98a1;
+    --button-light: #d4d0db;
+    --text-med: #545357;
+    --text-dark: #202022;
+    --text-light: #d1d1e4;
+    --big-block-background: #ede8f5;
+}
+
+nav {
+    background-color: var(--big-block-background);
+}
+
+.allign-center {
+    align-items: center;
+    flex-direction: column;
+    display: flex;
+}
+
+.round-item {
+    border-radius: 12px;
+}
