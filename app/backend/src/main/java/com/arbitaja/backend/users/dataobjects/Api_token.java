@@ -22,7 +22,7 @@ public class Api_token {
     private String name;
     @Column(name = "token")
     private String token;
-    @OneToMany(mappedBy = "token")
+    @OneToMany(mappedBy = "token", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<ScoringAgent> scoringAgents = new LinkedHashSet<>();
 
     public Api_token(User user, String name, String token) {

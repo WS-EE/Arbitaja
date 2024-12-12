@@ -14,7 +14,7 @@ public class User {
     private int id;
 
     @OneToOne
-    @JoinColumn(name = "default_token_id", nullable = false)
+    @JoinColumn(name = "default_token_id")
     private Api_token default_token;
 
     @Column(name = "username")
@@ -25,7 +25,7 @@ public class User {
     @JoinColumn(name = "personal_data_id")
     private Personal_data personal_data;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Api_token> apiTokens = new LinkedHashSet<>();
 
     public User(Personal_data personal_data, String salted_password, String username, Api_token default_token) {

@@ -21,7 +21,7 @@ public class Permission {
     @Column(name = "key_object")
     private String key_object;
 
-    @OneToMany(mappedBy = "permission")
+    @OneToMany(mappedBy = "permission", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Role_permissions> rolePermissions = new LinkedHashSet<>();
 
     public Permission(String name, String key, String key_object) {
