@@ -22,12 +22,17 @@ public class Role {
     @Column(name = "changed_at")
     private Timestamp changed_at;
 
+    @OneToMany(mappedBy = "parentRole", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Role_relation> parentRoleRelations = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "childRole", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Role_relation> childRoleRelations = new LinkedHashSet<>();
+
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Role_permissions> rolePermissions = new LinkedHashSet<>();
+
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<User_role> userRoles = new LinkedHashSet<>();
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<Role_relation> roleRelations = new LinkedHashSet<>();
 
 
 
@@ -80,13 +85,5 @@ public class Role {
                 ", created_at=" + created_at +
                 ", changed_at=" + changed_at +
                 '}';
-    }
-
-    public Set<Role_relation> getRoleRelations() {
-        return roleRelations;
-    }
-
-    public void setRoleRelations(Set<Role_relation> roleRelations) {
-        this.roleRelations = roleRelations;
     }
 }
