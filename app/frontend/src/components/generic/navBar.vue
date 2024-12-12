@@ -1,8 +1,7 @@
 <script setup>
 import { RouterLink, useRoute } from 'vue-router';
 import logo from '@/assets/media/logo.svg'
-
-const navPaths = {};
+import git_logo from '@/assets/media/git.png';
 
 const isLinkActive = (routePath) => {
     const route = useRoute();
@@ -41,6 +40,10 @@ const isLinkActive = (routePath) => {
                 </ul>
                 </li>
             </ul>
+            <div class="d-flex me-5 p-1 github rounded">
+                <img :src="git_logo" alt="" width="30px">
+                <a href="https://github.com/WS-EE/Arbitaja" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+            </div>
             <div class="d-flex">
                 <RouterLink :class="[isLinkActive('/login') ? 'active' : '', 'btn btn-outline-dark']" to="login">Login</RouterLink>
             </div>
@@ -69,8 +72,13 @@ li:hover {
     color: var(--text-dark);
 }
 
-.active a {
-    background-color: var(--button-light) !important;
-    color: var(--text-dark) !important;
+.github {
+    color: brown;
+    font-weight: 600;
 }
+
+.github:hover {
+    background-color: var(--button-light);
+}
+
 </style>
