@@ -67,7 +67,7 @@ services:
      - db
     build:
       context: backend/
-      dockerfile: ../docker-build/dev/dev-backend.dockerfile
+      dockerfile: ../docker-build/prod/prod-backend.dockerfile
     env_file:
       - ./.env
 
