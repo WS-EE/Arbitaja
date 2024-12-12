@@ -73,13 +73,16 @@ services:
 
   # Generic Docker compose
   db:
-    image: postgres:17
+    image: arbitaja/postgres:17
     container_name: postgresql
     restart: always
     profiles: 
       - dev
       - prod
     volumes:
-      - ./database_data:/var/lib/postgresql/data 
+      - ./database_data:/var/lib/postgresql/data
+    build:
+      context: ./docker-build
+      dockerfile: postgres.dockerfile 
     env_file:
       - ./.env
