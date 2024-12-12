@@ -8,6 +8,8 @@ services:
     build:
       context: frontend/
       dockerfile: ../docker-build/dev/dev-frontend.dockerfile
+    ports:
+      - 3000:3000
     volumes:
       - ./frontend/public:/opt/arbitaja-frontend/public
       - ./frontend/src:/opt/arbitaja-frontend/src
