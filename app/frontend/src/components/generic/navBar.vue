@@ -64,7 +64,6 @@ const isLinkActive = (routePath) => {
 
 li:hover {
     background-color: var(--button-dark);
-    color: var(--text-light);
 }
 
 .active-item {
