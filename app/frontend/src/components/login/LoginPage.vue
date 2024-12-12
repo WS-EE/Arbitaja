@@ -2,11 +2,30 @@
 import { ref } from 'vue';
 
 import logo from '@/assets/media/logo.svg';
+import {useRouter} from "vue-router";
 
+const router = useRouter();
 const username = ref("");
 const password = ref("");
 
-const userLogin = () => {
+const userLogin = async () => {
+  const response = await fetch('http://localhost/api/v1/login-user', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      username: username.value,
+      password: password.value,
+    }),
+    credentials: 'include',
+  });
+  if (response.ok) {
+    console.log("Login successful");
+    await router.replace("home")
+  } else {
+    console.log("Login failed");
+  }
 };
 </script>
 
@@ -18,10 +37,10 @@ const userLogin = () => {
         <h1 class="d-flex justify-content-center">Arbitaja</h1>
         
         <div class="form-group form-width text-center">
-          <form @click.prevent="userLogin">
-            <input type="username" class="form-control" v-model="username" placeholder="Username">
-            <input type="password" class="form-control" v-model="password" placeholder="Password">
-            <button class="btn btn-dark" type="button">Login</button>
+          <form @submit.prevent="userLogin">
+            <input type="text" class="form-control" v-model="username" placeholder="Username" required>
+            <input type="password" class="form-control" v-model="password" placeholder="Password" required>
+            <button class="btn btn-dark" type="submit">Login</button>
           </form>
         </div>
       </div>
