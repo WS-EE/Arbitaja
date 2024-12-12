@@ -19,7 +19,3 @@ nav {
     flex-direction: column;
     display: flex;
 }
-
-.round-item {
-    border-radius: 12px;
-}

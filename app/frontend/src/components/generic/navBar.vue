@@ -18,17 +18,17 @@ const isLinkActive = (routePath) => {
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item round-item">
+                <li class="nav-item rounded">
                 <RouterLink 
                 to="home" 
                 :class="[
                     isLinkActive('/home') 
                         ? 'active-item' : '',
-                    'nav-link round-item',
+                    'nav-link rounded',
                 ]" 
                 >Home</RouterLink>
                 </li>
-                <li class="nav-item dropdown round-item">
+                <li class="nav-item dropdown rounded">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Competitions
                 </a>
