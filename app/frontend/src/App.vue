@@ -7,7 +7,6 @@ import customFooter from '@/components/generic/customFooter.vue';
 <template>
   <div id="page-container">
     <div id="content-wrap">
-      <navBar />
       <RouterView />
     </div>
     <customFooter />

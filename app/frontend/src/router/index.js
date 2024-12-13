@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import loginView from '@/views/loginView.vue';
 import notFoundView from '@/views/notFoundView.vue';
 import homeView from '@/views/homeView.vue';
+import baseView from '@/views/baseView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,12 +14,15 @@ const router = createRouter({
         },
         {
             path: '/',
-            redirect: { name: 'home' }
-        },
-        {
-            path: '/home',
-            name: 'home',
-            component: homeView 
+            name: 'base',
+            component: baseView,
+            children:[
+                {
+                    path: '/home',
+                    name: 'home',
+                    component: homeView 
+                },
+            ]
         },
         {
             path: '/:catchAll(.*)',
