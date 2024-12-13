@@ -7,6 +7,25 @@ const isLinkActive = (routePath) => {
     const route = useRoute();
     return route.path === routePath;
 }
+
+// Get if user is logged in.
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+const isLoggedIn = ref(false)
+const userProfile = ref('')
+
+onMounted(async () => {
+    try {
+        const response = await axios.get('http://localhost/api/v1/profile');
+        if (response.data !== 'Successful login'){
+            userProfile.value = response.data
+            isLoggedIn.value = true
+        }
+    } catch(error) {
+        console.log('Error:', error)
+    };
+});
+
 </script>
 
 <template>
@@ -39,13 +58,18 @@ const isLinkActive = (routePath) => {
                     <li><RouterLink class="dropdown-item" to="/bogus3">Competition History</RouterLink></li>
                 </ul>
                 </li>
+                <li class="nav-item rounded" v-if="isLoggedIn"><a class="nav-link disabled">Admin</a></li>
             </ul>
             <div class="d-flex me-5 p-1 github rounded">
                 <img :src="git_logo" alt="" width="30px">
                 <a href="https://github.com/WS-EE/Arbitaja" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub</a>
             </div>
-            <div class="d-flex">
-                <RouterLink :class="[isLinkActive('/login') ? 'active' : '', 'btn btn-outline-dark']" to="login">Login</RouterLink>
+            <div class="d-flex" v-if="!isLoggedIn">
+                <RouterLink class="btn btn-outline-dark" to="login">Login</RouterLink>
+            </div>
+            <div class="d-flex" v-if="isLoggedIn">
+                <p class="me-2">{{ userProfile }}</p>
+                <button class="btn btn-outline-dark" @click="logoutUser">Logout</button>
             </div>
             </div>
         </div>
@@ -62,8 +86,12 @@ const isLinkActive = (routePath) => {
     background-color: var(--big-block-background);
 }
 
-li:hover {
-    background-color: var(--button-dark);
+.nav-item:hover {
+    background-color: var(--button-dark) !important;
+}
+
+.disabled:hover {
+    background-color: red !important;
 }
 
 .active-item {
