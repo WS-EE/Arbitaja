@@ -3,13 +3,15 @@ import { ref } from 'vue';
 
 import logo from '@/assets/media/logo.svg';
 import {useRouter} from "vue-router";
+import axios from 'axios';
 
 const router = useRouter();
 const username = ref("");
 const password = ref("");
+const getLogonError = ref('');
 
 const userLogin = async () => {
-  const response = await fetch('http://localhost/api/v1/login-user', {
+  await fetch('http://localhost/api/v1/login-user', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -20,11 +22,11 @@ const userLogin = async () => {
     }),
     credentials: 'include',
   });
-  if (response.ok) {
-    console.log("Login successful");
-    await router.replace("home")
+  const response = await axios.get('http://localhost/api/v1/profile');
+  if (response.data !== 'Successful login'){
+    await router.replace("home");
   } else {
-    console.log("Login failed");
+    getLogonError.value = true;
   }
 };
 </script>
@@ -40,7 +42,21 @@ const userLogin = async () => {
           <form @submit.prevent="userLogin">
             <input type="text" class="form-control" v-model="username" placeholder="Username" required>
             <input type="password" class="form-control" v-model="password" placeholder="Password" required>
+            <div
+              v-if="getLogonError"
+              class="alert alert-danger alert-dismissible fade show"
+              role="alert"
+            >
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+              <strong>Alert Heading</strong> Alert Content
+            </div>
             <button class="btn btn-dark" type="submit">Login</button>
+            {{ getLogonError }}
           </form>
         </div>
       </div>
