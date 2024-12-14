@@ -16,7 +16,7 @@ const userProfile = ref('')
 
 onMounted(async () => {
     try {
-        const response = await axios.get('http://localhost/api/v1/profile');
+        const response = await axios.get('http://localhost/api/v1/profile')
         if (response.data !== 'Successful login'){
             userProfile.value = response.data
             isLoggedIn.value = true
@@ -25,6 +25,18 @@ onMounted(async () => {
         console.log('Error:', error)
     };
 });
+
+const userLogout = async () => {
+    let response
+    try {
+        response = await axios.post('http://localhost/api/v1/logout');
+    } catch (error) {
+        console.log('Failed to log out. Error:' + error);
+    }
+    if (response.status === 200) {
+        location.reload();
+    }
+}
 
 </script>
 
@@ -69,7 +81,7 @@ onMounted(async () => {
             </div>
             <div class="d-flex" v-if="isLoggedIn">
                 <p class="me-2">{{ userProfile }}</p>
-                <button class="btn btn-outline-dark" @click="logoutUser">Logout</button>
+                <button class="btn btn-outline-dark" @click.prevent="userLogout">Logout</button>
             </div>
             </div>
         </div>
