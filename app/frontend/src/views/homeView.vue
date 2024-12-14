@@ -38,8 +38,8 @@ onMounted(async () => {
                 ></button>
                 <strong>You are not authenticated!</strong> More content visable when logged in.
             </div>
+            <h1>Welcome to Arbitaja</h1>
         </div>
-        <h1>Welcome to Arbitaja</h1>
         <div v-if="isLoggedIn">
             <div
             class="alert alert-success alert-dismissible fade show"
