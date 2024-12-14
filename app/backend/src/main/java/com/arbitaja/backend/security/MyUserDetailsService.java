@@ -29,23 +29,13 @@ public class MyUserDetailsService implements UserDetailsService {
     @Autowired
     private PermissionRepository permissionRepository; // Fetches permissions directly
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+        log.debug("Found user: {}", user.getUsername());
         Collection<GrantedAuthority> authorities = getAuthorities(user);
-        String rawPassword = user.getSalted_password();
-        String enteredPassword = "123";  // You would get the entered password from the authentication request
-
-        if (passwordEncoder.matches(enteredPassword, rawPassword)) {
-            log.info("Passwords match!");
-        } else {
-            log.error("Passwords do not match!");
-        }  // Log the user found
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
