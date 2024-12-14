@@ -1,41 +1,59 @@
 <script setup>
-import notFound from '@/assets/media/404.gif'
 import { RouterLink } from 'vue-router';
 </script>
 
 <template>
-    <div class="page_404">
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <div class="text-center">
-                
-                        <h1 class="text-center">404</h1>
-                        <h3>
-                            Page not Found.
-                        </h3>
-                        <p>Something went wrong.</p>
-                        <RouterLink to="home" class="btn btn-dark">Back Home</RouterLink>
-                        <a href="https://www.instagram.com/motionmarkus/" class="btn btn-outline-dark m-3 set-item-top" target="_blank" rel="noopener noreferrer">Caveman by Markus Magnusson</a>
-
-                        <div class="allign-center">
-                            <img alt="Caveman by Markus Magnusson" :src="notFound" class="set-item-bottom image-width"/>
-                        </div>
-                    </div>
-                </div>
+    <div class="d-flex justify-content-center horizontal-center">
+        <div class="text-center background-image" >
+            <h1 class="text-center">404</h1>
+            <h3>
+                Page not Found.
+            </h3>
+            <p>Something went wrong.</p>
+            <RouterLink to="/home" class="btn btn-outline-dark me-3">Back Home</RouterLink>
+            <a @click="$router.back()" class="btn btn-dark me-3">Go Back</a>
+            <div class="allign-center p-3">
+                <a href="https://www.instagram.com/motionmarkus/" class="btn btn-outline-dark image-link" target="_blank" rel="noopener noreferrer">Caveman by Markus Magnusson</a>
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-.image-width {
+
+.background-image {
+    background-image: url('@/assets/media/404.gif');
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position: center 8rem;
+    background: cover;
+    background-size: cover;
+    height: 600px;
     width: 800px;
+    align-items: center;
 }
 
-@media (max-width: 800px) {
-    .image-width {
-        width: 100%;
+.image-link {
+    position: relative;
+    margin-top: 24rem;    
+}
+
+.horizontal-center {
+    padding-top: 12vh;   
+}
+
+@media (max-height: 760px) {
+    .background-image {
+        background-position: center 2rem;
+    }
+
+    .image-link {
+        position: relative;
+        margin-top: 18rem;    
+    }
+
+    .horizontal-center {
+        padding-top: 5vh;
     }
 }
 </style>
