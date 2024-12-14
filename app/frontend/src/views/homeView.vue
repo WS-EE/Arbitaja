@@ -1,41 +1,61 @@
 <script setup>
-import { onMounted } from 'vue';
-import { ref } from 'vue';
-import axios from 'axios';
-const isLoggedIn = ref(false)
-const userProfile = ref('')
+// Get if user is logged in.
+import { onMounted,ref } from 'vue';
 
+import { useCookies } from '@/assets/js/useCookies';
+const $cookies = useCookies(); 
+
+const isLoggedIn = ref(true)
+const userParameters = ref('')
+const displayUsername = ref('')
+
+// Get cookies for user logged in status
 onMounted(async () => {
+    // get cookies
     try {
-        const response = await axios.get('http://localhost/api/v1/profile');
-        if (response.data !== 'Successful login'){
-            userProfile.value = response.data
-            isLoggedIn.value = true
-        }
-    } catch(error) {
-        console.log('Error:', error)
-    };
-});
+        isLoggedIn.value = await $cookies.get('isLoggedIn');
+        userParameters.value = await $cookies.get('userParameters');
+        displayUsername.value = userParameters.value.username
+    } catch(err) {
+        console.log(error)
+        isLoggedIn.value = false
+    }
+})
 
 </script>
 
 <template>
     <div class="container p-3">
-        <div
-            class="alert alert-primary alert-dismissible fade show"
-            role="alert"
-            v-if="!isLoggedIn"
-        >
+        <div v-if="!isLoggedIn">
+            <div
+                class="alert alert-primary alert-dismissible fade show"
+                role="alert">
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                ></button>
+                <strong>You are not authenticated!</strong> More content visable when logged in.
+            </div>
+        </div>
+        <h1>Welcome to Arbitaja</h1>
+        <div v-if="isLoggedIn">
+            <div
+            class="alert alert-success alert-dismissible fade show"
+            role="alert">
             <button
                 type="button"
                 class="btn-close"
                 data-bs-dismiss="alert"
                 aria-label="Close"
             ></button>
-            <strong>Try logging in!</strong> More content visable when logged in.
+            <strong>Success.</strong> Your are now authenticated and ready to use arbitaja.
         </div>
-        <h1>Welcome to Arbitaja</h1>
-        <p v-if="isLoggedIn">{{ userProfile }}</p>
+            
+            <h1>Welcome {{ displayUsername }}!</h1>
+            <p>You have logged in!</p>
+        </div>
     </div>
     <div class="container p-3">
     </div>

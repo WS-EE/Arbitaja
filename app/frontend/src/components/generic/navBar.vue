@@ -2,7 +2,13 @@
 import { RouterLink, useRoute } from 'vue-router';
 import logo from '@/assets/media/logo.svg'
 import git_logo from '@/assets/media/git.png';
+import axios from 'axios';
 
+// import cookie handler
+import { useCookies } from '@/assets/js/useCookies';
+const $cookies = useCookies(); 
+
+// check the active link
 const isLinkActive = (routePath) => {
     const route = useRoute();
     return route.path === routePath;
@@ -10,22 +16,21 @@ const isLinkActive = (routePath) => {
 
 // Get if user is logged in.
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 const isLoggedIn = ref(false)
-const userProfile = ref('')
+const userParameters = ref('')
+const username = ref('')
+const displayUsername = ref('')
 
+// Get cookies for user logged in status
 onMounted(async () => {
-    try {
-        const response = await axios.get('http://localhost/api/v1/profile')
-        if (response.data !== 'Successful login'){
-            userProfile.value = response.data
-            isLoggedIn.value = true
-        }
-    } catch(error) {
-        console.log('Error:', error)
-    };
-});
+    // get cookies
+    isLoggedIn.value = await $cookies.get('isLoggedIn');
+    userParameters.value = await $cookies.get('userParameters');
+    username.value = userParameters.value.username
+    displayUsername.value = userParameters.value.username
+})
 
+// User logout function
 const userLogout = async () => {
     let response
     try {
@@ -34,6 +39,8 @@ const userLogout = async () => {
         console.log('Failed to log out. Error:' + error);
     }
     if (response.status === 200) {
+        await $cookies.remove('userParameters');
+        await $cookies.remove('isLoggedIn');
         location.reload();
     }
 }
@@ -70,6 +77,14 @@ const userLogout = async () => {
                     <li><RouterLink class="dropdown-item" to="/bogus3">Competition History</RouterLink></li>
                 </ul>
                 </li>
+                <li class="nav-item dropdown rounded">
+                    <a class="nav-link dropdown-toggle" href="#" id="userProfile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        User Profile
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="userProfile">
+                        <li><RouterLink class="dropdown-item" :to="'/userProfile/'+ username">{{ displayUsername }}</RouterLink></li>
+                    </ul>
+                </li>
                 <li class="nav-item rounded" v-if="isLoggedIn"><a class="nav-link disabled">Admin</a></li>
             </ul>
             <div class="d-flex me-5 p-1 github rounded">
@@ -80,7 +95,6 @@ const userLogout = async () => {
                 <RouterLink class="btn btn-outline-dark" to="login">Login</RouterLink>
             </div>
             <div class="d-flex" v-if="isLoggedIn">
-                <p class="me-2">{{ userProfile }}</p>
                 <button class="btn btn-outline-dark" @click.prevent="userLogout">Logout</button>
             </div>
             </div>

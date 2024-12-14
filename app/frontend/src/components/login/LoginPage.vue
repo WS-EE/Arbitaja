@@ -5,6 +5,10 @@ import logo from '@/assets/media/logo.svg';
 import {useRouter} from "vue-router";
 import axios from 'axios';
 
+// import cookie handler
+import { useCookies } from '@/assets/js/useCookies';
+const $cookies = useCookies(); 
+
 const router = useRouter();
 const username = ref("");
 const password = ref("");
@@ -20,7 +24,10 @@ const userLogin = () => {
       .then(function (response) {
         console.log(response.data.data);
         if(response.status === 200){
-          router.replace('home')
+          // Set user to be logged in
+          $cookies.set('isLoggedIn', true, 0);
+          $cookies.set('userParameters', response.data, 0);
+          router.replace('home');
         }
       })
       .catch(function (error) {
