@@ -45,6 +45,21 @@ const userLogout = async () => {
     }
 }
 
+// Is the admin button on navbar disabled
+const isUserAdmin = () => {
+    // Get user groups
+    const userGroups = userParameters.value.roles
+
+    // loop over user groups
+    for (var role of userGroups){
+        // if we find admin groups in users groups return true
+        if (role.authority === 'admin') {
+            return true
+        }
+    }
+    // else return false
+    return false
+}
 </script>
 
 <template>
@@ -85,7 +100,16 @@ const userLogout = async () => {
                         <li><RouterLink class="dropdown-item" :to="'/userProfile/'+ username">{{ displayUsername }}</RouterLink></li>
                     </ul>
                 </li>
-                <li class="nav-item rounded" v-if="isLoggedIn"><a class="nav-link disabled">Admin</a></li>
+                <li class="nav-item rounded" v-if="isUserAdmin">
+                    <RouterLink 
+                        to="/admin"
+                        :class="[
+                            isLinkActive('/admin') 
+                                ? 'active-item' : '',
+                            'nav-link rounded',
+                        ]" 
+                    >Admin</RouterLink>
+                </li>
             </ul>
             <div class="d-flex me-5 p-1 github rounded">
                 <img :src="git_logo" alt="" width="30px">
