@@ -56,12 +56,11 @@ const userLogin = () => {
             >
               <strong>Logon failure</strong>
             </div>
-            <div>
-              <input type="checkbox" id="rememberMe" v-model="rememberMe">
+            <div class="checkbox-div">
+              <input class="me-2" type="checkbox" id="rememberMe" v-model="rememberMe">
               <label for="rememberMe">Remember me</label>
             </div>
             <button class="btn btn-dark" type="submit">Login</button>
-            {{ getLogonError }}
           </form>
         </div>
       </div>
@@ -94,6 +93,39 @@ form {
   align-items: center;
   flex-direction: column;
   display: flex;
+}
+
+.checkbox-div {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+input[type="checkbox"] {
+    appearance: checkbox;
+    -webkit-appearance: none;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    padding: 0.2rem;
+    border: 0.25rem solid var(--text-dark);
+    border-radius: 0.5rem;
+}
+
+input[type="checkbox"]::before {
+    content: "";
+    width: 0.8rem;
+    height: 0.8rem;
+    clip-path: polygon(0 0, 50% 0, 100% 0, 100% 100%, 50% 100%, 0 100%);
+    transform: scale(0);
+    transition-duration: 100ms;
+    background-color: var(--text-dark);
+}
+
+input[type="checkbox"]:checked::before {
+    transform: scale(2);
+    clip-path: polygon(28% 38%, 41% 53%, 75% 24%, 86% 38%, 40% 78%, 15% 50%);
+    transition-duration: 100ms;
 }
 
 </style>
