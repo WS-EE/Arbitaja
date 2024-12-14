@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,10 +59,11 @@ public class SecurityConfig{
                 http.getSharedObject(AuthenticationManagerBuilder.class);
 
         authenticationManagerBuilder
-                .userDetailsService(userDetailsService())  // Use your custom userDetailsService
-                .passwordEncoder(passwordEncoder());  // Use the password encoder
+                .userDetailsService(userDetailsService())
+                .passwordEncoder(passwordEncoder());
 
-        return authenticationManagerBuilder.build();  // Build and return the AuthenticationManager
+        authenticationManagerBuilder.parentAuthenticationManager(null);
+        return authenticationManagerBuilder.build();
     }
 
 
@@ -75,7 +77,7 @@ public class SecurityConfig{
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply the CORS configuration
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-user", "/error").permitAll()  // Allow these pages without authentication
+                        .requestMatchers("/login", "/login-user", "/error", "/profile").permitAll()  // Allow these pages without authentication
                         .anyRequest().authenticated() // Secure other endpoints
                 )
                 .formLogin(form -> form
@@ -83,21 +85,21 @@ public class SecurityConfig{
                         .usernameParameter("username")
                         .passwordParameter("password")
                         .loginProcessingUrl("/login-user")
-                        .defaultSuccessUrl("/home", true)  // Redirect to homepage on successful login
-                        .failureUrl("/login?error=true")  // Redirect to a successful login page
+                        .defaultSuccessUrl("/login?error=false", true)
+                        .failureUrl("/login?error=true")
                 )
-                .rememberMe(rememberMe -> rememberMe // Configure "Remember Me"
+                .rememberMe(rememberMe -> rememberMe
                         .userDetailsService(userDetailsService())
-                        .alwaysRemember(true) // Always apply "Remember Me"
-                        .tokenValiditySeconds(30 * 5) // Token validity: 5 minutes
-                        .rememberMeCookieName("mouni") // Custom cookie name
-                        .key("somesecret") // Secret key for token generation
+                        .alwaysRemember(false)
+                        .tokenValiditySeconds(30 * 5)
+                        .rememberMeCookieName("remember-me")
+                        .key("somesecret")
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                 )
-                .csrf(csrf -> csrf.disable()) // Disable CSRF (consider enabling it if needed)
+                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF (consider enabling it if needed)
                 .build();
     }
 }
