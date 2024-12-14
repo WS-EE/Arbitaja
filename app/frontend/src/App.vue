@@ -1,6 +1,5 @@
 <script setup>
 import { RouterView } from 'vue-router';
-import navBar from '@/components/generic/navBar.vue';
 import customFooter from '@/components/generic/customFooter.vue';
 </script>
 
