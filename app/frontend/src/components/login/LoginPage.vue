@@ -16,6 +16,7 @@ const getLogonError = ref('');
 const rememberMe = ref(false);
 
 const userLogin = () => {
+  getLogonError.value = false
   const params = new URLSearchParams();
   params.append('username', username.value)
   params.append('rememberMe', rememberMe.value)
@@ -32,6 +33,7 @@ const userLogin = () => {
       })
       .catch(function (error) {
         console.log(error);
+        getLogonError.value = true
       });
 }
 </script>
@@ -49,16 +51,10 @@ const userLogin = () => {
             <input type="password" class="form-control" v-model="password" placeholder="Password" required>
             <div
               v-if="getLogonError"
-              class="alert alert-danger alert-dismissible fade show"
+              class="alert alert-danger"
               role="alert"
             >
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Close"
-              ></button>
-              <strong>Alert Heading</strong> Alert Content
+              <strong>Logon failure</strong>
             </div>
             <div>
               <input type="checkbox" id="rememberMe" v-model="rememberMe">
