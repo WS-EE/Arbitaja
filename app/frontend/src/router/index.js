@@ -3,6 +3,8 @@ import loginView from '@/views/loginView.vue';
 import notFoundView from '@/views/notFoundView.vue';
 import homeView from '@/views/homeView.vue';
 import baseView from '@/views/baseView.vue';
+import userProfileView from '@/views/userProfileView.vue';
+import adminView from '@/views/adminView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,11 +18,22 @@ const router = createRouter({
             path: '/',
             name: 'base',
             component: baseView,
+            redirect: 'home',
             children:[
                 {
                     path: '/home',
                     name: 'home',
                     component: homeView 
+                },
+                {
+                    path: '/userProfile/:id',
+                    name: 'userProfile',
+                    component: userProfileView
+                },
+                {
+                    path: '/admin/',
+                    name: 'admin',
+                    component: adminView
                 },
             ]
         },
