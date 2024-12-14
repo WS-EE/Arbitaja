@@ -90,9 +90,9 @@ public class SecurityConfig{
                 )
                 .rememberMe(rememberMe -> rememberMe
                         .userDetailsService(userDetailsService())
-                        .alwaysRemember(false)
                         .tokenValiditySeconds(30 * 5)
                         .rememberMeCookieName("remember-me")
+                        .rememberMeParameter("rememberMe")
                         .key("somesecret")
                 )
                 .logout(logout -> logout

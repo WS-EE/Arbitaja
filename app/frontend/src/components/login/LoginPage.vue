@@ -9,26 +9,24 @@ const router = useRouter();
 const username = ref("");
 const password = ref("");
 const getLogonError = ref('');
+const rememberMe = ref(false);
 
-const userLogin = async () => {
-  await fetch('http://localhost/api/v1/login-user', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      username: username.value,
-      password: password.value,
-    }),
-    credentials: 'include',
-  });
-  const response = await axios.get('http://localhost/api/v1/profile');
-  if (response.data !== 'Successful login'){
-    await router.replace("home");
-  } else {
-    getLogonError.value = true;
-  }
-};
+const userLogin = () => {
+  const params = new URLSearchParams();
+  params.append('username', username.value)
+  params.append('rememberMe', rememberMe.value)
+  params.append('password', password.value)
+  axios.post('http://localhost/api/v1/login-user', params)
+      .then(function (response) {
+        console.log(response.data.data);
+        if(response.status === 200){
+          router.replace('home')
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+}
 </script>
 
 <template>
@@ -54,6 +52,10 @@ const userLogin = async () => {
                 aria-label="Close"
               ></button>
               <strong>Alert Heading</strong> Alert Content
+            </div>
+            <div>
+              <input type="checkbox" id="rememberMe" v-model="rememberMe">
+              <label for="rememberMe">Remember me</label>
             </div>
             <button class="btn btn-dark" type="submit">Login</button>
             {{ getLogonError }}
