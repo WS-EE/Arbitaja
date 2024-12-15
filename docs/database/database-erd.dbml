@@ -15,7 +15,6 @@ table personal_data {
   id integer [primary key, increment]
   full_name varchar
   email varchar
-  alias varchar [note: "For anonymose alias"]
   school_id integer
   created_at timestamp
 }
@@ -85,6 +84,7 @@ table competition {
 table competitor {
   id integer [primary key, increment]
   public_display_name_type integer [note: "1 - full_name, 2 - school, 3 - alias"]
+  alias varchar [note: "For anonymose alias"]
   personal_data_id integer
 }
 ref: personal_data.id - competitor.personal_data_id
