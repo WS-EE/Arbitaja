@@ -20,14 +20,22 @@ const isLoggedIn = ref(false)
 const userParameters = ref('')
 const username = ref('')
 const displayUsername = ref('')
+const userRoles = ref([])
+const isUserAdmin = ref();
 
 // Get cookies for user logged in status
 onMounted(async () => {
-    // get cookies
-    isLoggedIn.value = await $cookies.get('isLoggedIn');
-    userParameters.value = await $cookies.get('userParameters');
-    username.value = userParameters.value.username
-    displayUsername.value = userParameters.value.username
+    try {
+        // get cookies
+        isLoggedIn.value = await $cookies.get('isLoggedIn');
+        userParameters.value = await $cookies.get('userParameters');
+        username.value = userParameters.value.username
+        displayUsername.value = userParameters.value.username
+        userRoles.value = userParameters.value.roles
+        isUserAdmin.value = await checkUserAdmin();
+    } catch(err) {
+        console.log('User is unauthenticated')
+    }
 })
 
 // User logout function
@@ -46,19 +54,24 @@ const userLogout = async () => {
 }
 
 // Is the admin button on navbar disabled
-const isUserAdmin = () => {
+const checkUserAdmin = async () => {
     // Get user groups
-    const userGroups = userParameters.value.roles
-
-    // loop over user groups
-    for (var role of userGroups){
-        // if we find admin groups in users groups return true
-        if (role.authority === 'admin') {
-            return true
+    try {
+        let isTrue = false
+        const userGroups = userParameters.value.roles
+        // loop over user groups
+        for (var role of userGroups){
+            // if we find admin groups in users groups return true
+            if (role.authority === 'admin') {
+                isTrue = true
+            }
         }
+        // else return false
+        return isTrue
+    } catch(error) {
+        console.log('Error:' + error);
+        return false
     }
-    // else return false
-    return false
 }
 </script>
 
@@ -92,7 +105,7 @@ const isUserAdmin = () => {
                     <li><RouterLink class="dropdown-item" to="/bogus3">Competition History</RouterLink></li>
                 </ul>
                 </li>
-                <li class="nav-item dropdown rounded">
+                <li class="nav-item dropdown rounded" v-if="isLoggedIn">
                     <a class="nav-link dropdown-toggle" href="#" id="userProfile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         User Profile
                     </a>
