@@ -10,10 +10,10 @@ import { RouterLink } from 'vue-router';
                 Page not Found.
             </h3>
             <p>Something went wrong.</p>
-            <RouterLink to="/home" class="btn btn-outline-dark me-3">Back Home</RouterLink>
-            <a @click="$router.back()" class="btn btn-dark me-3">Go Back</a>
+            <a @click="$router.back()" class="btn btn-outline-dark me-3"><i class="me-1 bi bi-arrow-up-left"></i>Go Back</a>
+            <RouterLink to="/home" class="btn btn-dark me-3">Back Home<i class="ms-1 bi bi-house"></i></RouterLink>
             <div class="allign-center p-3">
-                <a href="https://www.instagram.com/motionmarkus/" class="btn btn-outline-dark image-link" target="_blank" rel="noopener noreferrer">Caveman by Markus Magnusson</a>
+                <a href="https://www.instagram.com/motionmarkus/" class="btn btn-outline-dark image-link" target="_blank" rel="noopener noreferrer">Caveman by Markus Magnusson<i class="ms-1 bi bi-instagram"></i></a>
             </div>
         </div>
     </div>

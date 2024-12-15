@@ -13,6 +13,7 @@
     "@vueuse/core": "^12.0.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "vue": "^3.5.13",
     "vue-cookies": "^1.8.4",
     "vue-router": "^4.5.0"
