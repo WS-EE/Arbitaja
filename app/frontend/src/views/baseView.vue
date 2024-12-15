@@ -10,7 +10,7 @@ const $cookies = useCookies();
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost/api/v1/profile')
+    const response = await axios.get('profile')
     if(response.status === 200 && response.data.username !== 'anonymousUser'){
       // Set user to be logged in
       await $cookies.set('isLoggedIn', true, 0);

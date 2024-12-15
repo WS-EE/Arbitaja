@@ -21,7 +21,7 @@ const userLogin = () => {
   params.append('username', username.value)
   params.append('rememberMe', rememberMe.value)
   params.append('password', password.value)
-  axios.post('http://localhost/api/v1/login-user', params)
+  axios.post('login-user', params)
       .then(function (response) {
         console.log(response.data.data);
         if(response.status === 200){

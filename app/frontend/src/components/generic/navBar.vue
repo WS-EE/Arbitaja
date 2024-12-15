@@ -34,7 +34,7 @@ onMounted(async () => {
 const userLogout = async () => {
     let response
     try {
-        response = await axios.post('http://localhost/api/v1/logout');
+        response = await axios.post('logout');
     } catch (error) {
         console.log('Failed to log out. Error:' + error);
     }

@@ -4,7 +4,8 @@ FROM node:lts-alpine
 WORKDIR /opt/arbitaja-frontend/
 
 # Copy all root packages
-COPY . .
+COPY frontend/. .
+COPY .env .
 
 # install project dependencies
 RUN npm install
