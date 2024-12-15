@@ -23,7 +23,6 @@ const userLogin = () => {
   params.append('password', password.value)
   axios.post('login-user', params)
       .then(function (response) {
-        console.log(response.data.data);
         if(response.status === 200){
           // Set user to be logged in
           $cookies.set('isLoggedIn', true, 0);

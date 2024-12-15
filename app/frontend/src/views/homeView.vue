@@ -17,7 +17,7 @@ onMounted(async () => {
         userParameters.value = await $cookies.get('userParameters');
         displayUsername.value = userParameters.value.username
     } catch(err) {
-        console.log(error)
+        console.log('User is unauthenticated')
         isLoggedIn.value = false
     }
 })
