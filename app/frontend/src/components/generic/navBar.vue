@@ -1,7 +1,6 @@
 <script setup>
 import { RouterLink, useRoute } from 'vue-router';
 import logo from '@/assets/media/logo.svg'
-import git_logo from '@/assets/media/git.png';
 import axios from 'axios';
 
 // import cookie handler
@@ -125,7 +124,7 @@ const checkUserAdmin = async () => {
                 </li>
             </ul>
             <div class="d-flex me-5 p-1 github rounded">
-                <img :src="git_logo" alt="" width="30px">
+                <i class="me-1 bi bi-github"></i>
                 <a href="https://github.com/WS-EE/Arbitaja" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub</a>
             </div>
             <div class="d-flex" v-if="!isLoggedIn">
@@ -153,18 +152,14 @@ const checkUserAdmin = async () => {
     background-color: var(--button-dark) !important;
 }
 
-.disabled:hover {
-    background-color: red !important;
-}
-
 .active-item {
     background-color: var(--button-light);
     color: var(--text-dark);
 }
 
 .github {
-    color: brown;
     font-weight: 600;
+    scale: 1.25;
 }
 
 .github:hover {
