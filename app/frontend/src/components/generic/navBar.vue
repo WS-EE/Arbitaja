@@ -65,7 +65,7 @@ const isUserAdmin = () => {
 <template>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <RouterLink class="navbar-brand d-inline-block align-text-top" to="home"><img :src="logo" width="30">Arbitaja</RouterLink>
+            <RouterLink class="navbar-brand d-inline-block align-text-top" to="/home"><img :src="logo" width="30">Arbitaja</RouterLink>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -73,7 +73,7 @@ const isUserAdmin = () => {
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item rounded">
                 <RouterLink 
-                to="home" 
+                to="/home" 
                 :class="[
                     isLinkActive('/home') 
                         ? 'active-item' : '',
@@ -116,7 +116,7 @@ const isUserAdmin = () => {
                 <a href="https://github.com/WS-EE/Arbitaja" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub</a>
             </div>
             <div class="d-flex" v-if="!isLoggedIn">
-                <RouterLink class="btn btn-outline-dark" to="login">Login</RouterLink>
+                <RouterLink class="btn btn-outline-dark" to="/login">Login</RouterLink>
             </div>
             <div class="d-flex" v-if="isLoggedIn">
                 <button class="btn btn-outline-dark" @click.prevent="userLogout">Logout</button>
