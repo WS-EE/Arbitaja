@@ -73,13 +73,14 @@ public class SecurityConfig{
                 .authenticationManager(authenticationManager(http))
                 .addFilterBefore(new LoginLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // Set session creation policy
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply the CORS configuration
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-user", "/error", "/profile").permitAll()  // Allow these pages without authentication
+                        .requestMatchers("/login", "/login-user", "/error").permitAll()
                         .anyRequest().authenticated() // Secure other endpoints
                 )
+                .anonymous(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
                         .loginPage("/login")
                         .usernameParameter("username")

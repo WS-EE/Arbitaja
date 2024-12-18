@@ -33,32 +33,26 @@ public class RolePermissionService {
 
     @Transactional  // Ensure this method runs within a transaction
     public void createRolePermissionMapping() {
-        // Retrieve the Role by name
         Optional<Role> roleOpt = roleRepository.findByName("user");
         Optional<Role> roleOptAdmin = roleRepository.findByName("admin");
         if (roleOpt.isPresent() && roleOptAdmin.isPresent()) {
             Role role = roleOpt.get();
             Role roleAdmin = roleOptAdmin.get();
-            // Reattach the Role entity to the session (if detached)
-            role = entityManager.merge(role); // Ensure entity is managed
+            role = entityManager.merge(role);
             roleAdmin = entityManager.merge(roleAdmin);
 
-            // Retrieve the Permission by key
             Optional<Permission> permissionOpt = permissionRepository.findByKey("basic");
             Optional<Permission> permissionOptAdmin = permissionRepository.findByKey("admin");
             if (permissionOpt.isPresent() && permissionOptAdmin.isPresent()) {
                 Permission permission = permissionOpt.get();
                 Permission permissionAdmin = permissionOptAdmin.get();
-                // Reattach the Permission entity to the session (if detached)
-                permission = entityManager.merge(permission); // Ensure entity is managed
+                permission = entityManager.merge(permission);
                 permissionAdmin = entityManager.merge(permissionAdmin);
 
                 log.info("Permission found: " + permission);
 
-                // Create Role_permissions mapping
                 Role_permissions role_permissions = new Role_permissions(permission, role, null);
                 Role_permissions role_permissionsAdmin = new Role_permissions(permissionAdmin, roleAdmin, null);
-                // Save the Role_permissions entity
                 rolePermissionsRepository.saveAll(List.of(role_permissions, role_permissionsAdmin));
 
                 log.info("Role-Permissions mapping created: " + role_permissions);

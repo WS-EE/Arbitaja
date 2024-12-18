@@ -16,8 +16,6 @@ public class Personal_data {
     private String full_name;
     @Column(name = "email")
     private String email;
-    @Column(name = "alias")
-    private String alias;
 
     @ManyToOne
     @JoinColumn(name = "school_id", nullable = false)
@@ -25,10 +23,9 @@ public class Personal_data {
     @Column(name = "created_at")
     private Timestamp created_at;
 
-    public Personal_data(String full_name, String email, String alias, School school, Timestamp created_at) {
+    public Personal_data(String full_name, String email, School school, Timestamp created_at) {
         this.full_name = full_name;
         this.email = email;
-        this.alias = alias;
         this.school = school;
         this.created_at = created_at;
     }
@@ -59,14 +56,6 @@ public class Personal_data {
         this.email = email;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
     public School getSchool() {
         return school;
     }
@@ -89,7 +78,6 @@ public class Personal_data {
                 "id=" + id +
                 ", full_name='" + full_name + '\'' +
                 ", email='" + email + '\'' +
-                ", alias='" + alias + '\'' +
                 ", school=" + school +
                 ", created_at=" + created_at +
                 '}';

@@ -1,6 +1,5 @@
 package com.arbitaja.backend.competitors.dataobjects;
 
-import com.arbitaja.backend.competitions.scorings.dataobjects.Scoring_groups_structure;
 import jakarta.persistence.*;
 
 import java.util.LinkedHashSet;
@@ -16,15 +15,15 @@ public class Competitor {
     @Column(name = "public_display_name_type")
     private int public_display_name_type;
 
+    @Column(name = "alias")
+    private String alias;
+
     @OneToOne
     @JoinColumn(name = "personal_data_id")
     private Personal_data personal_data;
 
     @OneToMany(mappedBy = "competitor")
     private Set<Competitor_competition> competitor_competitions = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "competitor")
-    private Set<Scoring_groups_structure> scoring_groups_structure = new LinkedHashSet<>();
 
     public Competitor(int public_display_name_type, Personal_data personal_data) {
         this.public_display_name_type = public_display_name_type;
@@ -41,6 +40,14 @@ public class Competitor {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public int getPublic_display_name_type() {
@@ -64,6 +71,7 @@ public class Competitor {
         return "Competitor{" +
                 "id=" + id +
                 ", public_display_name_type=" + public_display_name_type +
+                ", alias='" + alias + '\'' +
                 ", personal_data=" + personal_data +
                 '}';
     }

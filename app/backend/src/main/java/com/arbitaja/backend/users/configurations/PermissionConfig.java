@@ -1,5 +1,9 @@
 package com.arbitaja.backend.users.configurations;
 
+import com.arbitaja.backend.competitors.dataobjects.Personal_data;
+import com.arbitaja.backend.competitors.dataobjects.School;
+import com.arbitaja.backend.competitors.repositories.PersonalDataRepository;
+import com.arbitaja.backend.competitors.repositories.SchoolRepository;
 import com.arbitaja.backend.users.RolePermissionService;
 import com.arbitaja.backend.users.dataobjects.*;
 import com.arbitaja.backend.users.repositories.*;
@@ -31,7 +35,9 @@ public class PermissionConfig {
             UserRoleRepository userRoleRepository,
             RoleRelationRepository roleRelationRepository,
             RolePermissionService rolePermissionService,
-            UserRepository userRepository)
+            UserRepository userRepository,
+            SchoolRepository schoolRepository,
+            PersonalDataRepository personalDataRepository)
 
     {
 
@@ -49,7 +55,7 @@ public class PermissionConfig {
                 Permission permission = new Permission("basic", "basic", "description");
                 Permission adminPermission = new Permission("admin", "admin", "description");
                 permissionRepository.saveAll(List.of(permission, adminPermission));
-                log.info("Permission created: " + permission);
+                log.info("Permission created: {}", permission);
             } else {
                 log.info("Permission already exists, skipping creation.");
             }
@@ -61,27 +67,48 @@ public class PermissionConfig {
                 roleRepository.saveAll(List.of(role, admin));
                 Role_relation role_relation = new Role_relation(admin, role);
                 roleRelationRepository.saveAll(List.of(role_relation));
-                log.info("Role created: " + role);
+                log.info("Role created: {}", role);
             } else {
                 log.info("Role already exists, skipping creation.");
             }
 
+            if (schoolRepository.count() == 0) {
+                School school = new School("RandomSchool", Timestamp.from(Instant.now()));
+                schoolRepository.save(school);
+            } else {
+                log.info("School already exists, skipping creation.");
+            }
+
+            int personalDataId = -1;
+            if(personalDataRepository.count() == 0) {
+                Optional<School> optSchool = schoolRepository.findSchoolByName("RandomSchool");
+                Personal_data personalData = new Personal_data();
+                personalData.setFull_name("Arbitaja");
+                personalData.setEmail("arbitaja@arbitaja.com");
+                personalData.setCreated_at(Timestamp.from(Instant.now()));
+                optSchool.ifPresent(personalData::setSchool);
+                personalDataRepository.save(personalData);
+                personalDataId = personalData.getId();
+                log.info("Personal-data mapping created: {}", personalData);
+            }
+
             rolePermissionService.createRolePermissionMapping();
 
-            // Create new User if it doesn't exist
             if (userRepository.count() == 0) {
-                User user = new User();
-                user.setUsername("Arbitaja");
-                user.setSalted_password(passwordEncoder.encode("123"));
-                userRepository.save(user);
-                log.info("User created: " + user);
+                Optional<Personal_data> optPersonalData = personalDataRepository.findById(personalDataId);
+                if (optPersonalData.isPresent()) {
+                    Personal_data personalData = optPersonalData.get();
+                    User user = new User(personalData, passwordEncoder.encode("123"), "Arbitaja", null);
+                    userRepository.save(user);
+                    log.info("User created: {}", user);
+                }
+
             } else {
                 log.info("User already exists, skipping creation.");
             }
 
 
 
-            // Create User-Role mapping if it doesn't exist
             if (userRoleRepository.count() == 0) {
                 Optional<User> userOpt = userRepository.findByUsername("Arbitaja");
                 Optional<Role> roleOpt = roleRepository.findByName("admin");
@@ -90,14 +117,14 @@ public class PermissionConfig {
                     Role role = roleOpt.get();
                     User_role userRole = new User_role(user, role, Timestamp.from(Instant.now()));
                     userRoleRepository.save(userRole);
-                    log.info("User-Role mapping created: " + userRole);
+                    log.info("User-Role mapping created: {}", userRole);
                 }
             } else {
                 log.info("User-Role mapping already exists, skipping.");
             }
             User user = userRepository.findByUsername("Arbitaja").get();
-            log.info("Users in the database: " + userRepository.findAll());
-            log.info("Permissions for user: " + permissionRepository.findPermissionsByUserId(user.getId()));
+            log.info("Users in the database: {}", userRepository.findAll());
+            log.info("Permissions for user: {}", permissionRepository.findPermissionsByUserId(user.getId()));
         };
     }
 
