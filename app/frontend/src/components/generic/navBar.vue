@@ -15,6 +15,7 @@ const isLinkActive = (routePath) => {
 
 // Get if user is logged in.
 import { ref, onMounted } from 'vue';
+import router from '@/router';
 const isLoggedIn = ref(false)
 const userParameters = ref('')
 const username = ref('')
@@ -39,16 +40,13 @@ onMounted(async () => {
 
 // User logout function
 const userLogout = async () => {
-    let response
     try {
-        response = await axios.post('logout');
-    } catch (error) {
-        console.log('Failed to log out. Error:' + error);
-    }
-    if (response.status === 200) {
+        await axios.post('logout');
+    } catch(error) {
+        // We are expecting 401 response when loggin out.
         await $cookies.remove('userParameters');
         await $cookies.remove('isLoggedIn');
-        location.reload();
+        router.go('/');
     }
 }
 
