@@ -31,7 +31,7 @@ const userLogin = () => {
         // Set user to be logged in
         $cookies.set('isLoggedIn', true, 0);
         $cookies.set('userParameters', response.data, 0);
-        router.replace('home');
+        router.replace('/home');
       }
     })
     .catch(function (error) {

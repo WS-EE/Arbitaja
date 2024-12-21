@@ -46,7 +46,7 @@ const userLogout = async () => {
         // We are expecting 401 response when loggin out.
         await $cookies.remove('userParameters');
         await $cookies.remove('isLoggedIn');
-        await router.replace('/');
+        await router.replace('/home');
         location.reload();
     }
 }
