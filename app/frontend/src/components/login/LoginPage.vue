@@ -31,8 +31,16 @@ const userLogin = () => {
         }
       })
       .catch(function (error) {
+        // Log error to console
         console.log(error);
+
+        // Show logon error
         getLogonError.value = true
+
+        // Fade out logon error
+        setTimeout(() => {
+          getLogonError.value = false
+        }, 3000);
       });
 }
 </script>
@@ -48,13 +56,15 @@ const userLogin = () => {
           <form @submit.prevent="userLogin">
             <input type="text" class="form-control" v-model="username" placeholder="Username" required>
             <input type="password" class="form-control" v-model="password" placeholder="Password" required>
-            <div
-              v-if="getLogonError"
-              class="alert alert-danger"
-              role="alert"
-            >
-              <strong>Logon failure</strong>
-            </div>
+            <Transition>
+              <div
+                v-if="getLogonError"
+                class="alert alert-danger"
+                role="alert"
+              >
+                <strong>Logon failure</strong>
+              </div>
+            </Transition>
             <div class="checkbox-div">
               <input class="me-2" type="checkbox" id="rememberMe" v-model="rememberMe">
               <label for="rememberMe">Remember me</label>
@@ -68,6 +78,16 @@ const userLogin = () => {
 </template>
 
 <style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
 input {
   margin-bottom: 1rem;
   padding: 1rem;
