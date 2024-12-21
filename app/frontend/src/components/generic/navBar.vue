@@ -87,18 +87,18 @@ const checkUserAdmin = async () => {
                 </div>
                 <div class="offcanvas-body">
                     <ul class="navbar-nav">
-                        <li class="nav-item rounded ms-1 me-1">
+                        <li class="nav-item rounded m-1">
                         <RouterLink 
                         to="/home" 
                         :class="[
                             isLinkActive('/home') 
                                 ? 'active-item' : '',
-                            'nav-link rounded',
+                            'nav-link rounded text-center',
                         ]" 
                         >Home</RouterLink>
                         </li>
-                        <li class="nav-item dropdown rounded ms-1 me-1">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <li class="nav-item dropdown rounded m-1">
+                        <a class="nav-link dropdown-toggle text-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Competitions
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -108,13 +108,13 @@ const checkUserAdmin = async () => {
                             <li><RouterLink class="dropdown-item" to="/bogus3">Competition History</RouterLink></li>
                         </ul>
                         </li>
-                        <li class="nav-item rounded ms-1 me-1" v-if="isUserAdmin">
+                        <li class="nav-item rounded m-1" v-if="isUserAdmin">
                             <RouterLink 
                                 to="/admin"
                                 :class="[
                                     isLinkActive('/admin') 
                                         ? 'active-item' : '',
-                                    'nav-link rounded',
+                                    'nav-link rounded text-center',
                                 ]" 
                             >Admin</RouterLink>
                         </li>
@@ -131,8 +131,8 @@ const checkUserAdmin = async () => {
                             <a href="https://github.com/WS-EE/Arbitaja" class="github rounded nav-link ps-3 pe-3 align-content-center bi bi-github" target="_blank" rel="noopener noreferrer"></a>
                         </div>
                         <div class="col-3 col-sm-3 d-flex me-sm-1 ms-sm-1">
-                            <a v-if="isLoggedIn" class="btn btn-outline-dark" @click.prevent="userLogout">Logout</a>
-                            <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark" to="/login">Login</RouterLink>
+                            <a v-if="isLoggedIn" class="btn btn-outline-dark m-1" @click.prevent="userLogout">Logout</a>
+                            <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark m-1" to="/login">Login</RouterLink>
                         </div>
                     </div>
                 </div>
