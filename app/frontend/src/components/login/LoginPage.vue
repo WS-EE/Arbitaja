@@ -17,31 +17,35 @@ const rememberMe = ref(false);
 
 const userLogin = () => {
   getLogonError.value = false
-  const params = new URLSearchParams();
-  params.append('username', username.value)
-  params.append('rememberMe', rememberMe.value)
-  params.append('password', password.value)
-  axios.post('login-user', params)
-      .then(function (response) {
-        if(response.status === 200){
-          // Set user to be logged in
-          $cookies.set('isLoggedIn', true, 0);
-          $cookies.set('userParameters', response.data, 0);
-          router.replace('home');
-        }
-      })
-      .catch(function (error) {
-        // Log error to console
-        console.log(error);
+  axios.post('login-user', {
+      username: username.value,
+      rememberMe: rememberMe.value,
+      password: password.value
+    }, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    .then(function (response) {
+      if(response.status === 200){
+        // Set user to be logged in
+        $cookies.set('isLoggedIn', true, 0);
+        $cookies.set('userParameters', response.data, 0);
+        router.replace('home');
+      }
+    })
+    .catch(function (error) {
+      // Log error to console
+      console.log(error);
 
-        // Show logon error
-        getLogonError.value = true
+      // Show logon error
+      getLogonError.value = true
 
-        // Fade out logon error
-        setTimeout(() => {
-          getLogonError.value = false
-        }, 3000);
-      });
+      // Fade out logon error
+      setTimeout(() => {
+        getLogonError.value = false
+      }, 3000);
+    });
 }
 </script>
 
