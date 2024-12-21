@@ -49,6 +49,8 @@ public class PermissionConfig {
             permissionRepository.deleteAll();
             roleRepository.deleteAll();
             userRepository.deleteAll();
+            personalDataRepository.deleteAll();
+            schoolRepository.deleteAll();
 
             // Create new Permission if it doesn't exist
             if (permissionRepository.count() == 0) {
