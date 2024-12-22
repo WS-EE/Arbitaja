@@ -86,23 +86,15 @@ const saveProfile = (async () =>{
                 id: school.value.id
             }
         })
+
         // On positive response load new data.
         if (response.status === 200){
-            // Try getting user data
-            try {
-                // Get the new user data parameters
-                const profileResponse = await axios.get('profile')
-                    if(profileResponse.status === 200 && response.data.username !== 'anonymousUser'){
-                    // Set new parameters to our cookie
-                    await $cookies.set('userParameters', response.data, 0);
-                }
 
-            } catch(error) {
-                displayAlert('<h4 class=alert-heading>Warning!<h4><p>Couldn\'t get updated user data from backend. Please refresh the web page.</p><hr><p class=mb-0> Error:' + error + '</p>', 'warning', 3000)
-            }
+            // Set user data to cookie returned by response
+                    await $cookies.set('userParameters', response.data, 0);
 
             // Get user parameters from cookies
-            const newUserParameters = $cookies.get('userParameters');
+            const newUserParameters = await $cookies.get('userParameters');
 
             // Map out cookie parameters
             fullName.value = newUserParameters.personal_data.full_name
