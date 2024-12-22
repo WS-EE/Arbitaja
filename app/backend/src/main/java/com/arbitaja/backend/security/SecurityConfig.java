@@ -78,7 +78,7 @@ public class SecurityConfig{
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/login-user", "/error").permitAll()
-                        .anyRequest().authenticated() // Secure other endpoints
+                        .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
@@ -100,7 +100,7 @@ public class SecurityConfig{
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                 )
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF (consider enabling it if needed)
+                .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 }

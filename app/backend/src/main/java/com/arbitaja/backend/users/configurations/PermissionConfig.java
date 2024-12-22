@@ -124,7 +124,7 @@ public class PermissionConfig {
             } else {
                 log.info("User-Role mapping already exists, skipping.");
             }
-            User user = userRepository.findByUsername("Arbitaja").get();
+            User user = userRepository.findUserByUsername("Arbitaja");
             log.info("Users in the database: {}", userRepository.findAll());
             log.info("Permissions for user: {}", permissionRepository.findPermissionsByUserId(user.getId()));
         };
