@@ -42,15 +42,7 @@ public class PermissionConfig {
     {
 
         return args -> {
-            // Clear existing data only if needed (this is for initial setup)
-            rolePermissionsRepository.deleteAll();
-            userRoleRepository.deleteAll();
-            roleRelationRepository.deleteAll();
-            permissionRepository.deleteAll();
-            roleRepository.deleteAll();
-            userRepository.deleteAll();
-            personalDataRepository.deleteAll();
-            schoolRepository.deleteAll();
+
 
             // Create new Permission if it doesn't exist
             if (permissionRepository.count() == 0) {
@@ -92,9 +84,11 @@ public class PermissionConfig {
                 personalDataRepository.save(personalData);
                 personalDataId = personalData.getId();
                 log.info("Personal-data mapping created: {}", personalData);
+            } else {
+                log.info("personalData already exists, skipping creation.");
             }
-
-            rolePermissionService.createRolePermissionMapping();
+            if(rolePermissionsRepository.count() == 0) rolePermissionService.createRolePermissionMapping();
+            else log.info("Role-Permissions mapping already exists, skipping.");
 
             if (userRepository.count() == 0) {
                 Optional<Personal_data> optPersonalData = personalDataRepository.findById(personalDataId);
@@ -104,7 +98,6 @@ public class PermissionConfig {
                     userRepository.save(user);
                     log.info("User created: {}", user);
                 }
-
             } else {
                 log.info("User already exists, skipping creation.");
             }
