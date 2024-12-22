@@ -11,6 +11,7 @@ import axios from 'axios';
 const allSchools = ref(''); 
 
 // Set user parameters to empty
+const userid = ref('')
 const fullName = ref('')
 const email = ref('')
 const username = ref('')
@@ -34,6 +35,7 @@ onMounted(async () => {
         const userParameters = $cookies.get('userParameters');
 
         // Map out cookie parameters
+        userid.value = userParameters.id
         fullName.value = userParameters.personal_data.full_name
         email.value = userParameters.personal_data.email
         username.value = userParameters.username
@@ -76,7 +78,9 @@ function displayAlert(message, type, timeout){
 // Save and discard functions
 const saveProfile = (async () =>{
     try {
+        // Update data with PUT request
         const response = await axios.put('profile', {
+            id: userid.value,
             username: username.value,
             personal_data: {
                 full_name: fullName.value,
@@ -91,7 +95,7 @@ const saveProfile = (async () =>{
         if (response.status === 200){
 
             // Set user data to cookie returned by response
-                    await $cookies.set('userParameters', response.data, 0);
+            await $cookies.set('userParameters', response.data, 0);
 
             // Get user parameters from cookies
             const newUserParameters = await $cookies.get('userParameters');
