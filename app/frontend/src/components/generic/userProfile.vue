@@ -204,7 +204,7 @@ function changeSchool(id, name){
                             @click="changeSchool(allSchool.id, allSchool.name)" 
                             class="dropdown-item"
                         >
-                            {{ allSchool.id }}. {{ allSchool.name }}
+                            {{ allSchool.name }}
                         </li>
                     </ul>
                 </div>
