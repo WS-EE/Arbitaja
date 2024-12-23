@@ -1,4 +1,4 @@
-package com.arbitaja.backend.competitors;
+package com.arbitaja.backend.competitors.APIs;
 
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.SchoolRepository;
@@ -8,9 +8,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,5 +42,21 @@ public class SchoolController {
         ResponseEntity<List<Map<String, ?>>> response = ResponseEntity.status(200).body(schoolMap);
         log.info("Sending schools list as response: " + "{}", objectMapper.writeValueAsString(response));
         return response;
+    }
+
+    @PostMapping("/school/register")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> registerSchool(@RequestBody School school) {
+        try {
+            log.info("Registering school: {}", school);
+            if(school.getName() == null) throw new Exception("School name cannot be null");
+            if(schoolRepository.findSchoolByName(school.getName()).isPresent()) throw new Exception("School already exists");
+            school.setCreated_at(Timestamp.from(Instant.now()));
+            schoolRepository.save(school);
+            return ResponseEntity.status(200).body(Map.of("message", "School registered successfully"));
+        } catch (Exception e) {
+            log.error("Failed to register school", e);
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage() != null ? e.getMessage() :"An error occurred"));
+        }
     }
 }
