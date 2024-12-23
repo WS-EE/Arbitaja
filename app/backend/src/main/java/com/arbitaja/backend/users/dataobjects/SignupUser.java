@@ -1,6 +1,5 @@
 package com.arbitaja.backend.users.dataobjects;
 
-import com.arbitaja.backend.competitors.dataobjects.Competitor;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import jakarta.persistence.*;
 
@@ -19,17 +18,9 @@ public class SignupUser {
     @Column(name = "salted_password", length = Integer.MAX_VALUE)
     private String saltedPassword;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "personal_data_id", nullable = false)
     private Personal_data personalData;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "competitor_id")
-    private Competitor competitor;
 
     @Column(name = "is_approved", nullable = false)
     private Boolean isApproved = false;
@@ -61,28 +52,12 @@ public class SignupUser {
         this.saltedPassword = saltedPassword;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public Personal_data getPersonalData() {
         return personalData;
     }
 
     public void setPersonalData(Personal_data personalData) {
         this.personalData = personalData;
-    }
-
-    public Competitor getCompetitor() {
-        return competitor;
-    }
-
-    public void setCompetitor(Competitor competitor) {
-        this.competitor = competitor;
     }
 
     public Boolean getIsApproved() {
