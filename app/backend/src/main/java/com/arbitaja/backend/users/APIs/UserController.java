@@ -1,5 +1,6 @@
 package com.arbitaja.backend.users.APIs;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
+import com.arbitaja.backend.users.dataobjects.SignupUser;
 import com.arbitaja.backend.users.dataobjects.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,4 +77,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
         }
     }
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> createSignupUser(@RequestBody SignupUser signupUser){
+        try{
+            return userService.signupUser(signupUser);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
+        }
+    }
+
 }

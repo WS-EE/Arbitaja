@@ -9,18 +9,19 @@ import java.time.Instant;
 @Table(name = "signup_user")
 public class SignupUser {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "username", length = Integer.MAX_VALUE)
+    @Column(name = "username", length = Integer.MAX_VALUE, unique = true, nullable = false)
     private String username;
 
     @Column(name = "salted_password", length = Integer.MAX_VALUE)
-    private String saltedPassword;
+    private String salted_password;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "personal_data_id", nullable = false)
-    private Personal_data personalData;
+    private Personal_data personal_data;
 
     @Column(name = "is_approved", nullable = false)
     private Boolean isApproved = false;
@@ -44,20 +45,20 @@ public class SignupUser {
         this.username = username;
     }
 
-    public String getSaltedPassword() {
-        return saltedPassword;
+    public String getSalted_password() {
+        return salted_password;
     }
 
-    public void setSaltedPassword(String saltedPassword) {
-        this.saltedPassword = saltedPassword;
+    public void setSalted_password(String saltedPassword) {
+        this.salted_password = saltedPassword;
     }
 
-    public Personal_data getPersonalData() {
-        return personalData;
+    public Personal_data getPersonal_data() {
+        return personal_data;
     }
 
-    public void setPersonalData(Personal_data personalData) {
-        this.personalData = personalData;
+    public void setPersonal_data(Personal_data personalData) {
+        this.personal_data = personalData;
     }
 
     public Boolean getIsApproved() {
@@ -76,4 +77,15 @@ public class SignupUser {
         this.createdAt = createdAt;
     }
 
+    @Override
+    public String toString() {
+        return "SignupUser{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", saltedPassword='" + salted_password + '\'' +
+                ", personalData=" + personal_data +
+                ", isApproved=" + isApproved +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

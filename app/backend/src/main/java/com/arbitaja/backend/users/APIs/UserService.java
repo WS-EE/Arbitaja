@@ -4,7 +4,9 @@ import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.PersonalDataRepository;
 import com.arbitaja.backend.competitors.repositories.SchoolRepository;
+import com.arbitaja.backend.users.dataobjects.SignupUser;
 import com.arbitaja.backend.users.dataobjects.User;
+import com.arbitaja.backend.users.repositories.SignupUserRepository;
 import com.arbitaja.backend.users.repositories.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -30,6 +33,10 @@ public class UserService {
     private SchoolRepository schoolRepository;
     @Autowired
     private PersonalDataRepository personalDataRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private SignupUserRepository signupUserRepository;
 
     public User getUserByUsername(String username){
         Optional<User> user = userRepository.findByUsername(username);
@@ -111,6 +118,22 @@ public class UserService {
         } catch (Exception e) {
             log.error("An error occurred while updating personal data", e);
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred");
+        }
+    }
+
+    public ResponseEntity<Map<String, ?>> signupUser(SignupUser sentUser) {
+        try{
+            if(signupUserRepository.findByUsername(sentUser.getUsername()).isPresent()) throw new Exception("User with username already exists");
+            String saltedPassword = passwordEncoder.encode(sentUser.getSalted_password());
+            sentUser.setSalted_password(saltedPassword);
+            sentUser.setCreatedAt(Instant.now());
+            sentUser.setIsApproved(false);
+            log.info("Creating new user: {}", sentUser);
+            signupUserRepository.save(sentUser);
+            return ResponseEntity.ok(Map.of("message", "User created successfully"));
+        } catch (Exception e){
+            log.error("An error occurred while creating user{}", e.getMessage());
+            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
         }
     }
 

@@ -77,7 +77,7 @@ public class SecurityConfig{
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-user", "/error").permitAll()
+                        .requestMatchers("/login", "/login-user", "/error", "/signup").permitAll()
                         .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
