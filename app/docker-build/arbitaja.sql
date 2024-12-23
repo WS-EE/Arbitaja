@@ -257,11 +257,7 @@ ALTER TABLE "competitor_competition" ADD FOREIGN KEY ("competition_id") REFERENC
 
 ALTER TABLE "competitor_competition" ADD FOREIGN KEY ("competitor_id") REFERENCES "competitor" ("id");
 
-ALTER TABLE "signup_user" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-
 ALTER TABLE "signup_user" ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id");
-
-ALTER TABLE "signup_user" ADD FOREIGN KEY ("competitor_id") REFERENCES "competitor" ("id");
 
 ALTER TABLE "scoring_groups_structure" ADD FOREIGN KEY ("competitor_id") REFERENCES "competitor" ("id");
 
