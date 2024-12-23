@@ -138,7 +138,7 @@ const checkUserAdmin = async () => {
             </div>
         </div>
     </div>
-    <nav class="navbar navbar-expand-sm">
+    <nav class="navbar navbar-expand-md">
         <div class="container-fluid">
             <RouterLink class="navbar-brand" to="/home"><img :src="logo" width="30">Arbitaja</RouterLink>
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation" >
