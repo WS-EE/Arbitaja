@@ -1,4 +1,4 @@
-package com.arbitaja.backend.users;
+package com.arbitaja.backend.users.APIs;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import com.arbitaja.backend.users.dataobjects.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -51,12 +51,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('basic')")
     public ResponseEntity<?> getUserProfile() throws JsonProcessingException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+        User user = userService.getUserByUsername(auth.getName());
 
-        User user = userService.getUserByUsername(username);
         if(user != null) {
             Personal_data personalData = user.getPersonal_data();
-            ResponseEntity<Map<String, ?>> response = userService.mapPersonalData(auth, personalData);
+            ResponseEntity<Map<String, ?>> response = userService.mapPersonalData(auth, personalData, user);
             log.debug("Sending Response for authenticated user: " + "{}", objectMapper.writeValueAsString(response));
             return response;
         }
