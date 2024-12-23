@@ -18,7 +18,7 @@ public class Personal_data {
     private String email;
 
     @ManyToOne
-    @JoinColumn(name = "school_id", nullable = false)
+    @JoinColumn(name = "school_id")
     private School school;
     @Column(name = "created_at")
     private Timestamp created_at;
