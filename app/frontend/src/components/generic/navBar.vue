@@ -74,6 +74,70 @@ const checkUserAdmin = async () => {
 </script>
 
 <template>
+    <!-- License Modal before navbar -->
+    <!-- If this is below navbar then it breaks on mobile-->
+    <div class="modal fade" id="LicenseBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticLicenseBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">MIT License</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>MIT License</p>
+
+                    <p>Copyright (c) 2024 WorldSkills Estonia</p>
+
+                    <p>
+                        Permission is hereby granted, free of charge, to any person obtaining a copy
+                        of this software and associated documentation files (the "Software"), to deal
+                        in the Software without restriction, including without limitation the rights
+                        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                        copies of the Software, and to permit persons to whom the Software is
+                        furnished to do so, subject to the following conditions:
+                    </p>
+
+                    <p>
+                        The above copyright notice and this permission notice shall be included in all
+                        copies or substantial portions of the Software.
+                    </p>
+
+                    <p>
+                        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+                        SOFTWARE.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal content when redirecting to github -->
+    <div class="modal fade" id="github-modal" tabindex="-1" aria-labelledby="github-redirect-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">You are about to be redirected!</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>You are going to be redirected to the source code of this project.</p> 
+                    <p>Which is held on Github<i class="bi bi-github"></i></p> 
+                    <p><strong>Yes. The entire source code.</strong> No ifs or buts.</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="https://github.com/WS-EE/Arbitaja" class="btn btn-outline-success" target="_blank" rel="noopener noreferrer">To source code</a>
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <nav class="navbar navbar-expand-sm">
         <div class="container-fluid">
             <RouterLink class="navbar-brand" to="/home"><img :src="logo" width="30">Arbitaja</RouterLink>
@@ -119,20 +183,29 @@ const checkUserAdmin = async () => {
                             >Admin</RouterLink>
                         </li>
                     </ul>
-                    <div class="row ms-auto">
-                        <div class="col-2 col-sm-3 d-flex nav-item rounded" 
-                            :class="[
-                                isLinkActive('/userProfile') 
-                                    ? 'active-item' : '',
-                            ]">
-                            <RouterLink v-if="isLoggedIn" class="github rounded nav-link ps-2 me-2 align-content-center" :to="'/userProfile'"><i class="bi bi-person-gear"></i></RouterLink>
+                    <div class="row ms-auto flex-row-reverse">
+                        <div class="col-4 col-sm-4 d-flex justify-content-center align-items-center m-1">
+                            <a v-if="isLoggedIn" class="btn btn-outline-dark" @click.prevent="userLogout">Logout</a>
+                            <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark align-content-center" to="/login">Login</RouterLink>
                         </div>
-                        <div class="col-7 col-sm-3 d-flex">
-                            <a href="https://github.com/WS-EE/Arbitaja" class="github rounded nav-link ps-3 pe-3 align-content-center bi bi-github" target="_blank" rel="noopener noreferrer"></a>
+                        <div class="col-2 col-sm-2 d-flex justify-content-center nav-item rounded align-items-center m-1">
+                            <button type="button" class="btn github align-content-center nav-link rounded" data-bs-toggle="modal" data-bs-target="#LicenseBackdrop">
+                                <i class="bi bi-pen"></i>
+                            </button>
                         </div>
-                        <div class="col-3 col-sm-3 d-flex me-sm-1 ms-sm-1">
-                            <a v-if="isLoggedIn" class="btn btn-outline-dark m-1" @click.prevent="userLogout">Logout</a>
-                            <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark m-1" to="/login">Login</RouterLink>
+                        <div class="col-2 col-sm-2 d-flex justify-content-center nav-item rounded align-items-center m-1">
+                            <button type="button" class="btn rounded nav-link align-content-center github" data-bs-toggle="modal" data-bs-target="#github-modal">
+                                <i class="bi bi-github"></i>
+                            </button>             
+                        </div>
+                        <div class="col-2 col-sm-2 d-flex rounded justify-content-center align-items-center m-1"
+                        :class="[ 
+                            (isLoggedIn) ? 'nav-item' : '',
+                            isLinkActive('/userProfile') 
+                            ? 'active-item' : '',
+                        ]" 
+                        >
+                            <RouterLink v-if="isLoggedIn" class="github rounded nav-link align-content-center" to="/userProfile"><i class="bi bi-person-gear"></i></RouterLink>
                         </div>
                     </div>
                 </div>
