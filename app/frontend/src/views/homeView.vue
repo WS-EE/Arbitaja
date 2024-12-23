@@ -15,60 +15,24 @@ onMounted(async () => {
     try {
         isLoggedIn.value = await $cookies.get('isLoggedIn');
         userParameters.value = await $cookies.get('userParameters');
-        displayUsername.value = userParameters.value.username
+        displayUsername.value = userParameters.value.personal_data.full_name
     } catch(err) {
         console.log('User is unauthenticated')
         isLoggedIn.value = false
     }
-
-    // Fade alerts
-    setTimeout(() => {
-        alertShow.value = false
-    }, 5000)
 })
-
-const alertShow = ref(true)
-
-function closeAlert(){
-    alertShow.value = false
-}
 
 </script>
 
 <template>
+    <!-- Alert message when conecting to site -->
     <div class="container p-3">
         <!-- When user is logged out -->
         <div v-if="!isLoggedIn">
-            <Transition>
-                <div
-                    v-if="alertShow"
-                    class="alert alert-warning alert-dismissible"
-                    role="alert">
-                    <button
-                        @click="closeAlert"
-                        type="button"
-                        class="btn-close"
-                    ></button>
-                    <strong>You are not authenticated!</strong> More content visable when logged in.
-                </div>
-            </Transition>
             <h1>Welcome to Arbitaja</h1>
         </div>
         <!-- When user is logged in -->
         <div v-if="isLoggedIn">
-            <Transition>
-                <div
-                    v-if="alertShow"
-                    class="alert alert-success alert-dismissible"
-                    role="alert">
-                    <button
-                        @click="closeAlert"
-                        type="button"
-                        class="btn-close"
-                    ></button>
-                <strong>Success.</strong> Your are now authenticated and ready to use arbitaja.
-                </div>
-            </Transition>
             <h1>Welcome {{ displayUsername }}!</h1>
             <p>You have logged in!</p>
         </div>    
