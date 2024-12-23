@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onBeforeMount } from 'vue';
 
 import logo from '@/assets/media/logo.svg';
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
 import axios from 'axios';
 
 // import cookie handler
@@ -31,7 +31,7 @@ const userLogin = () => {
         // Set user to be logged in
         $cookies.set('isLoggedIn', true, 0);
         $cookies.set('userParameters', response.data, 0);
-        router.replace('/home');
+        router.back()
       }
     })
     .catch(function (error) {
@@ -47,6 +47,17 @@ const userLogin = () => {
       }, 3000);
     });
 }
+
+// Redirect back to previos page when user is logged in.
+onBeforeMount(async () => {
+    try {
+      const userData = await axios.get('profile')
+      if (userData.status === 200) {
+        router.back();
+        location.reload;
+      }
+    } finally {}
+})
 </script>
 
 <template>
