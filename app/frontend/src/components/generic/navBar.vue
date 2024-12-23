@@ -184,9 +184,13 @@ const checkUserAdmin = async () => {
                         </li>
                     </ul>
                     <div class="row ms-auto flex-row-reverse">
-                        <div class="col-4 col-sm-4 d-flex justify-content-center align-items-center m-1">
+                        <div class="col-4 col-sm-4 d-flex justify-content-center align-items-center m-1"
+                            :class="[
+                                (isLoggedIn) ? 'col-4 col-sm-4' : 'col-6 col-sm-6'
+                            ]"
+                        >
                             <a v-if="isLoggedIn" class="btn btn-outline-dark" @click.prevent="userLogout">Logout</a>
-                            <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark align-content-center" to="/login">Login</RouterLink>
+                            <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark align-content-center" to="/login">Login/Signup</RouterLink>
                         </div>
                         <div class="col-2 col-sm-2 d-flex justify-content-center nav-item rounded align-items-center m-1">
                             <button type="button" class="btn github align-content-center nav-link rounded" data-bs-toggle="modal" data-bs-target="#LicenseBackdrop">
@@ -199,13 +203,14 @@ const checkUserAdmin = async () => {
                             </button>             
                         </div>
                         <div class="col-2 col-sm-2 d-flex rounded justify-content-center align-items-center m-1"
-                        :class="[ 
-                            (isLoggedIn) ? 'nav-item' : '',
-                            isLinkActive('/userProfile') 
-                            ? 'active-item' : '',
-                        ]" 
+                            v-if="isLoggedIn"
+                            :class="[ 
+                                (isLoggedIn) ? 'nav-item' : '',
+                                isLinkActive('/userProfile') 
+                                ? 'active-item' : '',
+                            ]" 
                         >
-                            <RouterLink v-if="isLoggedIn" class="github rounded nav-link align-content-center" to="/userProfile"><i class="bi bi-person-gear"></i></RouterLink>
+                            <RouterLink class="github rounded nav-link align-content-center" to="/userProfile"><i class="bi bi-person-gear"></i></RouterLink>
                         </div>
                     </div>
                 </div>

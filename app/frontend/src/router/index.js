@@ -5,6 +5,8 @@ import homeView from '@/views/homeView.vue';
 import userView from '@/views/userView.vue';
 import userProfileView from '@/views/userProfileView.vue';
 import adminView from '@/views/adminView.vue';
+import LoginPage from '@/components/login/LoginPage.vue';
+import SignupPage from '@/components/login/SignupPage.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,7 +14,20 @@ const router = createRouter({
         {
             path: '/login',
             name: 'login',
-            component: loginView
+            component: loginView,
+            redirect: '/login/1',
+            children: [
+                {
+                    path: '/login/1',
+                    name: 'loginMenu',
+                    component: LoginPage
+                },
+                {
+                    path: '/login/2',
+                    name: 'signupMenu',
+                    component: SignupPage
+                },
+            ]
         },
         {
             path: '/',

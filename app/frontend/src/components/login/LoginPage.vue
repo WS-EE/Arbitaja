@@ -56,7 +56,7 @@ onBeforeMount(async () => {
         router.back();
         location.reload;
       }
-    } finally {}
+    } catch(e) {}
 })
 </script>
 
@@ -84,7 +84,8 @@ onBeforeMount(async () => {
               <input class="me-2" type="checkbox" id="rememberMe" v-model="rememberMe">
               <label for="rememberMe">Remember me</label>
             </div>
-            <button class="btn btn-dark" type="submit">Login</button>
+            <button class="btn btn-dark m-1" type="submit">Login</button>
+            <RouterLink to="/login/2" class="btn btn-outline-dark m-1">Sign up</RouterLink>
           </form>
         </div>
       </div>
