@@ -45,10 +45,22 @@ const router = createRouter({
                     name: 'userProfile',
                     component: userProfileView
                 },
+            ]
+        },
+        {
+            path: '/admin/',
+            name: 'admin',
+            component: adminView,
+            children: [
                 {
-                    path: '/admin/',
-                    name: 'admin',
-                    component: adminView
+                    path: 'competition',
+                    name: 'adminCompetiton',
+                    component: homeView 
+                },
+                {
+                    path: 'schools',
+                    name: 'adminSchools',
+                    component: userProfileView
                 },
             ]
         },
