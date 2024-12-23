@@ -51,6 +51,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('basic')")
     public ResponseEntity<?> getUserProfile() throws JsonProcessingException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Getting user profile for user: {}, {}", auth.getName(), auth.getDetails());
         User user = userService.getUserByUsername(auth.getName());
 
         if(user != null) {
@@ -65,9 +66,9 @@ public class UserController {
     @Transactional
     @PutMapping("/profile")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> updateUserProfile(@RequestBody Map<String, ?> userProfile) {
+    public ResponseEntity<?> updateUserProfile(@RequestBody User sentUser) {
         try {
-            ResponseEntity<Map<String, ?>> resp = userService.updatePersonalData(SecurityContextHolder.getContext().getAuthentication(), userProfile);
+            ResponseEntity<Map<String, ?>> resp = userService.updatePersonalData(SecurityContextHolder.getContext().getAuthentication(), sentUser);
             log.debug("Sending Response for updated user: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e) {

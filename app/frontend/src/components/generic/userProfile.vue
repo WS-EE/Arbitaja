@@ -84,11 +84,11 @@ const saveProfile = (async () =>{
             username: username.value,
             personal_data: {
                 full_name: fullName.value,
-                email: email.value
+                email: email.value,
+                school: {
+                  id: school.value.id
+                }
             },
-            school: {
-                id: school.value.id
-            }
         })
 
         // On positive response load new data.

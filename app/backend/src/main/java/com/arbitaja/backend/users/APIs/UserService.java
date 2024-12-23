@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,9 +36,9 @@ public class UserService {
         return user.orElse(null);
     }
 
-    public User getUserById(Map<String, ?> userProfile){
-        int userId = getUserId(userProfile);
-        Optional<User> user = userRepository.findById(userId);
+    public User getUserById(int id){
+        if(id == 0) return null;
+        Optional<User> user = userRepository.findById(id);
         return user.orElse(null);
     }
 
@@ -65,42 +67,41 @@ public class UserService {
                 "school", Map.of("id", personalData.getSchool().getId(), "name", personalData.getSchool().getName())));
     }
 
-    public ResponseEntity<Map<String, ?>> updatePersonalData(Authentication auth, Map<String, ?> userProfile) {
-        log.info("Updating user profile: {}", userProfile);
+    public ResponseEntity<Map<String, ?>> updatePersonalData(Authentication auth, User sentUser) {
+        log.info("Updating user profile: {}", sentUser);
         try {
-            User user = getUserById(userProfile);
-            if (user == null) {
-                return errorResponse(HttpStatus.NOT_FOUND, "User not found");
-            }
+            User user = getUserById(sentUser.getId());
+            if (user == null) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
+            String newUsername = sentUser.getUsername();
 
-            String newUsername = (String) userProfile.get("username");
-            if (!validateUsername(newUsername)) {
-                return errorResponse(HttpStatus.BAD_REQUEST, "Invalid username");
-            }
+            
+            if (newUsername == null) return errorResponse(HttpStatus.BAD_REQUEST, "Invalid username");
             user.setUsername(newUsername);
 
+
             Personal_data personalData = user.getPersonal_data();
-            if (personalData == null) {
-                personalData = new Personal_data();
-            }
+            if (personalData == null) personalData = new Personal_data();
 
-            Map<String, Integer> schoolMap = extractMap(userProfile, "school");
-            Map<String, String> personalDataMap = extractMap(userProfile, "personal_data");
-            if (schoolMap == null || personalDataMap == null) {
-                return errorResponse(HttpStatus.BAD_REQUEST, "Invalid profile data");
-            }
 
-            if (!validatePersonalData(personalDataMap)) {
-                return errorResponse(HttpStatus.BAD_REQUEST, "Invalid full name or email");
-            }
-            personalData.setFull_name(personalDataMap.get("full_name"));
-            personalData.setEmail(personalDataMap.get("email"));
+            Personal_data personalDataMap = sentUser.getPersonal_data();
+            if (personalDataMap == null) return errorResponse(HttpStatus.BAD_REQUEST, "Invalid personal data");
 
-            School school = getSchoolFromProfile(schoolMap);
-            if (school == null) {
-                return errorResponse(HttpStatus.NOT_FOUND, "School not found");
-            }
+
+            School schoolMap = personalDataMap.getSchool();
+            if (schoolMap == null) return errorResponse(HttpStatus.BAD_REQUEST, "Invalid school");
+
+
+            if (personalDataMap.getEmail().isEmpty() || personalDataMap.getFull_name().isEmpty()) return errorResponse(HttpStatus.BAD_REQUEST, "Invalid full name or email");
+            personalData.setFull_name(personalDataMap.getFull_name());
+            personalData.setEmail(personalDataMap.getEmail());
+
+
+            School school = getSchoolById(schoolMap.getId());
+            if (school == null) return errorResponse(HttpStatus.NOT_FOUND, "School not found");
             personalData.setSchool(school);
+
+
+            if(personalData.getCreated_at() == null) personalData.setCreated_at(Timestamp.from(Instant.now()));
 
             updatePersonalData(personalData);
             user.setPersonal_data(personalData);
@@ -113,65 +114,8 @@ public class UserService {
         }
     }
 
-    private boolean validateUsername(String username) {
-        if (username == null || username.isEmpty()) {
-            log.error("Invalid username: {}", username);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean validatePersonalData(Map<String, String> personalDataMap) {
-        String fullName = personalDataMap.get("full_name");
-        String email = personalDataMap.get("email");
-        if (fullName == null || fullName.isEmpty()) {
-            log.error("Invalid full name: {}", fullName);
-            return false;
-        }
-        if (email == null || email.isEmpty()) {
-            log.error("Invalid email: {}", email);
-            return false;
-        }
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> T extractMap(Map<String, ?> data, String key) {
-        Object value = data.get(key);
-        if (value instanceof Map) {
-            return (T) value;
-        }
-        return null;
-    }
-
-    private School getSchoolFromProfile(Map<String, Integer> schoolMap) {
-        Integer schoolId = schoolMap.get("id");
-        if (schoolId == null) {
-            log.error("Missing school ID");
-            return null;
-        }
-        School school = getSchoolById(schoolId);
-        if (school == null) {
-            log.error("School not found for ID: {}", schoolId);
-        }
-        return school;
-    }
-
     private ResponseEntity<Map<String, ?>> errorResponse(HttpStatus status, String errorMessage) {
         log.error(errorMessage);
         return ResponseEntity.status(status).body(Map.of("error", errorMessage));
-    }
-
-    private int getUserId(Map<String, ?> userProfile) {
-        Object userId;
-        try{
-            userId = userProfile.get("id");
-            if(userId == null) throw new Exception("user id is null");
-            if(!(userId instanceof Integer)) throw new Exception("user id is not an integer");
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return -1;
-        }
-        return (int) userId;
     }
 }
