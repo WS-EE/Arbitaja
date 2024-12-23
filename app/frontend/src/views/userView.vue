@@ -16,9 +16,7 @@ onMounted(async () => {
       await $cookies.set('isLoggedIn', true, 0);
       await $cookies.set('userParameters', response.data, 0);
     }
-  } catch(error) {
-    console.log('Error:', error)
-  };
+  } catch(error) {};
 });
 </script>
 

@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import loginView from '@/views/loginView.vue';
 import notFoundView from '@/views/notFoundView.vue';
 import homeView from '@/views/homeView.vue';
-import baseView from '@/views/baseView.vue';
+import userView from '@/views/userView.vue';
 import userProfileView from '@/views/userProfileView.vue';
 import adminView from '@/views/adminView.vue';
 
@@ -16,8 +16,8 @@ const router = createRouter({
         },
         {
             path: '/',
-            name: 'base',
-            component: baseView,
+            name: 'user',
+            component: userView,
             redirect: 'home',
             children:[
                 {
