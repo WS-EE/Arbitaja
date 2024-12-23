@@ -142,18 +142,22 @@ function changeSchool(id, name){
 </script>
 
 <template>
+    <!-- Alert when needed -->
+    <div class="container text-center fixed-top">
+        <div class="row justify-content-center align-items-center align-self-center">
+            <Transition class="m-2 col-10 col-md-8 col-lg-6" name="alert">
+                <div
+                    v-if="showAlert"
+                    class="alert alert-sizes align-self-center"
+                    :class="alertType"
+                    role="alert"
+                >
+                    <span v-html="alertMessage"></span>
+                </div>
+            </Transition>
+        </div>
+    </div>
     <div class="container p-3 container-bottom">
-        <!-- Alert when needed pressed -->
-        <Transition name="alert">
-            <div
-                v-if="showAlert"
-                class="alert"
-                :class="alertType"
-                role="alert"
-            >
-                <span v-html="alertMessage"></span>
-            </div>
-        </Transition>
         <h1 class="">User Profile</h1>
         <hr>
 
@@ -248,13 +252,4 @@ function changeSchool(id, name){
 </template>
 
 <style scoped>
-.alert-enter-active,
-.alert-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.alert-enter-from,
-.alert-leave-to {
-  opacity: 0;
-}
 </style>
