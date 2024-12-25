@@ -81,10 +81,38 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<?> createSignupUser(@RequestBody SignupUser signupUser){
         try{
-            return userService.signupUser(signupUser);
+            ResponseEntity<Map<String, ?>> resp = userService.signupUser(signupUser);
+            log.debug("Sending Response for SignupUser: " + "{}", objectMapper.writeValueAsString(resp));
+            return resp;
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
         }
     }
 
+    @PostMapping("/confirm/signup")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> confirmSignupUser(@RequestBody SignupUser signupUser){
+        try{
+            ResponseEntity<Map<String, ?>> resp = userService.confirmUser(signupUser.getId());
+            log.debug("Sending Response for user confirmation: " + "{}", objectMapper.writeValueAsString(resp));
+            return resp;
+        }catch (Exception e){
+            log.error("An error occurred while confirming user", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
+        }
+    }
+
+    @GetMapping("/get/signups")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> getSignups(){
+        try{
+            ResponseEntity<Map<String, ?>> resp = ResponseEntity.ok(Map.of("signup_users", userService.signupUserList()));
+            log.debug("Sending Response for Signups: " + "{}", objectMapper.writeValueAsString(resp));
+            return resp;
+        } catch (Exception e) {
+            log.error(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
+
+        }
+    }
 }

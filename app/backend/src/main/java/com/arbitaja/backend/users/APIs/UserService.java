@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -123,7 +124,8 @@ public class UserService {
 
     public ResponseEntity<Map<String, ?>> signupUser(SignupUser sentUser) {
         try{
-            if(signupUserRepository.findByUsername(sentUser.getUsername()).isPresent()) throw new Exception("User with username already exists");
+            if(signupUserRepository.findByUsername(sentUser.getUsername()).isPresent()
+                    || userRepository.findUserByUsername(sentUser.getUsername()) != null) throw new Exception("User with username already exists");
             String saltedPassword = passwordEncoder.encode(sentUser.getSalted_password());
             sentUser.setSalted_password(saltedPassword);
             sentUser.setCreatedAt(Instant.now());
@@ -135,6 +137,26 @@ public class UserService {
             log.error("An error occurred while creating user{}", e.getMessage());
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
         }
+    }
+
+    public ResponseEntity<Map<String, ?>> confirmUser(int id) {
+        try{
+            Optional<SignupUser> signupUser = signupUserRepository.findById(id);
+            if(signupUser.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
+            SignupUser user = signupUser.get();
+            User newUser = new User(user.getPersonal_data(), user.getSalted_password(), user.getUsername(), null);
+            user.setIsApproved(true);
+            userRepository.save(newUser);
+            signupUserRepository.delete(user);
+            return ResponseEntity.ok(Map.of("message", "User approved successfully"));
+        } catch (Exception e){
+            log.error("An error occurred while confirming user{}", e.getMessage());
+            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
+        }
+    }
+
+    public List<SignupUser> signupUserList() {
+        return signupUserRepository.findAll();
     }
 
     private ResponseEntity<Map<String, ?>> errorResponse(HttpStatus status, String errorMessage) {
