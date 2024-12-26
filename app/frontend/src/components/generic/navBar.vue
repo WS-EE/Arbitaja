@@ -56,11 +56,11 @@ const checkUserAdmin = async () => {
     // Get user groups
     try {
         let isTrue = false
-        const userGroups = userParameters.value.roles
+        const userGroups = userParameters.value.permissions
         // loop over user groups
-        for (var role of userGroups){
+        for (var permission of userGroups){
             // if we find admin groups in users groups return true
-            if (role.authority === 'admin') {
+            if (permission.authority === 'admin') {
                 isTrue = true
             }
         }
