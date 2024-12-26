@@ -40,7 +40,7 @@ public class UserController {
 
         if(user != null) {
             Personal_data personalData = user.getPersonal_data();
-            ResponseEntity<Map<String, ?>> response = userService.mapPersonalData(auth, personalData, user);
+            ResponseEntity<Map<String, ?>> response = userService.mapPersonalData(personalData, user);
             log.debug("Sending Response for authenticated user: " + "{}", objectMapper.writeValueAsString(response));
             return response;
         }
@@ -75,7 +75,6 @@ public class UserController {
 
     @Transactional
     @PostMapping("/signup/approve")
-    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> approveSignupUser(@RequestBody SignupUser signupUser){
         try{
             ResponseEntity<Map<String, ?>> resp = userService.approveUser(signupUser);
