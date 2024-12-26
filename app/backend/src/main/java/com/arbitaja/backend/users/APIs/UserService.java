@@ -155,19 +155,31 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Map<String, ?>> approveUser(int id) {
+    public ResponseEntity<Map<String, ?>> declineUser(SignupUser sentUser) {
         try{
-            Optional<SignupUser> signupUser = signupUserRepository.findById(id);
-            if(signupUser.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
-            SignupUser user = signupUser.get();
+            signupUserRepository.delete(sentUser);
+            return ResponseEntity.ok(Map.of("message", "User declined successfully"));
+        } catch (Exception e){
+            log.error("An error occurred while declining user{}", e.getMessage());
+            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
+        }
+    }
+
+    public ResponseEntity<Map<String, ?>> approveUser(SignupUser sentUser) {
+        try{
+            SignupUser user = setSignupUserChanges(sentUser);
+
             Personal_data personalData = new Personal_data(user.getPersonal_data());
             personalDataRepository.save(personalData);
+
             User newUser = new User(user, personalData);
-            user.setIsApproved(true);
+
+            userRepository.save(newUser);
+
             Optional<Role> role = roleRepository.findByName("user");
             if(role.isEmpty()) return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "role user not found");
             User_role basic = new User_role(newUser, role.get());
-            userRepository.save(newUser);
+
             userRoleRepository.save(basic);
             signupUserRepository.delete(user);
             return ResponseEntity.ok(Map.of("message", "User approved successfully"));
@@ -184,5 +196,15 @@ public class UserService {
     private ResponseEntity<Map<String, ?>> errorResponse(HttpStatus status, String errorMessage) {
         log.error(errorMessage);
         return ResponseEntity.status(status).body(Map.of("error", errorMessage));
+    }
+
+    private SignupUser setSignupUserChanges(SignupUser sentUser) throws Exception {
+        Optional<SignupUser> signupUser = signupUserRepository.findById(sentUser.getId());
+        if(signupUser.isEmpty()) throw new Exception("User not found");
+        SignupUser newUser = signupUser.get();
+        newUser.setUsername(sentUser.getUsername());
+        newUser.setPersonal_data(sentUser.getPersonal_data());
+        newUser.setIsApproved(true);
+        return newUser;
     }
 }

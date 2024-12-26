@@ -57,10 +57,11 @@ public class UserController {
             return resp;
         } catch (Exception e) {
             log.error("Failed to update user profile", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
         }
     }
 
+    @Transactional
     @PostMapping("/signup/create")
     public ResponseEntity<?> createSignupUser(@RequestBody SignupUser signupUser){
         try{
@@ -68,7 +69,7 @@ public class UserController {
             log.debug("Sending Response for SignupUser: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
         }
     }
 
@@ -77,12 +78,26 @@ public class UserController {
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> approveSignupUser(@RequestBody SignupUser signupUser){
         try{
-            ResponseEntity<Map<String, ?>> resp = userService.approveUser(signupUser.getId());
+            ResponseEntity<Map<String, ?>> resp = userService.approveUser(signupUser);
             log.debug("Sending Response for user confirmation: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         }catch (Exception e){
             log.error("An error occurred while confirming user", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
+        }
+    }
+
+    @Transactional
+    @DeleteMapping("/signup/approve")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> deleteSignupUser(@RequestBody SignupUser signupUser){
+        try{
+            ResponseEntity<Map<String, ?>> resp = userService.declineUser(signupUser);
+            log.debug("Sending Response for declining user: " + "{}", objectMapper.writeValueAsString(resp));
+            return resp;
+        } catch (Exception e){
+            log.error("An error occurred while confirming user", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
         }
     }
 
@@ -95,7 +110,7 @@ public class UserController {
             return resp;
         } catch (Exception e) {
             log.error(e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
 
         }
     }
