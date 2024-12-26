@@ -4,8 +4,10 @@ import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.PersonalDataRepository;
 import com.arbitaja.backend.competitors.repositories.SchoolRepository;
+import com.arbitaja.backend.users.dataobjects.Role;
 import com.arbitaja.backend.users.dataobjects.SignupUser;
 import com.arbitaja.backend.users.dataobjects.User;
+import com.arbitaja.backend.users.repositories.RoleRepository;
 import com.arbitaja.backend.users.repositories.SignupUserRepository;
 import com.arbitaja.backend.users.repositories.UserRepository;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +40,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private SignupUserRepository signupUserRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     public User getUserByUsername(String username){
         Optional<User> user = userRepository.findByUsername(username);
@@ -65,13 +69,16 @@ public class UserService {
     }
 
     public ResponseEntity<Map<String, ?>> mapPersonalData(Authentication auth, Personal_data personalData, User user){
+        List<Role> roles = roleRepository.findRolesByUserId(user.getId());
         if(personalData == null){
-            return ResponseEntity.ok(Map.of("id", user.getId(), "username", user.getUsername(),"roles", auth.getAuthorities(),
+            return ResponseEntity.ok(Map.of("id", user.getId(), "username", user.getUsername(),
+                    "permissions", auth.getAuthorities(), "roles", roles,
                     "personal_data", Map.of("full_name", "", "email", "",
                             "school", Map.of("id", "", "name", ""))));
         }
-        return ResponseEntity.ok(Map.of("id", user.getId(), "username", user.getUsername(),"roles", auth.getAuthorities(), "personal_data",
-                Map.of("full_name", personalData.getFull_name(), "email", personalData.getEmail()),
+        return ResponseEntity.ok(Map.of("id", user.getId(), "username", user.getUsername(),
+                "permissions", auth.getAuthorities(), "roles", roles,
+                "personal_data", Map.of("full_name", personalData.getFull_name(), "email", personalData.getEmail()),
                 "school", Map.of("id", personalData.getSchool().getId(), "name", personalData.getSchool().getName())));
     }
 
