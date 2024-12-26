@@ -1,7 +1,7 @@
 package com.arbitaja.backend.users.dataobjects;
 
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -17,7 +17,7 @@ public class SignupUser {
     @Column(name = "username", length = Integer.MAX_VALUE, unique = true, nullable = false)
     private String username;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "salted_password", length = Integer.MAX_VALUE)
     private String salted_password;
 
