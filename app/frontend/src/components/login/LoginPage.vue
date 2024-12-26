@@ -51,7 +51,7 @@ const userLogin = () => {
 // Redirect back to previos page when user is logged in.
 onBeforeMount(async () => {
     try {
-      const userData = await axios.get('profile')
+      const userData = await axios.get('user/profile/get')
       if (userData.status === 200) {
         router.back();
         location.reload;

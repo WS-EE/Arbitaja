@@ -23,7 +23,7 @@ const school = ref('')
 onMounted(async () => {
     // Try getting school data
     try {
-        const response = await axios.get('schools')
+        const response = await axios.get('school/all/get')
         allSchools.value = response.data
     } catch(error) {
         displayAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
@@ -79,7 +79,7 @@ function displayAlert(message, type, timeout){
 const saveProfile = (async () =>{
     try {
         // Update data with PUT request
-        const response = await axios.put('profile', {
+        const response = await axios.put('user/profile/get', {
             id: userid.value,
             username: username.value,
             personal_data: {
@@ -239,7 +239,7 @@ function changeSchool(id, name){
             <div class="col">
                 <!-- Horizontal under breakpoint -->
                 <ul class="list-group list-group-horizontal">
-                    <li v-for="role in roles" class="list-group-item disabled">{{ role.authority }}</li>
+                    <li v-for="role in roles" class="list-group-item disabled">{{ role.name }}</li>
                 </ul>          
             </div>
         </div>

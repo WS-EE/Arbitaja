@@ -14,8 +14,15 @@ const rePassword = ref("");
 
 
 const userSignup = () => {
-    //axios.post('singup')
-    displayAlert('hello')
+    const resp = axios.post('user/signup/create', {
+      username: username.value,
+      salted_password: password.value,
+      personal_data: {
+        full_name: fullName.value,
+        email: email.value
+      }
+    })
+    displayAlert(resp)
 }
 
 // Alert function

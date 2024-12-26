@@ -15,7 +15,7 @@ const isUserAdmin = ref();
 
 onMounted(async () => {
   try {
-    const response = await axios.get('profile')
+    const response = await axios.get('user/profile/get')
     if(response.status === 200 && response.data.username !== 'anonymousUser'){
       // Set user to be logged in
       await $cookies.set('isLoggedIn', true, 0);
@@ -42,9 +42,9 @@ const checkUserAdmin = async () => {
         let isTrue = false
         const userGroups = userParameters.value.roles
         // loop over user groups
-        for (var role of userGroups){
+        for (const role of userGroups){
             // if we find admin groups in users groups return true
-            if (role.authority === 'admin') {
+            if (role.name === 'admin') {
                 isTrue = true
             }
         }
