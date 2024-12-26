@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import loginView from '@/views/loginView.vue';
 import notFoundView from '@/views/notFoundView.vue';
-import homeView from '@/views/homeView.vue';
+import homeView from '@/views/userViews/homeView.vue';
 import userView from '@/views/userView.vue';
-import userProfileView from '@/views/userProfileView.vue';
+import userProfileView from '@/views/userViews/userProfileView.vue';
 import adminView from '@/views/adminView.vue';
 import LoginPage from '@/components/login/LoginPage.vue';
 import SignupPage from '@/components/login/SignupPage.vue';
