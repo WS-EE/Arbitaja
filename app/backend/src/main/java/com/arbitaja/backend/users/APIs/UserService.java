@@ -7,9 +7,11 @@ import com.arbitaja.backend.competitors.repositories.SchoolRepository;
 import com.arbitaja.backend.users.dataobjects.Role;
 import com.arbitaja.backend.users.dataobjects.SignupUser;
 import com.arbitaja.backend.users.dataobjects.User;
+import com.arbitaja.backend.users.dataobjects.User_role;
 import com.arbitaja.backend.users.repositories.RoleRepository;
 import com.arbitaja.backend.users.repositories.SignupUserRepository;
 import com.arbitaja.backend.users.repositories.UserRepository;
+import com.arbitaja.backend.users.repositories.UserRoleRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,8 @@ public class UserService {
     private SignupUserRepository signupUserRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private UserRoleRepository userRoleRepository;
 
     public User getUserByUsername(String username){
         Optional<User> user = userRepository.findByUsername(username);
@@ -80,7 +84,8 @@ public class UserService {
         return ResponseEntity.ok(Map.of("id", user.getId(), "username", user.getUsername(),
                 "permissions", auth.getAuthorities(), "roles", roles,
                 "personal_data", Map.of("full_name", personalData.getFull_name(), "email", personalData.getEmail()),
-                "school", Map.of("id", personalData.getSchool().getId(), "name", personalData.getSchool().getName())));
+                "school", personalData.getSchool() != null ? Map.of("id", personalData.getSchool().getId(), "name", personalData.getSchool().getName()) :
+                        Map.of("id", "", "name", "")));
     }
 
     public ResponseEntity<Map<String, ?>> updatePersonalData(Authentication auth, User sentUser) {
@@ -150,14 +155,20 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Map<String, ?>> confirmUser(int id) {
+    public ResponseEntity<Map<String, ?>> approveUser(int id) {
         try{
             Optional<SignupUser> signupUser = signupUserRepository.findById(id);
             if(signupUser.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
             SignupUser user = signupUser.get();
-            User newUser = new User(user.getPersonal_data(), user.getSalted_password(), user.getUsername(), null);
+            Personal_data personalData = new Personal_data(user.getPersonal_data());
+            personalDataRepository.save(personalData);
+            User newUser = new User(user, personalData);
             user.setIsApproved(true);
+            Optional<Role> role = roleRepository.findByName("user");
+            if(role.isEmpty()) return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "role user not found");
+            User_role basic = new User_role(newUser, role.get());
             userRepository.save(newUser);
+            userRoleRepository.save(basic);
             signupUserRepository.delete(user);
             return ResponseEntity.ok(Map.of("message", "User approved successfully"));
         } catch (Exception e){

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -40,6 +41,12 @@ public class Role {
         this.name = name;
         this.created_at = created_at;
         this.changed_at = changed_at;
+    }
+
+    public Role(String name) {
+        this.name = name;
+        this.created_at = Timestamp.from(Instant.now());
+        this.changed_at = Timestamp.from(Instant.now());
     }
 
     public Role() {

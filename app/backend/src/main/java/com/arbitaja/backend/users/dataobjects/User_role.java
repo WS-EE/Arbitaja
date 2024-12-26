@@ -3,6 +3,7 @@ package com.arbitaja.backend.users.dataobjects;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @Table(name = "user_role")
@@ -27,6 +28,12 @@ public class User_role {
         this.user = user;
         this.role = role;
         this.created_at = created_at;
+    }
+
+    public User_role(User user, Role role) {
+        this.user = user;
+        this.role = role;
+        this.created_at = Timestamp.from(Instant.now());
     }
 
     public User_role() {}

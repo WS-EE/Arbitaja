@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -71,11 +72,12 @@ public class UserController {
         }
     }
 
+    @Transactional
     @PostMapping("/signup/approve")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> approveSignupUser(@RequestBody SignupUser signupUser){
         try{
-            ResponseEntity<Map<String, ?>> resp = userService.confirmUser(signupUser.getId());
+            ResponseEntity<Map<String, ?>> resp = userService.approveUser(signupUser.getId());
             log.debug("Sending Response for user confirmation: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         }catch (Exception e){
@@ -85,10 +87,10 @@ public class UserController {
     }
 
     @GetMapping("/signup/get")
-    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> getSignups(){
         try{
-            ResponseEntity<Map<String, ?>> resp = ResponseEntity.ok(Map.of("signup_users", userService.signupUserList()));
+            List<SignupUser> signupUsers = userService.signupUserList();
+            ResponseEntity<Map<String, ?>> resp = ResponseEntity.ok(Map.of("signup_users", signupUsers));
             log.debug("Sending Response for Signups: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e) {

@@ -21,12 +21,18 @@ public class User {
     private String username;
     @Column(name = "salted_password")
     private String salted_password;
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "personal_data_id")
     private Personal_data personal_data;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Api_token> apiTokens = new LinkedHashSet<>();
+
+    public User(SignupUser signupUser, Personal_data personal_data) {
+        this.username = signupUser.getUsername();
+        this.salted_password = signupUser.getSalted_password();
+        this.personal_data = personal_data;
+    }
 
     public User(Personal_data personal_data, String salted_password, String username, Api_token default_token) {
         this.personal_data = personal_data;

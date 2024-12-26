@@ -30,6 +30,13 @@ public class Personal_data {
         this.created_at = created_at;
     }
 
+    public Personal_data(Personal_data personal_data) {
+        this.full_name = personal_data.getFull_name();
+        this.email = personal_data.getEmail();
+        this.school = personal_data.getSchool();
+        this.created_at = personal_data.getCreated_at();
+    }
+
     public Personal_data() {}
 
     public int getId() {

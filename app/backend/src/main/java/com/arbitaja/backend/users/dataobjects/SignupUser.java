@@ -19,7 +19,7 @@ public class SignupUser {
     @Column(name = "salted_password", length = Integer.MAX_VALUE)
     private String salted_password;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "personal_data_id", nullable = false)
     private Personal_data personal_data;
 
