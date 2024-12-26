@@ -79,7 +79,7 @@ function displayAlert(message, type, timeout){
 const saveProfile = (async () =>{
     try {
         // Update data with PUT request
-        const response = await axios.put('user/profile/get', {
+        const response = await axios.put('user/profile/edit', {
             id: userid.value,
             username: username.value,
             personal_data: {
