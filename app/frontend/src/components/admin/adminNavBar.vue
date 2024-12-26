@@ -47,9 +47,20 @@ import logo from '@/assets/media/logo.svg'
                             ]" 
                             >Schools</RouterLink>
                         </li>
+                        <li class="nav-item rounded m-1 dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Users
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><RouterLink class="dropdown-item" to="/admin/users/user">Users</RouterLink></li>
+                                <li><RouterLink class="dropdown-item" to="/admin/users/role">Roles</RouterLink></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><RouterLink class="dropdown-item" to="/admin/users/singup">Signup Approve</RouterLink></li>
+                            </ul>
+                        </li>
                     </ul>
                     <div class="ms-auto flex-row-reverse justify-content-center align-items-center text-center">
-                        <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark align-content-center m-1" to="/home">Back to User View</RouterLink>
+                        <RouterLink class="btn btn-outline-dark align-content-center m-1" to="/home">Back to User View</RouterLink>
                     </div>
                 </div>
             </div>
