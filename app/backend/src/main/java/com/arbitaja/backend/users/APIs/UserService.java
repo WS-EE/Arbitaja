@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +88,9 @@ public class UserService {
         try {
             User user = getUserById(sentUser.getId());
             if (user == null) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
+            if(!auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")) && auth.getName().equals(user.getUsername())) {
+                return errorResponse(HttpStatus.FORBIDDEN, "User not authorized to change other user");
+            }
             String newUsername = sentUser.getUsername();
 
             

@@ -48,7 +48,7 @@ public class UserController {
 
     @Transactional
     @PutMapping("/profile/edit")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('basic')")
     public ResponseEntity<?> updateUserProfile(@RequestBody User sentUser) {
         try {
             ResponseEntity<Map<String, ?>> resp = userService.updatePersonalData(SecurityContextHolder.getContext().getAuthentication(), sentUser);
