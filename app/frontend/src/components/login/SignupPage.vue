@@ -13,8 +13,9 @@ const email = ref("");
 const rePassword = ref("");
 
 
-const userSignup = () => {
-    const resp = axios.post('user/signup/create', {
+const userSignup = async () => {
+  try{
+    const response = await axios.post('user/signup/create', {
       username: username.value,
       salted_password: password.value,
       personal_data: {
@@ -22,7 +23,19 @@ const userSignup = () => {
         email: email.value
       }
     })
-    displayAlert(resp)
+    if (response.status === 200){
+      displayAlert('<strong>' + response.data.message + '</strong>', 'success')
+    }
+  } catch(error) {
+    displayAlert(
+      '<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to signup!</strong></h4><hr><p class=mb-0>Error: ' + 
+      error + 
+      '</p><p class=mb-0><strong>' + error.response.data.error + '</strong></p>',
+      'danger',
+      6000
+    )
+    console.log(error)
+  }
 }
 
 // Alert function

@@ -12,6 +12,7 @@ const $cookies = useCookies();
 
 // Set isUser admin variable
 const isUserAdmin = ref();
+const userParameters = ref();
 
 onMounted(async () => {
   try {
@@ -21,9 +22,10 @@ onMounted(async () => {
       await $cookies.set('isLoggedIn', true, 0);
       await $cookies.set('userParameters', response.data, 0);
     }
+    userParameters.value = await $cookies.get('userParameters') 
     isUserAdmin.value = await checkUserAdmin();
 
-    if (isUserAdmin.value) {
+    if (!isUserAdmin.value) {
         await router.replace('/login');
         location.reload();
     }
