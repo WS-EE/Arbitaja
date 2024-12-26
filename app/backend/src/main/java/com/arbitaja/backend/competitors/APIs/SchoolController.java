@@ -9,10 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -20,7 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController("school")
+@RequestMapping("/school")
 public class SchoolController {
 
     private static final Logger log = LogManager.getLogger(SchoolController.class);
@@ -32,7 +30,7 @@ public class SchoolController {
     private ObjectMapper objectMapper;
 
 
-    @GetMapping("/schools")
+    @GetMapping("/all/get")
     public ResponseEntity<?> schools() throws JsonProcessingException {
         List<School> schools = schoolRepository.findAll();
         List<Map<String, ?>> schoolMap = new ArrayList<>();
@@ -44,7 +42,7 @@ public class SchoolController {
         return response;
     }
 
-    @PostMapping("/school/register")
+    @PostMapping("/register")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> registerSchool(@RequestBody School school) {
         try {

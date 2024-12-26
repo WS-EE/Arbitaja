@@ -20,7 +20,8 @@ import java.util.Map;
 
 
 @EnableMethodSecurity
-@RestController
+@RestController("user")
+@RequestMapping("/user")
 public class UserController {
     private static final Logger log = LogManager.getLogger(UserController.class);
 
@@ -29,26 +30,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/login")
-    public ResponseEntity<?> loginPage(@RequestParam(value = "error", required = false) boolean error, @RequestParam(value = "logout", required = false) boolean logout) throws JsonProcessingException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!error && auth != null) {
-            ResponseEntity<Map<String, Object>> response = ResponseEntity.status(HttpStatus.OK).body(Map.of("username", auth.getName(), "roles", auth.getAuthorities()));
-            log.info("Sending response for successful login: " + "{}", objectMapper.writeValueAsString(response));
-            return response;
-        }
-
-        if(logout && auth != null) {
-            ResponseEntity<String> response = ResponseEntity.status(HttpStatus.OK).body("User with username: " + auth.getName() + " logged out.");
-            log.info("Sending response for successful logout: " + "{}", objectMapper.writeValueAsString(response));
-            return response;
-        }
-        ResponseEntity<Map<String, Object>> response = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid username or password"));
-        log.info("Sending Response for unsuccessful login: " + "{}", objectMapper.writeValueAsString(response));
-        return response;
-    }
-
-    @GetMapping("/profile")
+    @GetMapping("/profile/get")
     @PreAuthorize("hasAuthority('basic')")
     public ResponseEntity<?> getUserProfile() throws JsonProcessingException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -65,7 +47,7 @@ public class UserController {
     }
 
     @Transactional
-    @PutMapping("/profile")
+    @PutMapping("/profile/edit")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> updateUserProfile(@RequestBody User sentUser) {
         try {
@@ -78,7 +60,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/signup/create")
     public ResponseEntity<?> createSignupUser(@RequestBody SignupUser signupUser){
         try{
             ResponseEntity<Map<String, ?>> resp = userService.signupUser(signupUser);
@@ -89,9 +71,9 @@ public class UserController {
         }
     }
 
-    @PostMapping("/confirm/signup")
+    @PostMapping("/signup/approve")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> confirmSignupUser(@RequestBody SignupUser signupUser){
+    public ResponseEntity<?> approveSignupUser(@RequestBody SignupUser signupUser){
         try{
             ResponseEntity<Map<String, ?>> resp = userService.confirmUser(signupUser.getId());
             log.debug("Sending Response for user confirmation: " + "{}", objectMapper.writeValueAsString(resp));
@@ -102,7 +84,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/get/signups")
+    @GetMapping("/signup/get")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> getSignups(){
         try{
