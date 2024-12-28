@@ -1,5 +1,8 @@
 package com.arbitaja.backend.security;
 
+import com.arbitaja.backend.competitors.dataobjects.Personal_data;
+import com.arbitaja.backend.users.APIs.UserService;
+import com.arbitaja.backend.users.dataobjects.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -24,14 +27,20 @@ public class AuthController {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/login")
     public ResponseEntity<?> loginPage(@RequestParam(value = "error", required = false) boolean error, @RequestParam(value = "logout", required = false) boolean logout) throws JsonProcessingException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!error && auth != null) {
-            ResponseEntity<Map<String, Object>> response = ResponseEntity.status(HttpStatus.OK).body(Map.of("username", auth.getName(), "roles", auth.getAuthorities()));
-            log.info("Sending response for successful login: " + "{}", objectMapper.writeValueAsString(response));
-            return response;
+            User user = userService.getUserByUsername(auth.getName());
+            if(user != null) {
+                Personal_data personalData = user.getPersonal_data();
+                ResponseEntity<Map<String, ?>> response = userService.mapPersonalData(personalData, user);
+                log.info("Sending response for successful login: " + "{}", objectMapper.writeValueAsString(response));
+                return response;
+            }
         }
 
         if(logout && auth != null) {
