@@ -1,6 +1,7 @@
 package com.arbitaja.backend.users.APIs.responses;
 
 import com.arbitaja.backend.users.dataobjects.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -23,6 +24,7 @@ public class UserProfileResponse {
     private Set<SimpleGrantedAuthority> permissions;
 
     @Schema(description = "Personal data of the user")
+    @JsonProperty("personal_data")
     private PersonalDataResponse personalData;
 
     public UserProfileResponse(int id, String username, List<Role> roles, Set<SimpleGrantedAuthority> permissions) {
@@ -74,6 +76,7 @@ public class UserProfileResponse {
 
     public static class PersonalDataResponse {
         @Schema(description = "Full name of the user", example = "John Doe")
+        @JsonProperty("full_name")
         private String fullName;
 
         @Schema(description = "Email address of the user", example = "john.doe@example.com")
@@ -121,7 +124,7 @@ public class UserProfileResponse {
 
     public static class SchoolResponse {
         @Schema(description = "School ID", example = "101")
-        private String id;
+        private Object id;
 
         @Schema(description = "School name", example = "Springfield High School")
         private String name;
@@ -131,16 +134,16 @@ public class UserProfileResponse {
             this.name = "";
         }
 
-        public SchoolResponse(String id, String name) {
+        public SchoolResponse(Integer id, String name) {
             this.id = id;
             this.name = name;
         }
 
-        public String getId() {
+        public Object getId() {
             return id;
         }
 
-        public void setId(String id) {
+        public void setId(Integer id) {
             this.id = id;
         }
 

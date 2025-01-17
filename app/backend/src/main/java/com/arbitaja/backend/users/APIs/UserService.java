@@ -124,7 +124,7 @@ public class UserService {
 
         UserProfileResponse.SchoolResponse schoolResponse = new UserProfileResponse.SchoolResponse();
         if (personalData != null && personalData.getSchool() != null) {
-            schoolResponse.setId(String.valueOf(personalData.getSchool().getId()));
+            schoolResponse.setId(personalData.getSchool().getId());
             schoolResponse.setName(personalData.getSchool().getName());
             personalDataResponse.setSchool(schoolResponse);
         }
