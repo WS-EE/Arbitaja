@@ -27,7 +27,7 @@ onMounted(async () => {
         allSchools.value = response.data
     } catch(error) {
         displayAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
-    };
+    }
 
     // Try getting user data
     try {
@@ -40,7 +40,7 @@ onMounted(async () => {
         email.value = userParameters.personal_data.email
         username.value = userParameters.username
         roles.value = userParameters.roles
-        school.value = userParameters.school
+        school.value = userParameters.personal_data.school
     } catch(error) {
         displayAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p>Couldn\'t get user data! </p class=mb-0><p>Error:' + error + '</p>', 'danger', 4500);
     }
@@ -105,7 +105,7 @@ const saveProfile = (async () =>{
             email.value = newUserParameters.personal_data.email
             username.value = newUserParameters.username
             roles.value = newUserParameters.roles
-            school.value = newUserParameters.school
+            school.value = newUserParameters.personal_data.school
 
             // Display a success message to user
             displayAlert('<h4 class=alert-heading>Success!</h4><hr><p class=mb-0>Changes have been saved.</p>', 'success')
@@ -125,7 +125,7 @@ function discardChanges(){
         email.value = prevParameters.personal_data.email
         username.value = prevParameters.username
         roles.value = prevParameters.roles
-        school.value = prevParameters.school
+        school.value = prevParameters.personal_data.school
 
         // Tell user that changes were discarded
         displayAlert('<i class="me-2 bi bi-trash"></i><strong>Changes were discarded</strong>', 'warning', 3000)
