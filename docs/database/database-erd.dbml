@@ -72,10 +72,12 @@ Ref: role.id < user_role.role_id
 table competition {
   id integer [primary key, increment]
   name varchar
+  organizer_id int
   scoring_criteria_group_main_id integer
   start_time time
   end_time time
 }
+ref: user.id < competition.organizer_id
 
 table competitor {
   id integer [primary key, increment]
@@ -127,8 +129,15 @@ table scoring_criteria {
   expected_result text [note: 'What was the data we checked for']
   criteria_template_id int
   is_template bool
+  visibility_level int
 }
-ref: scoring_criteria.id < scoring_criteria.criteria_template_id
+Table criteria_dependency {
+  id integer [primary key, increment]
+  criteria_id integer
+  dependent_on_criteria_id integer
+}
+ref: scoring_criteria.id < criteria_dependency.criteria_id
+ref: scoring_criteria.id < criteria_dependency.dependent_on_criteria_id
 
 table scoring_host {
   id integer [primary key, increment]
