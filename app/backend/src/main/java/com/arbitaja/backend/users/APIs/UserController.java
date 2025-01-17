@@ -1,9 +1,15 @@
 package com.arbitaja.backend.users.APIs;
-import com.arbitaja.backend.competitors.dataobjects.Personal_data;
+import com.arbitaja.backend.users.APIs.responses.UserProfileResponse;
 import com.arbitaja.backend.users.dataobjects.SignupUser;
 import com.arbitaja.backend.users.dataobjects.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +21,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 
 import java.util.List;
 import java.util.Map;
@@ -33,48 +41,97 @@ public class UserController {
 
     @GetMapping("/profile/get")
     @PreAuthorize("hasAuthority('basic')")
-    public ResponseEntity<?> getUserProfile() throws JsonProcessingException {
+    @Operation(
+            summary = "Get user profile details",
+            description = "Returns a structured JSON object containing user profile, roles, permissions, and associated school data.",
+            security = @SecurityRequirement(name = "basicAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserProfileResponse.class))),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = "{\"error\": \"User not found\"}")})),
+    })
+    public ResponseEntity<?> getUserProfile(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         log.info("Getting user profile for user: {}, {}", auth.getName(), auth.getDetails());
         User user = userService.getUserByUsername(auth.getName());
 
-        if(user != null) {
-            Personal_data personalData = user.getPersonal_data();
-            ResponseEntity<Map<String, ?>> response = userService.mapPersonalData(personalData, user);
-            log.debug("Sending Response for authenticated user: " + "{}", objectMapper.writeValueAsString(response));
-            return response;
+        if (user != null) {
+            return userService.mapPersonalData(user.getPersonal_data(), user);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not Found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not Found"));
     }
+
 
     @Transactional
     @PutMapping("/profile/edit")
     @PreAuthorize("hasAuthority('basic')")
+    @Operation(
+            summary = "Update user profile",
+            description = "Returns a structured JSON object containing user profile, roles, permissions, and associated school data.",
+            security = @SecurityRequirement(name = "basicAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated user profile",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserProfileResponse.class))),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(mediaType = "application/json", examples = {
+        @ExampleObject(value = "{\"error\": \"User not found\"}")})),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
     public ResponseEntity<?> updateUserProfile(@RequestBody User sentUser) {
         try {
-            ResponseEntity<Map<String, ?>> resp = userService.updatePersonalData(SecurityContextHolder.getContext().getAuthentication(), sentUser);
+            ResponseEntity<?> resp = userService.updatePersonalData(SecurityContextHolder.getContext().getAuthentication(), sentUser);
             log.debug("Sending Response for updated user: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e) {
             log.error("Failed to update user profile", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
         }
     }
 
     @Transactional
     @PostMapping("/signup/create")
+    @Operation(
+            summary = "Create signup user",
+            description = "Returns if the signup user creation was successful",
+            security = @SecurityRequirement(name = "basicAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated user profile",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = "{\"message\": \"User created successfully\"}")})),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
     public ResponseEntity<?> createSignupUser(@RequestBody SignupUser signupUser){
         try{
             ResponseEntity<Map<String, ?>> resp = userService.signupUser(signupUser);
             log.debug("Sending Response for SignupUser: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
         }
     }
 
     @Transactional
     @PostMapping("/signup/approve")
+    @PreAuthorize("hasAuthority('admin')")
+    @Operation(
+            summary = "Approve signup user",
+            description = "Returns if signup user approval and user creation was successful",
+            security = @SecurityRequirement(name = "basicAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully approved signup user",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = "{\"message\": \"User approved successfully\"}")})),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
     public ResponseEntity<?> approveSignupUser(@RequestBody SignupUser signupUser){
         try{
             ResponseEntity<Map<String, ?>> resp = userService.approveUser(signupUser);
@@ -82,13 +139,25 @@ public class UserController {
             return resp;
         }catch (Exception e){
             log.error("An error occurred while confirming user", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
         }
     }
 
     @Transactional
     @DeleteMapping("/signup/approve")
     @PreAuthorize("hasAuthority('admin')")
+    @Operation(
+            summary = "Decline signup user",
+            description = "Returns if declining signup user its deletion was successful",
+            security = @SecurityRequirement(name = "basicAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Signup user deletion was successful",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = "{\"message\": \"User declined successfully\"}")})),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
     public ResponseEntity<?> deleteSignupUser(@RequestBody SignupUser signupUser){
         try{
             ResponseEntity<Map<String, ?>> resp = userService.declineUser(signupUser);
@@ -96,11 +165,24 @@ public class UserController {
             return resp;
         } catch (Exception e){
             log.error("An error occurred while confirming user", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
         }
     }
 
+
     @GetMapping("/signup/get")
+    @PreAuthorize("hasAuthority('admin')")
+    @Operation(
+            summary = "Get all signup requests (signup users)",
+            description = "Returns a JSON list of signup users",
+            security = @SecurityRequirement(name = "basicAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Signup user deletion was successful",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SignupUser.class)))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
     public ResponseEntity<?> getSignups(){
         try{
             List<SignupUser> signupUsers = userService.signupUserList();
@@ -109,8 +191,17 @@ public class UserController {
             return resp;
         } catch (Exception e) {
             log.error(e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",e.getMessage() != null ? e.getMessage() : "An error occurred"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
+        }
+    }
 
+
+    public static class ErrorResponse {
+        @Schema(description = "error message", example = "An error occurred")
+        String error;
+
+        public ErrorResponse(String error) {
+            this.error = error;
         }
     }
 }

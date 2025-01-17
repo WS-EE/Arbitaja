@@ -1,6 +1,7 @@
 package com.arbitaja.backend.users.dataobjects;
 
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 import java.util.LinkedHashSet;
@@ -15,6 +16,7 @@ public class User {
 
     @OneToOne
     @JoinColumn(name = "default_token_id")
+    @Schema(hidden = true)
     private Api_token default_token;
 
     @Column(name = "username")

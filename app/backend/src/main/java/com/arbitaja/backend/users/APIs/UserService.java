@@ -4,6 +4,7 @@ import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.PersonalDataRepository;
 import com.arbitaja.backend.competitors.repositories.SchoolRepository;
+import com.arbitaja.backend.users.APIs.responses.UserProfileResponse;
 import com.arbitaja.backend.users.dataobjects.*;
 import com.arbitaja.backend.users.repositories.*;
 import org.apache.logging.log4j.LogManager;
@@ -12,17 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -110,25 +107,33 @@ public class UserService {
      *
      * @return ResponseEntity of the users data
      */
-    public ResponseEntity<Map<String, ?>> mapPersonalData(Personal_data personalData, User user){
+    public ResponseEntity<UserProfileResponse> mapPersonalData(Personal_data personalData, User user) {
         List<Role> roles = roleRepository.findRolesByUserId(user.getId());
         List<Permission> permissions = permissionRepository.findPermissionsByUserId(user.getId());
-        Collection<GrantedAuthority> authorities = permissions.stream()
+        Set<SimpleGrantedAuthority> authorities = permissions.stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.getName()))
                 .collect(Collectors.toSet());
 
-        if(personalData == null){
-            return ResponseEntity.ok(Map.of("id", user.getId(), "username", user.getUsername(),
-                    "permissions", authorities, "roles", roles,
-                    "personal_data", Map.of("full_name", "", "email", "",
-                            "school", Map.of("id", "", "name", ""))));
+        UserProfileResponse response = new UserProfileResponse(user.getId(), user.getUsername(), roles, authorities);
+
+        UserProfileResponse.PersonalDataResponse personalDataResponse = new UserProfileResponse.PersonalDataResponse();
+        if (personalData != null) {
+            personalDataResponse.setFullName(personalData.getFull_name());
+            personalDataResponse.setEmail(personalData.getEmail());
         }
-        return ResponseEntity.ok(Map.of("id", user.getId(), "username", user.getUsername(),
-                "permissions", authorities, "roles", roles,
-                "personal_data", Map.of("full_name", personalData.getFull_name(), "email", personalData.getEmail()),
-                "school", personalData.getSchool() != null ? Map.of("id", personalData.getSchool().getId(), "name", personalData.getSchool().getName()) :
-                        Map.of("id", "", "name", "")));
+
+        UserProfileResponse.SchoolResponse schoolResponse = new UserProfileResponse.SchoolResponse();
+        if (personalData != null && personalData.getSchool() != null) {
+            schoolResponse.setId(String.valueOf(personalData.getSchool().getId()));
+            schoolResponse.setName(personalData.getSchool().getName());
+            personalDataResponse.setSchool(schoolResponse);
+        }
+
+        response.setPersonalData(personalDataResponse);
+
+        return ResponseEntity.ok(response);
     }
+
 
     /**
      * Updates the users data given in the request.
@@ -138,7 +143,7 @@ public class UserService {
      *
      * @return ResponseEntity of the new users data
      */
-    public ResponseEntity<Map<String, ?>> updatePersonalData(Authentication auth, User sentUser) {
+    public ResponseEntity<?> updatePersonalData(Authentication auth, User sentUser) {
         log.info("Updating user profile: {}", sentUser);
         try {
             User user = getUserById(sentUser.getId());

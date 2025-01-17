@@ -1,5 +1,6 @@
 package com.arbitaja.backend.competitors.dataobjects;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -15,6 +16,7 @@ public class School {
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "created_at")
+    @Schema(hidden = true)
     private Timestamp created_at;
 
     @OneToMany(mappedBy = "school")

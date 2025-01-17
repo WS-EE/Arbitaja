@@ -1,5 +1,6 @@
 package com.arbitaja.backend.users.dataobjects;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 
@@ -18,8 +19,10 @@ public class Role {
 
     @Column(name = "name")
     private String name;
+    @Schema(hidden = true)
     @Column(name = "created_at")
     private Timestamp created_at;
+    @Schema(hidden = true)
     @Column(name = "changed_at")
     private Timestamp changed_at;
 
