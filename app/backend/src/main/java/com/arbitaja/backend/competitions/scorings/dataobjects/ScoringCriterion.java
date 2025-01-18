@@ -42,6 +42,9 @@ public class ScoringCriterion {
     @Column(name = "is_template")
     private Boolean isTemplate;
 
+    @Column(name = "visibility_level")
+    private int visibilityLevel;
+
     @OneToMany(mappedBy = "scoringCriteria")
     private Set<LogicalGroupLink> logicalGroupLinks = new LinkedHashSet<>();
 

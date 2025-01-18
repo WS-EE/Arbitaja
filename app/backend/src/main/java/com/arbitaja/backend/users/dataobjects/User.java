@@ -1,5 +1,6 @@
 package com.arbitaja.backend.users.dataobjects;
 
+import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -29,6 +30,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Api_token> apiTokens = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "organizer_id", fetch = FetchType.LAZY)
+    private Set<Competition> competitions = new LinkedHashSet<>();
 
     public User(SignupUser signupUser, Personal_data personal_data) {
         this.username = signupUser.getUsername();
