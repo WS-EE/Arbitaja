@@ -15,16 +15,24 @@ const rePassword = ref("");
 
 const userSignup = async () => {
   try{
-    const response = await axios.post('user/signup/create', {
-      username: username.value,
-      salted_password: password.value,
-      personal_data: {
-        full_name: fullName.value,
-        email: email.value
+    if (password.value === rePassword.value){
+      const response = await axios.post('user/signup/create', {
+        username: username.value,
+        salted_password: password.value,
+        personal_data: {
+          full_name: fullName.value,
+          email: email.value
+        }
+      })
+      if (response.status === 200){
+        displayAlert('<strong>' + response.data.message + '</strong>', 'success')
       }
-    })
-    if (response.status === 200){
-      displayAlert('<strong>' + response.data.message + '</strong>', 'success')
+    } else {
+      displayAlert(
+      '<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to signup!</strong></h4><hr><p class=mb-0>Error: Passwords didn\'t  match.</p>',
+      'danger',
+      6000
+    )
     }
   } catch(error) {
     displayAlert(
