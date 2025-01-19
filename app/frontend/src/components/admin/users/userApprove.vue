@@ -14,7 +14,6 @@ onMounted(async () => {
         // Try getting school data
         const response2 = await axios.get('school/all/get')
         schools.value = response2.data
-        console.log(schools.value)
     } catch(error) {
         // Throw console log error if fail
         console.log(error)
@@ -60,7 +59,7 @@ import allSchools from './school/allSchools.vue';
             <div class="col-lg-2 d-none d-lg-block border-5 border rounded m-2 p-1 p-md-2 p-lg-3 justify-content-center align-items-center text-center">
                 <div class="row">
                     <div class="col">
-                        <addSchool :modalID="'sm-Modal'"/>
+                        <addSchool :modalId="'sm-Modal'"/>
                     </div>
                 </div>
                 <div class="row">
