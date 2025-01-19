@@ -48,9 +48,7 @@ import allSchools from './school/allSchools.vue';
                         <p class="m-0">Full Name</p>
                     </div>
                     <div class="col-lg-2 col-md-4 col-sm-5 ms-auto text-center">
-                        <div class="d-lg-none d-block">
                             <addSchool :modalId="'lg-Modal'" />
-                        </div>
                     </div>
                 </div>
                 <p v-if="isLoadingUsers">Loading...</p>
@@ -59,7 +57,7 @@ import allSchools from './school/allSchools.vue';
             <div class="col-lg-2 d-none d-lg-block border-5 border rounded m-2 p-1 p-md-2 p-lg-3 justify-content-center align-items-center text-center">
                 <div class="row">
                     <div class="col">
-                        <addSchool :modalId="'sm-Modal'"/>
+                        <h4>Schools</h4>
                     </div>
                 </div>
                 <div class="row">
