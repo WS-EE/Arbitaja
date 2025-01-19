@@ -25,17 +25,17 @@ const userSignup = async () => {
         }
       })
       if (response.status === 200){
-        displayAlert('<strong>' + response.data.message + '</strong>', 'success')
+        showAlert('<strong>' + response.data.message + '</strong>', 'success')
       }
     } else {
-      displayAlert(
+      showAlert(
       '<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to signup!</strong></h4><hr><p class=mb-0>Error: Passwords didn\'t  match.</p>',
       'danger',
       6000
     )
     }
   } catch(error) {
-    displayAlert(
+    showAlert(
       '<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to signup!</strong></h4><hr><p class=mb-0>Error: ' + 
       error + 
       '</p><p class=mb-0><strong>' + error.response.data.error + '</strong></p>',
@@ -47,51 +47,22 @@ const userSignup = async () => {
 }
 
 // Alert function
-const showAlert = ref(false)
+const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
 
-function displayAlert(message, type, timeout){
-    // Set default type to primary(info)
-    if (timeout === undefined){
-        timeout = 3000;
-    }
-    if (type === undefined){
-        type = 'primary';
-    }
+import displayAlert from '@/components/generic/displayAlert.vue';
 
-    // Set the alert type
-    alertType.value = 'alert-' + type
-
-    // Tell user that changes were discarded
-    showAlert.value = true
-
+function showAlert(message, type, timeout){
     alertMessage.value = message
-    // Fade out alert after 3000ms
-    if (timeout !== 0) {
-        setTimeout(() => {
-            showAlert.value = false
-        }, timeout);
-    }
+    alertType.value = type
+    alertTimeout.value = timeout
 }
 </script>
 
 <template>
   <!-- Alert when needed -->
-  <div class="container text-center fixed-top">
-    <div class="row justify-content-center align-items-center align-self-center">
-      <Transition class="m-2 col-10 col-md-8 col-lg-6" name="alert">
-        <div
-            v-if="showAlert"
-            class="alert alert-sizes align-self-center"
-            :class="alertType"
-            role="alert"
-        >
-          <span v-html="alertMessage"></span>
-        </div>
-      </Transition>
-    </div>
-  </div>
+  <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
   <!-- Start Main body -->
   <div class="container text-center pt-5">
     <div class="row justify-content-center align-items-center align-self-center">

@@ -26,7 +26,7 @@ onMounted(async () => {
         const response = await axios.get('school/all/get')
         allSchools.value = response.data
     } catch(error) {
-        displayAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
+        showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     }
 
     // Try getting user data
@@ -42,38 +42,9 @@ onMounted(async () => {
         roles.value = userParameters.roles
         school.value = userParameters.personal_data.school
     } catch(error) {
-        displayAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p>Couldn\'t get user data! </p class=mb-0><p>Error:' + error + '</p>', 'danger', 4500);
+        showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p>Couldn\'t get user data! </p class=mb-0><p>Error:' + error + '</p>', 'danger', 4500);
     }
 });
-
-// Alert function
-const showAlert = ref(false)
-const alertMessage = ref('')
-const alertType = ref('')
-
-function displayAlert(message, type, timeout){
-    // Set default type to primary(info)
-    if (timeout === undefined){
-        timeout = 3000;
-    }
-    if (type === undefined){
-        type = 'primary';
-    }
-
-    // Set the alert type
-    alertType.value = 'alert-' + type
-
-    // Tell user that changes were discarded
-    showAlert.value = true
-
-    alertMessage.value = message
-    // Fade out alert after 3000ms
-    if (timeout !== 0) {
-        setTimeout(() => {
-            showAlert.value = false
-        }, timeout);
-    }
-}
 
 // Save and discard functions
 const saveProfile = (async () =>{
@@ -108,10 +79,10 @@ const saveProfile = (async () =>{
             school.value = newUserParameters.personal_data.school
 
             // Display a success message to user
-            displayAlert('<h4 class=alert-heading>Success!</h4><hr><p class=mb-0>Changes have been saved.</p>', 'success')
+            showAlert('<h4 class=alert-heading>Success!</h4><hr><p class=mb-0>Changes have been saved.</p>', 'success')
         }
     } catch (error) {
-        displayAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to save changes!</strong></h4><hr><p class=mb-0>Error: ' + error + '</p><p class=mb-0>For more information check console log.</p>', 'danger', 6000)
+        showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to save changes!</strong></h4><hr><p class=mb-0>Error: ' + error + '</p><p class=mb-0>For more information check console log.</p>', 'danger', 6000)
         console.log(error)
     }
 });
@@ -128,9 +99,9 @@ function discardChanges(){
         school.value = prevParameters.personal_data.school
 
         // Tell user that changes were discarded
-        displayAlert('<i class="me-2 bi bi-trash"></i><strong>Changes were discarded</strong>', 'warning', 3000)
+        showAlert('<i class="me-2 bi bi-trash"></i><strong>Changes were discarded</strong>', 'warning', 3000)
     } catch (error) {
-        displayAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p class=mb-0>Error: ' + error + '</p>', 'danger')
+        showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p class=mb-0>Error: ' + error + '</p>', 'danger')
     }
 }
 
@@ -139,24 +110,24 @@ function changeSchool(id, name){
     school.value = { id: id, name: name }
 }
 
+// Alert function
+const alertTimeout = ref(3000)
+const alertMessage = ref('')
+const alertType = ref('')
+
+import displayAlert from '@/components/generic/displayAlert.vue';
+
+function showAlert(message, type, timeout){
+    alertMessage.value = message
+    alertType.value = type
+    alertTimeout.value = timeout
+}
+
 </script>
 
 <template>
     <!-- Alert when needed -->
-    <div class="container text-center fixed-top">
-        <div class="row justify-content-center align-items-center align-self-center">
-            <Transition class="m-2 col-10 col-md-8 col-lg-6" name="alert">
-                <div
-                    v-if="showAlert"
-                    class="alert alert-sizes align-self-center"
-                    :class="alertType"
-                    role="alert"
-                >
-                    <span v-html="alertMessage"></span>
-                </div>
-            </Transition>
-        </div>
-    </div>
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
     <div class="container p-3 container-bottom">
         <h1 class="">User Profile</h1>
         <hr>

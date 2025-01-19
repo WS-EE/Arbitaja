@@ -1,10 +1,31 @@
 <script setup>
-import { ref } from 'vue';
+const props = defineProps({
+    message: {
+        type: String,
+        default: "Error"
+    },
+    type: {
+      type: String,
+      default: "danger",
+    },
+    timeout: {
+      type: Number,
+    },
+})
+import { ref, watch } from 'vue';
 
 // Alert function
 const showAlert = ref(false)
 const alertMessage = ref('')
 const alertType = ref('')
+
+watch(() => ({ type: props.type, message: props.message, timeout: props.timeout }),
+  (val) => {
+    // display alert
+    displayAlert(val.message, val.type, val.timeout)
+  }
+);
+
 
 function displayAlert(message, type, timeout){
     // Set default type to primary(info)
