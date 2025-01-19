@@ -7,9 +7,23 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    limitItems: {
+        type: Number,
+        default: 0,
+    },
 })
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import axios from 'axios';
+
+// Watch for the limit
+watch(
+  () => props.limitItems,
+  (newLimit, oldLimit) => {
+    // Limit schools
+    changeLimit(schools.value, newLimit);
+  }
+);
+
 
 // schools to loop over
 const schools = ref();
@@ -20,12 +34,24 @@ const isLoadingSchools = ref(true)
 // If we want to show delete button to user
 const addDelete = ref(true)
 
+// Add school limit
+const loopedSchools = ref([]);
+
+function changeLimit(schools, limit){
+    // Limit schools
+    if (limit === 0) {
+        loopedSchools.value = schools
+    } else (
+        loopedSchools.value = schools.slice(0, limit)
+    )
+}
+
 onMounted(async () => {
     try {
         // If prop schools is not defined try to get them ourselves
         if (props.schools === undefined){  
-            const response2 = await axios.get('school/all/get')
-            schools.value = response2.data
+            const response = await axios.get('school/all/get')
+            schools.value = response.data
 
         // else get the variables from props
         } else {
@@ -36,6 +62,9 @@ onMounted(async () => {
         if (props.addDelete === false) {
             addDelete.value = props.addDelete
         }
+
+        // Limit schools
+        changeLimit(schools.value, props.limitItems);
     } catch(error) {
         // Throw console log error if fail
         console.log(error)
@@ -62,7 +91,7 @@ function unsetSchoolToDelete(){
 }
 
 // Delete the school based on the variables we set earlier
-const deleteSchool = async(school) => {
+const deleteSchool = async() => {
     // Delete school based on ID
     await axios.delete("/school/register", { id: setSchoolId });
     
@@ -77,7 +106,7 @@ const deleteSchool = async(school) => {
 
 <template>
     <div v-if="!isLoadingSchools" class="mt-2">
-        <div v-for="school in schools" class="row border border-2 mt-2 justify-content-center text-center align-items-center">
+        <div v-for="school in loopedSchools" :key="school.id" class="row border border-2 mt-2 justify-content-center text-center align-items-center">
             <div class="col-xl-2 d-xl-block d-none mt-3">
                 <p>{{ school.id }}:</p>
             </div>

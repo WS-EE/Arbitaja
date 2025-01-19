@@ -1,6 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
+import { RouterLink } from 'vue-router';
+
+// Import components
+import approveModal from './userApproveModal.vue';
+import addSchool from './school/addSchool.vue';
+import allSchools from './school/allSchools.vue';
 
 const singupUsers = ref([]);
 const schools = ref('');
@@ -28,10 +34,18 @@ onMounted(async () => {
     };
 })
 
+// limit school count
+const limitSchools = ref(7);
+const showMoreSchools = ref(true)
+function moreSchools(){
+    limitSchools.value = 0
+    showMoreSchools.value = false
+}
+function lessSchools(){
+    limitSchools.value = 7
+    showMoreSchools.value = true
+}
 
-import approveModal from './userApproveModal.vue';
-import addSchool from './school/addSchool.vue';
-import allSchools from './school/allSchools.vue';
 </script>
 
 <template>
@@ -47,8 +61,8 @@ import allSchools from './school/allSchools.vue';
                     <div class="col-lg-3 col-md-2 col-sm-3">
                         <p class="m-0">Full Name</p>
                     </div>
-                    <div class="col-lg-2 col-md-4 col-sm-5 ms-auto text-center">
-                            <addSchool :modalId="'lg-Modal'" />
+                    <div class="col-lg-2 col-md-4 col-sm-5 ms-auto text-center">                        
+                        <addSchool :modalId="'lg-Modal'" />
                     </div>
                 </div>
                 <p v-if="isLoadingUsers">Loading...</p>
@@ -62,7 +76,13 @@ import allSchools from './school/allSchools.vue';
                 </div>
                 <div class="row">
                     <p v-if="isLoadingUsers">Loading...</p>
-                    <allSchools v-else :schools="schools" :addDelete="false" />
+                    <allSchools v-else :schools="schools" :addDelete="false" :limitItems="limitSchools" />
+                </div>
+                <div class="row text-center">
+                    <div class="col">
+                        <p v-if="showMoreSchools" class="btn btn-dark mt-2" @click.prevent="moreSchools()">More schools<i class="ms-1 bi bi-arrow-down"></i></p>
+                        <p v-else class="btn btn-dark mt-2" @click.prevent="lessSchools()">Less schools<i class="ms-1 bi bi-arrow-up"></i></p>
+                    </div>
                 </div>
             </div>
         </div>
