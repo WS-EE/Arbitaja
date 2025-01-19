@@ -6,6 +6,10 @@ const props = defineProps({
         type: String,
         default: "modelId"
     },
+    addButtonDivClass: {
+        type: String,
+        default: '',
+    },
 })
 const myModalId = props.modalId
 const schoolName = ref("")
@@ -18,16 +22,17 @@ const createSchool = async(school) => {
 
 <template>
     <!-- Button trigger modal -->
-    <button
-        type="button"
-        class="btn btn-success"
-        data-bs-toggle="modal"
-        :data-bs-target="'#' + myModalId"
-        
-    >
-        Add school
-    </button>
-    
+    <div :class="addButtonDivClass">
+        <button
+            type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            :data-bs-target="'#' + myModalId"
+            
+        >
+            Add school
+        </button>
+    </div>
     <!-- Modal -->
     <div
         class="modal fade"

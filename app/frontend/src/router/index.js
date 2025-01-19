@@ -8,6 +8,7 @@ import adminView from '@/views/adminView.vue';
 import LoginPage from '@/components/login/LoginPage.vue';
 import SignupPage from '@/components/login/SignupPage.vue';
 import singupApproveView from '@/views/adminViews/Users/singupApproveView.vue';
+import schoolView from '@/views/adminViews/Users/schoolView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,7 +62,7 @@ const router = createRouter({
                 {
                     path: 'schools',
                     name: 'adminSchools',
-                    component: userProfileView
+                    component: schoolView
                 },
                 {
                     path: 'users/',

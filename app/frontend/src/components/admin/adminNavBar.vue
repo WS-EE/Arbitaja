@@ -37,23 +37,14 @@ import logo from '@/assets/media/logo.svg'
                             ]" 
                             >Competitions</RouterLink>
                         </li>
-                        <li class="nav-item rounded m-1">
-                            <RouterLink 
-                            to="/admin/schools" 
-                            :class="[
-                                isLinkActive('/admin/schools') 
-                                    ? 'active-item' : '',
-                                'nav-link rounded text-center',
-                            ]" 
-                            >Schools</RouterLink>
-                        </li>
-                        <li class="nav-item rounded m-1 dropdown">
+                        <li class="nav-item rounded m-1 dropdown text-center">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Users
                             </a>
                             <ul class="dropdown-menu">
                                 <li><RouterLink class="dropdown-item" to="/admin/users/user">Users</RouterLink></li>
                                 <li><RouterLink class="dropdown-item" to="/admin/users/role">Roles</RouterLink></li>
+                                <li><RouterLink class="dropdown-item" to="/admin/schools">Schools</RouterLink></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><RouterLink class="dropdown-item" to="/admin/users/singup">Signup Approve</RouterLink></li>
                             </ul>

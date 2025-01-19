@@ -64,7 +64,7 @@ import allSchools from './school/allSchools.vue';
                 </div>
                 <div class="row">
                     <p v-if="isLoadingUsers">Loading...</p>
-                    <allSchools v-else :schools="schools" />
+                    <allSchools v-else :schools="schools" :addDelete="false" />
                 </div>
             </div>
         </div>
