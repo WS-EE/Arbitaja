@@ -38,19 +38,37 @@ function changeSchool(id, name){
     commitedUserData.value.personal_data.school = { id: id, name: name }
 }
 
+const emit = defineEmits(['approveSignupUser'])
+
 // approve user
 const approveUser = async() => {
     try {
-        console.log(await axios.post('user/signup/approve', commitedUserData.value))
-        location.reload();
+        await axios.post('user/signup/approve', commitedUserData.value)
+        showAlert('User ' + commitedUserData.value.username + ' has been approved.', 'success')
+        await emit('approveSignupUser')
     } catch(error){
-        console.log(error)
+        showAlert('Couldn\'t approve user. <br> Error: '+ error, 'danger');
     }
+}
+
+// Alert function
+const alertTimeout = ref(3000)
+const alertMessage = ref('')
+const alertType = ref('')
+
+import displayAlert from '@/components/generic/displayAlert.vue';
+
+function showAlert(message, type, timeout){
+    alertMessage.value = message
+    alertType.value = type
+    alertTimeout.value = timeout
 }
 
 </script>
 
 <template>
+    <!-- Alert when needed -->
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
     <!-- Tabel Content -->
     <div v-for="user in singupUsers" class="row border rounded m-2 p-1 p-md-2 p-lg-3 text-center justify-content-center align-items-center text-center">
         <div class="col-lg-2 col-md-3 col-sm-4">
@@ -59,7 +77,7 @@ const approveUser = async() => {
         <div class="col-lg-3 col-md-2 col-sm-3">
             <p class="m-0">{{ user.personal_data.full_name }}</p>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-5 ms-auto">
+        <div class="col-lg-4 col-md-4 col-sm-5 ms-auto text-center text-lg-end">
             <button @click.prevent="setCommitedUserData(user)" type="button" class="me-2 btn btn-success" data-bs-toggle="modal" data-bs-target="#ApproveModal">Accept</button>
             <button class="btn btn-danger">Delete</button>
         </div>

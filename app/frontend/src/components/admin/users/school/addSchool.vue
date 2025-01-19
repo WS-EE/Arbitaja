@@ -14,13 +14,39 @@ const props = defineProps({
 const myModalId = props.modalId
 const schoolName = ref("")
 
+const emit = defineEmits(['addSchool'])
+
 const createSchool = async(school) => {
-    await axios.post('/school/register', { "name": school })
-    location.reload();
+    try {
+        // Register the school
+        await axios.post('/school/register', { "name": school })
+        
+        // show alert of success
+        await showAlert('School <strong>' + school + '</strong> has been created.', 'success')
+        
+        emit('addSchool');
+    } catch(e) {
+        showAlert('Couldn\'t create school. <br> Error: ' + e, 'danger')
+    }
+}
+
+// Alert function
+const alertTimeout = ref(3000)
+const alertMessage = ref('')
+const alertType = ref('')
+
+import displayAlert from '@/components/generic/displayAlert.vue';
+
+function showAlert(message, type, timeout){
+    alertMessage.value = message
+    alertType.value = type
+    alertTimeout.value = timeout
 }
 </script>
 
 <template>
+    <!-- Alert when needed -->
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
     <!-- Button trigger modal -->
     <div :class="addButtonDivClass">
         <button
@@ -66,7 +92,7 @@ const createSchool = async(school) => {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button @click.prevent="createSchool(schoolName)" type="button" class="btn btn-success">Add</button>
+                    <button @click.prevent="createSchool(schoolName)" type="button" class="btn btn-success" data-bs-dismiss="modal">Add</button>
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>

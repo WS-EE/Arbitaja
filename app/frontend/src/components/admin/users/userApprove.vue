@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
-import { RouterLink } from 'vue-router';
 
 // Import components
 import approveModal from './userApproveModal.vue';
@@ -12,26 +11,39 @@ const singupUsers = ref([]);
 const schools = ref('');
 const isLoadingUsers = ref(true)
 
-onMounted(async () => {
-    try {
+// Get all signup users
+const getSignupUsers = async() => {
+    try{
         // Try getting the Users
         const response = await axios.get('user/signup/get')
         singupUsers.value = response.data.signup_users
-        // Try getting school data
-        const response2 = await axios.get('school/all/get')
-        schools.value = response2.data
     } catch(error) {
         // Throw console log error if fail
-        console.log(error)
+        showAlert('Couldn\'t get data for signup Users. <br> Error: ' + error, 'danger', 9000)
+    }
+}
+
+// Get all schools
+const getSchools = async() => {
+    try {
+        // Try getting school data
+        const response = await axios.get('school/all/get')
+        schools.value = response.data
+    } catch(error) {
+        showAlert('Couldn\'t get data for all the schools. <br> Error: ' + error, 'danger', 9000)
+    };
+}
+
+onMounted(async () => {
+    try {
+        // 
+        await getSignupUsers();
+        await getSchools();
+    } catch(error) {
+        showAlert('Something went wrong. <br> Error:' + error, 'danger', 9000)
     } finally {
         isLoadingUsers.value = false
     }
-    
-    try {
-        
-    } catch(error) {
-        //displayAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
-    };
 })
 
 // limit school count
@@ -46,9 +58,33 @@ function lessSchools(){
     showMoreSchools.value = true
 }
 
+// Alert function
+const alertTimeout = ref(3000)
+const alertMessage = ref('')
+const alertType = ref('')
+
+import displayAlert from '@/components/generic/displayAlert.vue';
+
+function showAlert(message, type, timeout){
+    alertMessage.value = message
+    alertType.value = type
+    alertTimeout.value = timeout
+}
+
+// when signup user is approve get all the signup users again.
+const onApproveSignupUser = async() => {
+    await getSignupUsers();
+}
+
+// When school is added
+const onAddSchool = async() => {
+    await getSchools();
+}
 </script>
 
 <template>
+    <!-- Alert when needed -->
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
     <!-- Main content-->
     <div class="container">
         <div class="row">
@@ -61,12 +97,12 @@ function lessSchools(){
                     <div class="col-lg-3 col-md-2 col-sm-3">
                         <p class="m-0">Full Name</p>
                     </div>
-                    <div class="col-lg-2 col-md-4 col-sm-5 ms-auto text-center">                        
-                        <addSchool :modalId="'lg-Modal'" />
+                    <div class="col-lg-3 col-md-4 col-sm-5 ms-auto text-center text-lg-end">                        
+                        <addSchool modalId="lg-Modal" @addSchool="onAddSchool" />
                     </div>
                 </div>
                 <p v-if="isLoadingUsers">Loading...</p>
-                <approveModal v-else :users="singupUsers" :schools="schools" />
+                <approveModal v-else :users="singupUsers" :schools="schools" @approveSignupUser="onApproveSignupUser" />
             </div>
             <div class="col-lg-2 d-none d-lg-block border-5 border rounded m-2 p-1 p-md-2 p-lg-3 justify-content-center align-items-center text-center">
                 <div class="row">

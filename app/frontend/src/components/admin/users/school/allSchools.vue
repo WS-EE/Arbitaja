@@ -15,14 +15,6 @@ const props = defineProps({
 import { onMounted, ref, watch } from 'vue';
 import axios from 'axios';
 
-// Watch for the limit
-watch(
-  () => props.limitItems,
-  (newLimit, oldLimit) => {
-    // Limit schools
-    changeLimit(schools.value, newLimit);
-  }
-);
 
 
 // schools to loop over
@@ -67,7 +59,7 @@ onMounted(async () => {
         changeLimit(schools.value, props.limitItems);
     } catch(error) {
         // Throw console log error if fail
-        console.log(error)
+        showAlert('Something went wrong while loading.', 'danger')
     } finally {
         // Show content when done loading
         isLoadingSchools.value = false
@@ -92,19 +84,59 @@ function unsetSchoolToDelete(){
 
 // Delete the school based on the variables we set earlier
 const deleteSchool = async() => {
-    // Delete school based on ID
-    await axios.delete("/school/register", { id: setSchoolId });
-    
-    // Unset to delete after deleting the school
-    unsetSchoolToDelete();
+    try{
+        // Delete school based on ID
+        await axios.delete("/school/register", { id: setSchoolId });
+        showAlert('School ' + setSchoolName + ' has been deleted', 'warning')
+        
+        // Unset to delete after deleting the school
+        unsetSchoolToDelete();
 
-    // Reload page to update the list of schools
-    location.reload();
+        // Reload page to update the list of schools
+        location.reload();
+    } catch (e) {
+        showAlert('Couldn\'t delete school. <br> Error: ' + e, 'danger')
+    }
 }
+
+// Alert function
+const alertTimeout = ref(3000)
+const alertMessage = ref('')
+const alertType = ref('')
+
+import displayAlert from '@/components/generic/displayAlert.vue';
+
+function showAlert(message, type, timeout){
+    alertMessage.value = message
+    alertType.value = type
+    alertTimeout.value = timeout
+}
+
+// Watch for the limit
+watch(
+  () => props.limitItems,
+  (newLimit) => {
+    // Limit schools
+    changeLimit(schools.value, newLimit);
+  }
+);
+
+// See if schools change
+watch(
+  () => props.schools,
+  (newSchools) => {
+    // New list of schools
+    schools.value = newSchools
+    console.log(schools.value)
+  }
+);
 
 </script>
 
 <template>
+    <!-- Alert when needed -->
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+    <!-- main content -->
     <div v-if="!isLoadingSchools" class="mt-2">
         <div v-for="school in loopedSchools" :key="school.id" class="row border border-2 mt-2 justify-content-center text-center align-items-center">
             <div class="col-xl-2 d-xl-block d-none mt-3">

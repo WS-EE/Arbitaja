@@ -6,7 +6,7 @@ const props = defineProps({
     },
     type: {
       type: String,
-      default: "danger",
+      default: "primary",
     },
     timeout: {
       type: Number,
