@@ -1,5 +1,7 @@
 package com.arbitaja.backend.users.configurations;
 
+import com.arbitaja.backend.competitions.dataobjects.Competition;
+import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.PersonalDataRepository;
@@ -15,8 +17,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +41,7 @@ public class PermissionConfig {
             RolePermissionService rolePermissionService,
             UserRepository userRepository,
             SchoolRepository schoolRepository,
+            CompetitionRepository competitionRepository,
             PersonalDataRepository personalDataRepository)
 
     {
@@ -118,6 +123,13 @@ public class PermissionConfig {
                 log.info("User-Role mapping already exists, skipping.");
             }
             log.info("Users in the database: {}", userRepository.findAll());
+
+
+            if (competitionRepository.count() == 0) {
+                User organizer = userRepository.findUserByUsername("Arbitaja");
+                competitionRepository.save(new Competition("Noor meister", null, Time.valueOf(LocalTime.now()), Time.valueOf(LocalTime.now()), organizer));
+            }
+            log.info(competitionRepository.findAll().toString());
         };
     }
 
