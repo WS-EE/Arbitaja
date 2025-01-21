@@ -130,9 +130,9 @@ public class SchoolController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class)))
     })
-    public ResponseEntity<?> deleteSchool(@RequestBody School school) {
+    public ResponseEntity<?> deleteSchool(@RequestParam Integer id) {
         try {
-            ResponseEntity<?> resp = schoolService.deleteSchool(school);
+            ResponseEntity<?> resp = schoolService.deleteSchool(id);
             log.info("Deleting school: {}", resp.getBody());
             return resp;
         } catch (Exception e) {

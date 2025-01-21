@@ -86,7 +86,12 @@ function unsetSchoolToDelete(){
 const deleteSchool = async() => {
     try{
         // Delete school based on ID
-        await axios.delete("/school/register", { id: setSchoolId });
+        await axios.delete("/school/register", {
+        params: { id: setSchoolId.value }, // Send `id` as a query parameter
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
         showAlert('School ' + setSchoolName + ' has been deleted', 'warning')
         
         // Unset to delete after deleting the school

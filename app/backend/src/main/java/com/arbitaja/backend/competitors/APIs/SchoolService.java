@@ -39,8 +39,8 @@ public class SchoolService {
         return ResponseEntity.status(200).body(school);
     }
 
-    public ResponseEntity<?> deleteSchool(School sentSchool) throws Exception {
-        School localSchool = getSchool(sentSchool);
+    public ResponseEntity<?> deleteSchool(Integer id) throws Exception {
+        School localSchool = getSchool(id);
         if(localSchool == null) ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error","School not found"));
         else schoolRepository.delete(localSchool);
         return ResponseEntity.status(200).body(Map.of("message", "School deleted successfully"));
