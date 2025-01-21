@@ -26,7 +26,7 @@ public class CompetitionResponse {
     public CompetitionResponse() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

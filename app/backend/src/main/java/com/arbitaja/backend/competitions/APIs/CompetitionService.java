@@ -11,11 +11,13 @@ import com.arbitaja.backend.users.dataobjects.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -32,10 +34,74 @@ public class CompetitionService {
 
     public ResponseEntity<Set<CompetitionResponse>> getAllCompetitions() {
         List<Competition> competitions = competitionRepository.findAll();
-        Set<CompetitionResponse> competitionResponses = competitionResponseSet(competitions);
-
+        Set<CompetitionResponse> competitionResponses = new HashSet<>();
+        for (Competition competition : competitions) {
+            competitionResponses.add(setCompetitionResponse(competition));
+        }
         return ResponseEntity.ok(competitionResponses);
     }
+
+    public ResponseEntity<?> getCompetitionsByCompetitionId(int competitionId) {
+        Competition competition = competitionRepository.findByid(competitionId);
+        if (competition == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+        }
+        return ResponseEntity.ok(setCompetitionResponse(competition));
+    }
+
+    public ResponseEntity<?> getCompetitionsByCompetitionName(String competitionName) {
+        Competition competition = competitionRepository.findByName(competitionName);
+        if (competition == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+        }
+        return ResponseEntity.ok(setCompetitionResponse(competition));
+    }
+
+    public ResponseEntity<?> addCompetition(Competition competition) {
+        try{
+            if(competitionRepository.findByName(competition.getName()) != null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this name already exists"));
+            }
+            if(competitionRepository.findByid(competition.getId()) != null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this id already exists"));
+            }
+            competitionRepository.save(competition);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("success", "Competition added"));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+        }
+    }
+    public ResponseEntity<?> updateCompetitionData(Competition competition) {
+        Competition updatedCompetition = competitionRepository.findByid(competition.getId());
+        if (updatedCompetition == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+        }
+
+        if(!competition.getName().equals(updatedCompetition.getName()) && competitionRepository.findByName(updatedCompetition.getName()) != null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this name already exists"));
+        }
+        updatedCompetition.setName(competition.getName());
+        updatedCompetition.setOrganizer_id(competition.getOrganizer_id());
+        updatedCompetition.setStart_time(competition.getStart_time());
+        updatedCompetition.setEnd_time(competition.getEnd_time());
+        updateCompetition(updatedCompetition);
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Competition updated"));
+    }
+
+    public ResponseEntity<?> deleteCompetition(int competitionId) {
+        Competition competition = competitionRepository.findByid(competitionId);
+        if (competition == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+        }
+        competitionRepository.delete(competition);
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Competition deleted"));
+    }
+
+    public void updateCompetition(Competition competition){
+        competitionRepository.updateCompetition(competition);
+    }
+
 
 
     private CompetitionResponse.OrganizerResp setOrganizer(User user) {
@@ -48,6 +114,7 @@ public class CompetitionService {
 
     private Set<CompetitionResponse.CompetitorResp> setCompetitors(Competition competition) {
         Set<Competitor> competitors = competitorRepository.findByCompetitionId(competition.getId());
+        log.info("competitors in competition {}", competitors);
         Set<CompetitionResponse.CompetitorResp> competitorsResponses = new HashSet<>();
         for(Competitor competitor : competitors) {
             CompetitionResponse.CompetitorResp competitionResponse = new CompetitionResponse.CompetitorResp();
@@ -76,21 +143,17 @@ public class CompetitionService {
         return scoring_groups_structure_resps;
     }
 
-    private Set<CompetitionResponse> competitionResponseSet(List<Competition> competitions) {
-        Set<CompetitionResponse> competitionResponses = new HashSet<>();
-        for(Competition competition : competitions) {
-            CompetitionResponse competitionResponse = new CompetitionResponse();
-            competitionResponse.setId(competition.getId());
-            competitionResponse.setName(competition.getName());
-            competitionResponse.setOrganizer(setOrganizer(competition.getOrganizer_id()));
-            competitionResponse.setCompetitors(setCompetitors(competition));
-            competitionResponse.setStart_time(competition.getStart_time());
-            competitionResponse.setEnd_time(competition.getEnd_time());
-            Set<Scoring_groups_structure> scoringGroupsStructures = scoringGroupsStructureRepository.findAllByCompetitionId(competition.getId());
-            competitionResponse.setScoring_groups(setScoring_groups_structure_resp(scoringGroupsStructures));
-            competitionResponses.add(competitionResponse);
-        }
+    private CompetitionResponse setCompetitionResponse(Competition competition) {
+        CompetitionResponse competitionResponse = new CompetitionResponse();
+        competitionResponse.setId(competition.getId());
+        competitionResponse.setName(competition.getName());
+        competitionResponse.setOrganizer(setOrganizer(competition.getOrganizer_id()));
+        competitionResponse.setCompetitors(setCompetitors(competition));
+        competitionResponse.setStart_time(competition.getStart_time());
+        competitionResponse.setEnd_time(competition.getEnd_time());
+        Set<Scoring_groups_structure> scoringGroupsStructures = scoringGroupsStructureRepository.findAllByCompetitionId(competition.getId());
+        competitionResponse.setScoring_groups(setScoring_groups_structure_resp(scoringGroupsStructures));
 
-        return competitionResponses;
+        return competitionResponse;
     }
 }

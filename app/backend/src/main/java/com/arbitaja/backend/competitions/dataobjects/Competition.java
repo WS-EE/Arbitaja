@@ -56,7 +56,7 @@ public class Competition {
         this.organizer_id = organizer_id;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
