@@ -258,6 +258,21 @@ public class UserController {
         }
     }
 
+    @Transactional
+    @PutMapping("/profile/update_password")
+    @PreAuthorize("hasAuthority('basic')")
+    public ResponseEntity<?> updatePassword(@RequestBody User user){
+        try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            ResponseEntity<?> resp = userService.changePassword(user, auth);
+            log.debug("Sending Response for successful password change: " + "{}", objectMapper.writeValueAsString(resp));
+            return resp;
+        } catch (Exception e) {
+            log.error(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("An error occurred"));
+        }
+    }
+
 
     public static class ErrorResponse {
         @Schema(description = "error message", example = "An error occurred")

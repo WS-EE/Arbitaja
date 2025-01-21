@@ -298,6 +298,17 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public ResponseEntity<?> changePassword(User sentUser, Authentication auth) {
+        Optional<User> userOpt = userRepository.findByUsername(sentUser.getUsername());
+        if(userOpt.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
+        User user = userOpt.get();
+        if(auth != null && auth.getName().equals(user.getUsername()) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) return errorResponse(HttpStatus.FORBIDDEN, "You are not allowed to change password");
+        user.setSalted_password(passwordEncoder.encode(sentUser.getSalted_password()));
+        updateUser(user);
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+    }
+
 
     /**
      * used to get a list of signup users
