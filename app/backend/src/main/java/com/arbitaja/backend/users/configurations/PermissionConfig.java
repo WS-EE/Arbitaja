@@ -12,6 +12,7 @@ import com.arbitaja.backend.users.repositories.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,11 @@ import java.util.Optional;
 @Configuration
 public class PermissionConfig {
     private static final Logger log = LogManager.getLogger(PermissionConfig.class);
+
+    @Value("${ADMIN_USERNAME}")
+    private String adminUsername;
+    @Value("${ADMIN_PASSWORD}")
+    private String adminPassword;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -99,7 +105,7 @@ public class PermissionConfig {
                 Optional<Personal_data> optPersonalData = personalDataRepository.findById(personalDataId);
                 if (optPersonalData.isPresent()) {
                     Personal_data personalData = optPersonalData.get();
-                    User user = new User(personalData, passwordEncoder.encode("123"), "Arbitaja", null);
+                    User user = new User(personalData, passwordEncoder.encode(adminPassword), adminUsername, null);
                     userRepository.save(user);
                     log.info("User created: {}", user);
                 }
