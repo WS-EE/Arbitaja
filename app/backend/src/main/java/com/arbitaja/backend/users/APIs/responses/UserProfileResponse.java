@@ -34,7 +34,7 @@ public class UserProfileResponse {
         this.permissions = permissions;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

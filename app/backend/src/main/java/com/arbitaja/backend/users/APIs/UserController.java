@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -43,27 +44,89 @@ public class UserController {
     @PreAuthorize("hasAuthority('basic')")
     @Operation(
             summary = "Get user profile details",
-            description = "Returns a structured JSON object containing user profile, roles, permissions, and associated school data.",
+            description = "Returns a structured JSON object containing user profile, roles, permissions, and associated school data. If user is an admin and id is included can request other users profile",
             security = @SecurityRequirement(name = "basicAuth")
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserProfileResponse.class))),
+            @ApiResponse(responseCode = "401", description = "User is not an admin",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = "{\"error\": \"unauthorized\"}")})),
             @ApiResponse(responseCode = "404", description = "User not found",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"error\": \"User not found\"}")})),
     })
-    public ResponseEntity<?> getUserProfile(){
+    public ResponseEntity<?> getUserProfile(@RequestParam(required = false) Integer id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Getting user profile for user: {}, {}", auth.getName(), auth.getDetails());
-        User user = userService.getUserByUsername(auth.getName());
-
+        User user;
+        if(id != null && auth != null){
+            if(!auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            user = userService.getUserById(id);
+        }
+        else {
+            if(auth == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("unauthorized"));
+            user = userService.getUserByUsername(auth.getName());
+        }
         if (user != null) {
-            return userService.mapPersonalData(user.getPersonal_data(), user);
+            UserProfileResponse userProfileResponse = userService.mapPersonalData(user.getPersonal_data(), user);
+            return new ResponseEntity<>(userProfileResponse, HttpStatus.OK);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not Found"));
     }
 
+    @GetMapping("/profile/all")
+    @PreAuthorize("hasAuthority('admin')")
+    @Operation(
+            summary = "Get all user profile details",
+            description = "Returns all user profiles",
+            security = @SecurityRequirement(name = "basicAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user profiles",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserProfileResponse.class)))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    public ResponseEntity<?> getAllUserProfile(){
+        try{
+             ResponseEntity<?> resp = userService.getAllUsers();
+             log.debug("Sending Response for all users: " + "{}", objectMapper.writeValueAsString(resp));
+             return resp;
+        }catch (Exception e) {
+            log.error("Failed to update user profile", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
+        }
+    }
+
+    @Transactional
+    @DeleteMapping("/profile/delete")
+    @PreAuthorize("hasAuthority('admin')")
+    @Operation(
+            summary = "Delete user by id",
+            description = "Deletes user",
+            security = @SecurityRequirement(name = "basicAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted user",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = "{\"message\": \"User was deleted successfully\"}")})),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(value = "{\"error\": \"User not found\"}")})),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    public ResponseEntity<?> deleteUserProfile(@RequestParam Integer id){
+        try{
+            ResponseEntity<?> resp = userService.deleteUser(id);
+            log.debug("Sending Response for delete user profile: " + "{}", objectMapper.writeValueAsString(resp));
+            return resp;
+        } catch (Exception e){
+            log.error("Failed to delete user profile", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("An error occurred"));
+        }
+    }
 
     @Transactional
     @PutMapping("/profile/edit")
@@ -78,7 +141,7 @@ public class UserController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserProfileResponse.class))),
             @ApiResponse(responseCode = "404", description = "User not found",
                     content = @Content(mediaType = "application/json", examples = {
-        @ExampleObject(value = "{\"error\": \"User not found\"}")})),
+                    @ExampleObject(value = "{\"error\": \"User not found\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })

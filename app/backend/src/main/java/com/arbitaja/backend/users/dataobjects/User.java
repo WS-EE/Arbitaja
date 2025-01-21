@@ -15,7 +15,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "default_token_id")
     @Schema(hidden = true)
     private Api_token default_token;
@@ -24,14 +24,16 @@ public class User {
     private String username;
     @Column(name = "salted_password")
     private String salted_password;
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "personal_data_id")
     private Personal_data personal_data;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<Api_token> apiTokens = new LinkedHashSet<>();
-    @OneToMany(mappedBy = "organizer_id", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "organizer_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Competition> competitions = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<User_role> user_roles = new LinkedHashSet<>();
 
     public User(SignupUser signupUser, Personal_data personal_data) {
         this.username = signupUser.getUsername();

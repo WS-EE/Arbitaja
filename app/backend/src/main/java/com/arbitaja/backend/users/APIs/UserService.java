@@ -7,6 +7,7 @@ import com.arbitaja.backend.competitors.repositories.SchoolRepository;
 import com.arbitaja.backend.users.APIs.responses.UserProfileResponse;
 import com.arbitaja.backend.users.dataobjects.*;
 import com.arbitaja.backend.users.repositories.*;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +108,7 @@ public class UserService {
      *
      * @return ResponseEntity of the users data
      */
-    public ResponseEntity<UserProfileResponse> mapPersonalData(Personal_data personalData, User user) {
+    public UserProfileResponse mapPersonalData(Personal_data personalData, User user) {
         List<Role> roles = roleRepository.findRolesByUserId(user.getId());
         List<Permission> permissions = permissionRepository.findPermissionsByUserId(user.getId());
         Set<SimpleGrantedAuthority> authorities = permissions.stream()
@@ -131,9 +132,29 @@ public class UserService {
 
         response.setPersonalData(personalDataResponse);
 
-        return ResponseEntity.ok(response);
+        return response;
     }
 
+    public ResponseEntity<?> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        Set<UserProfileResponse> userResponses = new HashSet<>();
+        for (User user : users) {
+            userResponses.add(mapPersonalData(user.getPersonal_data(), user));
+        }
+        return new ResponseEntity<>(userResponses, HttpStatus.OK);
+    }
+
+
+    @Transactional
+    public ResponseEntity<?> deleteUser(int id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
+            return ResponseEntity.ok(Map.of("message", "User was deleted successfully"));
+        } else {
+            return new ResponseEntity<>(Map.of("error", "User not found"), HttpStatus.NOT_FOUND);
+        }
+    }
 
     /**
      * Updates the users data given in the request.
@@ -186,7 +207,7 @@ public class UserService {
             user.setPersonal_data(personalData);
             updateUser(user);
 
-            return mapPersonalData(personalData, user);
+            return ResponseEntity.ok(mapPersonalData(personalData, user));
         } catch (Exception e) {
             log.error("An error occurred while updating personal data", e);
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred");

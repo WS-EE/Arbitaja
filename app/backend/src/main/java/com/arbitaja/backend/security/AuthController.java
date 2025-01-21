@@ -56,7 +56,8 @@ public class AuthController {
             User user = userService.getUserByUsername(auth.getName());
             if(user != null) {
                 Personal_data personalData = user.getPersonal_data();
-                ResponseEntity<UserProfileResponse> response = userService.mapPersonalData(personalData, user);
+                UserProfileResponse userProfileResponse = userService.mapPersonalData(personalData, user);
+                ResponseEntity<UserProfileResponse> response = ResponseEntity.ok(userProfileResponse);
                 log.info("Sending response for successful login: " + "{}", objectMapper.writeValueAsString(response));
                 return response;
             }
