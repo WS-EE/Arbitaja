@@ -39,7 +39,7 @@ public class School {
         this.name = name;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
