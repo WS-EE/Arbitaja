@@ -116,7 +116,7 @@ public class PermissionConfig {
 
 
             if (userRoleRepository.count() == 0) {
-                Optional<User> userOpt = userRepository.findByUsername("Arbitaja");
+                Optional<User> userOpt = userRepository.findByUsername(adminUsername);
                 Optional<Role> roleOpt = roleRepository.findByName("admin");
                 if(userOpt.isPresent() && roleOpt.isPresent()) {
                     User user = userOpt.get();
@@ -132,7 +132,7 @@ public class PermissionConfig {
 
 
             if (competitionRepository.count() == 0) {
-                User organizer = userRepository.findUserByUsername("Arbitaja");
+                User organizer = userRepository.findUserByUsername(adminUsername);
                 competitionRepository.save(new Competition("Noor meister", null, Time.valueOf(LocalTime.now()), Time.valueOf(LocalTime.now()), organizer));
             }
             log.info(competitionRepository.findAll().toString());
