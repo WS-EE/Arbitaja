@@ -347,7 +347,7 @@ public class UserService {
         SignupUser newUser = signupUser.get();
         newUser.setUsername(sentUser.getUsername());
         newUser.setPersonal_data(sentUser.getPersonal_data());
-        if(newUser.getPersonal_data().getSchool().getId() == 0) newUser.getPersonal_data().setSchool(null);
+        if(newUser.getPersonal_data().getSchool() == null || newUser.getPersonal_data().getSchool().getId() == 0) newUser.getPersonal_data().setSchool(null);
         newUser.setIsApproved(true);
         signupUserRepository.save(newUser);
         return newUser;

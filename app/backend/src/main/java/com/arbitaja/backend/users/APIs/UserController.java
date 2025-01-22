@@ -241,7 +241,7 @@ public class UserController {
             security = @SecurityRequirement(name = "basicAuth")
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Signup user deletion was successful",
+            @ApiResponse(responseCode = "200", description = "Returns all user signups",
                     content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SignupUser.class)))),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
