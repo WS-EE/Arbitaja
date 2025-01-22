@@ -1,6 +1,7 @@
 package com.arbitaja.backend.security;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +26,8 @@ import java.util.Arrays;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig{
+    @Value("${VITE_APP_BASE_URL}")
+    private String VITE_APP_BASE_URL;
 
     @Bean
     public HttpFirewall defaultHttpFirewall() {
@@ -46,7 +49,7 @@ public class SecurityConfig{
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost"));
+        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000", VITE_APP_BASE_URL));
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         corsConfig.setAllowCredentials(true);
