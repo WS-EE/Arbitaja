@@ -60,6 +60,6 @@ function showAlert(message, type, timeout){
             <PulseLoader />
         </div>
         <allSchools v-else :schools="schools" />
-        <AddSchool modalId="addSchool" addButtonDivClass="pb-2 pt-2 sticky-bottom" @addSchool="onAddSchool()"/>
+        <AddSchool modalId="addSchool" addButtonDivClass="z-0 pb-2 pt-2 sticky-bottom" @addSchool="onAddSchool()"/>
     </div>
 </template>
