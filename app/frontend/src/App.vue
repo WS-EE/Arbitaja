@@ -5,22 +5,28 @@ import axios from 'axios';
 import { onMounted,ref } from 'vue';
 const backendLoading = ref(true)
 
+import PulseSpinner from 'vue-spinner/src/PulseLoader.vue';
+
 onMounted(async () => {
-  let isLoading = true
-  while (isLoading){
-    const response = await axios.get('/health')
-    if (response.status === 200){
-      isLoading = false
-    } else {
+  while (backendLoading.value){
+    try {
+      const response = await axios.get('/health')
+      if (response.status === 200){
+        backendLoading.value = false
+      }
+
+    } catch(e) {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
-  backendLoading.value = false
 })
 </script>
 
 <template>
-  <div v-if="backendLoading">Backend is loading up...</div>
+  <div id="page-container" v-if="backendLoading" class="text-center justify-content-center align-items-center align-content-center">    
+    <h5 class="pb-3">Loading backend</h5>
+    <PulseSpinner />
+  </div>
   <div v-else id="page-container"> 
     <div id="content-wrap">
       <RouterView />

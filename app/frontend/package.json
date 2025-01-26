@@ -16,7 +16,8 @@
     "bootstrap-icons": "^1.11.3",
     "vue": "^3.5.13",
     "vue-cookies": "^1.8.4",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "vue-spinner": "^1.0.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
