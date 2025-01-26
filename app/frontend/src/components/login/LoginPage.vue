@@ -71,6 +71,12 @@ onBeforeMount(async () => {
           <form @submit.prevent="userLogin">
             <input type="text" class="form-control" v-model="username" placeholder="Username" required>
             <input type="password" class="form-control" v-model="password" placeholder="Password" required>
+            <div class="checkbox-div">
+              <input class="me-2" type="checkbox" id="rememberMe" v-model="rememberMe">
+              <label for="rememberMe">Remember me</label>
+            </div>
+            <button class="btn btn-dark m-1" type="submit">Login</button>
+            <RouterLink to="/login/2" class="btn btn-outline-dark m-1">Sign up</RouterLink>
             <Transition>
               <div
                 v-if="getLogonError"
@@ -80,12 +86,6 @@ onBeforeMount(async () => {
                 <strong>Logon failure</strong>
               </div>
             </Transition>
-            <div class="checkbox-div">
-              <input class="me-2" type="checkbox" id="rememberMe" v-model="rememberMe">
-              <label for="rememberMe">Remember me</label>
-            </div>
-            <button class="btn btn-dark m-1" type="submit">Login</button>
-            <RouterLink to="/login/2" class="btn btn-outline-dark m-1">Sign up</RouterLink>
           </form>
         </div>
       </div>
