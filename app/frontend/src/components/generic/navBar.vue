@@ -190,7 +190,7 @@ const checkUserAdmin = async () => {
                             ]"
                         >
                             <a v-if="isLoggedIn" class="btn btn-outline-dark" @click.prevent="userLogout">Logout</a>
-                            <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark align-content-center" to="/login">Login/Signup</RouterLink>
+                            <RouterLink  v-if="!isLoggedIn" class="btn btn-outline-dark align-content-center" to="/login">Login</RouterLink>
                         </div>
                         <div class="col-2 col-sm-2 d-flex justify-content-center nav-item rounded align-items-center m-1">
                             <button type="button" class="btn github align-content-center nav-link rounded" data-bs-toggle="modal" data-bs-target="#LicenseBackdrop">
