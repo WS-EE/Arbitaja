@@ -5,13 +5,15 @@ import allSchools from '@/components/admin/users/school/allSchools.vue';
 import axios from 'axios';
 import { onMounted,ref } from 'vue';
 
-const onAddSchool = async() => {
-    await getSchools();
-}
-
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const isLoadingSchools = ref(true)
 const schools = ref([]);
+
+const onAddSchool = async() => {
+    isLoadingSchools.value = true
+    await getSchools();
+    isLoadingSchools.value = false
+}
 
 // Get all schools
 const getSchools = async() => {
