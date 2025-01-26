@@ -4,8 +4,8 @@ import axios from 'axios';
 
 // Import components
 import approveModal from './userApproveModal.vue';
-import addSchool from './school/addSchool.vue';
-import allSchools from './school/allSchools.vue';
+import addSchool from '../school/addSchool.vue';
+import allSchools from '../school/allSchools.vue';
 
 const singupUsers = ref([]);
 const schools = ref('');
