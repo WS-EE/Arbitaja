@@ -22,6 +22,7 @@ const schools = ref();
 
 // Display loading until onmount is doing stuff
 const isLoadingSchools = ref(true)
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // If we want to show delete button to user
 const addDelete = ref(true)
@@ -155,8 +156,8 @@ watch(
             </div>
         </div>
     </div>
-    <div v-else>
-        Loading...
+    <div v-else class="text-center">
+        <PulseLoader />
     </div>
     <!-- Delete school modal -->
     <div

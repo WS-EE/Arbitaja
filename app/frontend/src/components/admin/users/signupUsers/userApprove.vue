@@ -10,6 +10,7 @@ import allSchools from '../school/allSchools.vue';
 const singupUsers = ref([]);
 const schools = ref('');
 const isLoadingUsers = ref(true)
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Get all signup users
 const getSignupUsers = async() => {
@@ -101,7 +102,9 @@ const onAddSchool = async() => {
                         <addSchool modalId="lg-Modal" @addSchool="onAddSchool" />
                     </div>
                 </div>
-                <p v-if="isLoadingUsers">Loading...</p>
+                <div v-if="isLoadingUsers" class="text-center">
+                    <PulseLoader />
+                </div>
                 <approveModal v-else :users="singupUsers" :schools="schools" @approveSignupUser="onApproveSignupUser" />
             </div>
             <div class="col-lg-2 d-none d-lg-block border-5 border rounded m-2 p-1 p-md-2 p-lg-3 justify-content-center align-items-center text-center">
@@ -111,7 +114,9 @@ const onAddSchool = async() => {
                     </div>
                 </div>
                 <div class="row">
-                    <p v-if="isLoadingUsers">Loading...</p>
+                    <div v-if="isLoadingUsers" class="text-center">
+                        <PulseLoader />
+                    </div>
                     <allSchools v-else :schools="schools" :addDelete="false" :limitItems="limitSchools" />
                 </div>
                 <div class="row text-center">

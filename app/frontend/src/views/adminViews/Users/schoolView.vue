@@ -9,6 +9,7 @@ const onAddSchool = async() => {
     await getSchools();
 }
 
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const isLoadingSchools = ref(true)
 const schools = ref([]);
 
@@ -53,7 +54,9 @@ function showAlert(message, type, timeout){
         <!-- Alert when needed -->
         <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
         <!-- Main content -->
-        <div v-if="isLoadingSchools"></div>
+        <div v-if="isLoadingSchools" class="text-center pt-5">
+            <PulseLoader />
+        </div>
         <allSchools v-else :schools="schools" />
         <AddSchool modalId="addSchool" addButtonDivClass="pb-2 pt-2 sticky-bottom" @addSchool="onAddSchool()"/>
     </div>
