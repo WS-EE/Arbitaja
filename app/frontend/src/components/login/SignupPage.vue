@@ -15,7 +15,10 @@ const rePassword = ref("");
 
 const userSignup = async () => {
   try{
+
+    // check if passwords match
     if (password.value === rePassword.value){
+      // Try to signup user
       const response = await axios.post('user/signup/create', {
         username: username.value,
         salted_password: password.value,
@@ -24,16 +27,29 @@ const userSignup = async () => {
           email: email.value
         }
       })
+
+      // If user is created
       if (response.status === 200){
+        // show user is created
         showAlert('<strong>' + response.data.message + '</strong>', 'success')
+        // empty fields after success
+        username.value = ''
+        password.value = ''
+        fullName.value = ''
+        email.value = ''
+        rePassword = ''
       }
+
+    // if passwords don't match show alert
     } else {
       showAlert(
-      '<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to signup!</strong></h4><hr><p class=mb-0>Error: Passwords didn\'t  match.</p>',
-      'danger',
-      6000
-    )
+        '<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to signup!</strong></h4><hr><p class=mb-0>Error: Passwords didn\'t  match.</p>',
+        'danger',
+        6000
+      )
     }
+
+  // If error in request made
   } catch(error) {
     showAlert(
       '<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to signup!</strong></h4><hr><p class=mb-0>Error: ' + 
@@ -97,8 +113,7 @@ function showAlert(message, type, timeout){
           <div class="row text-center">
             <div class="col">
               <button class="btn btn-success m-1" type="submit">Send Signup Request</button>
-              <RouterLink class="btn btn-outline-dark m-1" to="/login">Back to login</RouterLink>
-              <RouterLink class="btn btn-outline-danger m-1" to="/home">Back Home</RouterLink>
+              <RouterLink class="btn btn-outline-dark m-1" to="/home">Back Home</RouterLink>
             </div>
           </div>
           
