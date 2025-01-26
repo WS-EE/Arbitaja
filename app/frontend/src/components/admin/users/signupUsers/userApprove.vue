@@ -74,7 +74,9 @@ function showAlert(message, type, timeout){
 
 // when signup user is approve get all the signup users again.
 const onApproveSignupUser = async() => {
+    isLoadingUsers.value = true 
     await getSignupUsers();
+    isLoadingUsers.value = false
 }
 
 // When school is added
