@@ -93,7 +93,7 @@ function showAlert(message, type, timeout){
                 <div class="modal-body">
                     <div class="row">
                         <h5>ID: {{  commitedUserData.id }}</h5>
-                        <p class="small">Create at: {{ commitedUserData.createdAt }}</p>
+                        <p class="small">Created at: {{ commitedUserData.createdAt }}</p>
                     </div>
                     <div class="row">
                         <div class="col-4">
