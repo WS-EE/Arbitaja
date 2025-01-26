@@ -9,6 +9,8 @@ import LoginPage from '@/components/login/LoginPage.vue';
 import SignupPage from '@/components/login/SignupPage.vue';
 import singupApproveView from '@/views/adminViews/Users/singupApproveView.vue';
 import schoolView from '@/views/adminViews/Users/schoolView.vue';
+import AdminUsersView from '@/views/adminViews/Users/adminUsersView.vue';
+import editUserProfile from '@/views/adminViews/Users/editUserProfile.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,6 +74,12 @@ const router = createRouter({
                         {
                             path: 'user',
                             name: 'adminUsersUser',
+                            component: AdminUsersView,
+                        },
+                        {
+                            path: 'user_edit/:id',
+                            name: 'adminUsersUserEdit',
+                            component: editUserProfile
                         },
                         {
                             path: 'role',

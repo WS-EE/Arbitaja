@@ -1,9 +1,19 @@
 <script setup>
-// import cookie handling
-import { useCookies } from '@/assets/js/useCookies';
-const $cookies = useCookies(); 
+// Use props to get user profile
+const props = defineProps({
+    user: {
+        type: Object,
+        required: true
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false,
+    },
+})
 
-// import ref
+const emit = defineEmits(['userUpdate'])
+
+// import ref and onmount
 import { onMounted, ref } from 'vue';
 
 // Get school list
@@ -17,22 +27,26 @@ const email = ref('')
 const username = ref('')
 const roles = ref('')
 const school = ref('')
+const successAlert = ref('')
 
-
-
-onMounted(async () => {
-    // Try getting school data
+const getSchools = async() => {
     try {
         const response = await axios.get('school/all/get')
         allSchools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     }
+}
+
+
+onMounted(async () => {
+    // Try getting school data
+    await getSchools();
 
     // Try getting user data
     try {
         // Get user parameters from cookies
-        const userParameters = $cookies.get('userParameters');
+        const userParameters = props.user;
 
         // Map out cookie parameters
         userid.value = userParameters.id
@@ -65,13 +79,10 @@ const saveProfile = (async () =>{
         // On positive response load new data.
         if (response.status === 200){
 
-            // Set user data to cookie returned by response
-            await $cookies.set('userParameters', response.data, 0);
+            // Set new parameters from reponse.data
+            const newUserParameters = response.data
 
-            // Get user parameters from cookies
-            const newUserParameters = await $cookies.get('userParameters');
-
-            // Map out cookie parameters
+            // Map out parameters
             fullName.value = newUserParameters.personal_data.full_name
             email.value = newUserParameters.personal_data.email
             username.value = newUserParameters.username
@@ -80,6 +91,9 @@ const saveProfile = (async () =>{
 
             // Display a success message to user
             showAlert('<h4 class=alert-heading>Success!</h4><hr><p class=mb-0>Changes have been saved.</p>', 'success')
+
+            // emit pack the changes to the profile
+            emit('userUpdate', newUserParameters)
         }
     } catch (error) {
         showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to save changes!</strong></h4><hr><p class=mb-0>Error: ' + error + '</p><p class=mb-0>For more information check console log.</p>', 'danger', 6000)
@@ -89,7 +103,7 @@ const saveProfile = (async () =>{
 function discardChanges(){
     try {
         // Get current values in cookies
-        const prevParameters = $cookies.get('userParameters');
+        const prevParameters = props.user;
 
         // Set the old values
         fullName.value = prevParameters.personal_data.full_name
@@ -116,6 +130,7 @@ const alertMessage = ref('')
 const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
+import router from '@/router';
 
 function showAlert(message, type, timeout){
     alertMessage.value = message
@@ -219,8 +234,6 @@ function showAlert(message, type, timeout){
     <div class="container d-flex justify-content-end align-items-end pt-3 pb-3">
         <button @click.prevent="saveProfile" class="btn btn-success me-3">Save<i class="ms-1 bi bi-floppy"></i></button>
         <button @click="discardChanges" class="btn btn-outline-danger me-3">Discard<i class="ms-1 bi bi-trash"></i></button>
+        <button v-if="isAdmin" @click="router.back()" class="btn btn-outline-dark me-3">Go Back</button>
     </div>
 </template>
-
-<style scoped>
-</style>
