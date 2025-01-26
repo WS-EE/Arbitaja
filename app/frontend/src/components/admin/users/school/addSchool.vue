@@ -24,7 +24,11 @@ const createSchool = async(school) => {
         // show alert of success
         await showAlert('School <strong>' + school + '</strong> has been created.', 'success')
         
+        // emit event to parent
         emit('addSchool');
+
+        // empty out school on success 
+        schoolName.value = '' 
     } catch(e) {
         showAlert('Couldn\'t create school. <br> Error: ' + e, 'danger')
     }
