@@ -54,7 +54,6 @@ onBeforeMount(async () => {
       const userData = await axios.get('user/profile/get')
       if (userData.status === 200) {
         router.back();
-        location.reload;
       }
     } catch(e) {}
 })
