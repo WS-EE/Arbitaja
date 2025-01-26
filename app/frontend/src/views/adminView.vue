@@ -27,13 +27,11 @@ onMounted(async () => {
 
     if (!isUserAdmin.value) {
         await router.replace('/login');
-        location.reload();
     }
 
   } catch(error) {
     console.log('Error:', error)
     await router.replace('/login');
-    location.reload();
   };
 });
 
