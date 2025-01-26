@@ -37,7 +37,7 @@ const userSignup = async () => {
         password.value = ''
         fullName.value = ''
         email.value = ''
-        rePassword = ''
+        rePassword.value = ''
       }
 
     // if passwords don't match show alert
