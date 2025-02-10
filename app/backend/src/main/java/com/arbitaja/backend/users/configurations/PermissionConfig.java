@@ -11,7 +11,6 @@ import com.arbitaja.backend.users.dataobjects.*;
 import com.arbitaja.backend.users.repositories.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -34,9 +33,6 @@ public class PermissionConfig {
     @Value("${ADMIN_PASSWORD}")
     private String adminPassword;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @Bean
     CommandLineRunner commandLineRunner(
             PermissionRepository permissionRepository,
@@ -48,7 +44,8 @@ public class PermissionConfig {
             UserRepository userRepository,
             SchoolRepository schoolRepository,
             CompetitionRepository competitionRepository,
-            PersonalDataRepository personalDataRepository)
+            PersonalDataRepository personalDataRepository,
+            PasswordEncoder passwordEncoder)
 
     {
 

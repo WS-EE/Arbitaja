@@ -28,22 +28,27 @@ public class UserService {
 
     private static final Logger log = LogManager.getLogger(UserService.class);
 
+    private final UserRepository userRepository;
+    private final SchoolRepository schoolRepository;
+    private final PersonalDataRepository personalDataRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final SignupUserRepository signupUserRepository;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final PermissionRepository permissionRepository;
+
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SchoolRepository schoolRepository;
-    @Autowired
-    private PersonalDataRepository personalDataRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private SignupUserRepository signupUserRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private UserRoleRepository userRoleRepository;
-    @Autowired
-    private PermissionRepository permissionRepository;
+    public UserService(UserRepository userRepository, SchoolRepository schoolRepository, PersonalDataRepository personalDataRepository, PasswordEncoder passwordEncoder, SignupUserRepository signupUserRepository,
+                       RoleRepository roleRepository, UserRoleRepository userRoleRepository, PermissionRepository permissionRepository) {
+        this.userRepository = userRepository;
+        this.schoolRepository = schoolRepository;
+        this.personalDataRepository = personalDataRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.signupUserRepository = signupUserRepository;
+        this.roleRepository = roleRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.permissionRepository = permissionRepository;
+    }
 
     /**
      * If user with given username exists returns the user otherwise returns null
@@ -148,12 +153,9 @@ public class UserService {
     @Transactional
     public ResponseEntity<?> deleteUser(int id) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            userRepository.delete(user.get());
-            return ResponseEntity.ok(Map.of("message", "User was deleted successfully"));
-        } else {
-            return new ResponseEntity<>(Map.of("error", "User not found"), HttpStatus.NOT_FOUND);
-        }
+        if (user.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
+        userRepository.delete(user.get());
+        return ResponseEntity.ok(Map.of("message", "User was deleted successfully"));
     }
 
     /**
@@ -244,13 +246,15 @@ public class UserService {
      * Used to decline a signup request by the admin
      * Deletes the signup user entity
      *
-     * @param sentUser signup user that is to be deleted
+     * @param id id of signup user trying to be deleted
      *
      * @return ResponseEntity of if the deletion was successful
      */
-    public ResponseEntity<Map<String, ?>> declineUser(SignupUser sentUser) {
+    public ResponseEntity<Map<String, ?>> declineUser(Integer id) {
         try{
-            signupUserRepository.delete(sentUser);
+            Optional<SignupUser> deletableUser = signupUserRepository.findById(id);
+            if(deletableUser.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
+            signupUserRepository.delete(deletableUser.get());
             return ResponseEntity.ok(Map.of("message", "User declined successfully"));
         } catch (Exception e){
             log.error("An error occurred while declining user{}", e.getMessage());
@@ -273,6 +277,7 @@ public class UserService {
 
             // Create and save new Personal_data
             Personal_data personalData = new Personal_data(user.getPersonal_data());
+            personalData.setCreated_at(Timestamp.from(Instant.now()));
             personalData = personalDataRepository.save(personalData);
 
             // Create User with managed Personal_data

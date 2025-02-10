@@ -35,10 +35,14 @@ import java.util.Map;
 public class UserController {
     private static final Logger log = LogManager.getLogger(UserController.class);
 
+    private final ObjectMapper objectMapper;
+    private final UserService userService;
+
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    UserService userService;
+    public UserController(ObjectMapper objectMapper, UserService userService) {
+        this.objectMapper = objectMapper;
+        this.userService = userService;
+    }
 
     @GetMapping("/profile/get")
     @PreAuthorize("hasAuthority('basic')")
@@ -221,9 +225,9 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })
-    public ResponseEntity<?> deleteSignupUser(@RequestBody SignupUser signupUser){
+    public ResponseEntity<?> deleteSignupUser(@RequestParam Integer id){
         try{
-            ResponseEntity<Map<String, ?>> resp = userService.declineUser(signupUser);
+            ResponseEntity<Map<String, ?>> resp = userService.declineUser(id);
             log.debug("Sending Response for declining user: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e){
@@ -250,7 +254,7 @@ public class UserController {
         try{
             List<SignupUser> signupUsers = userService.signupUserList();
             ResponseEntity<Map<String, ?>> resp = ResponseEntity.ok(Map.of("signup_users", signupUsers));
-            log.debug("Sending Response for Signups: " + "{}", objectMapper.writeValueAsString(resp));
+            log.debug("Sending Response for Signups: {}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e) {
             log.error(e);
