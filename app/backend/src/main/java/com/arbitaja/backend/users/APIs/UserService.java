@@ -124,6 +124,7 @@ public class UserService {
 
         UserProfileResponse.PersonalDataResponse personalDataResponse = new UserProfileResponse.PersonalDataResponse();
         if (personalData != null) {
+            personalDataResponse.setId(personalData.getId());
             personalDataResponse.setFullName(personalData.getFull_name());
             personalDataResponse.setEmail(personalData.getEmail());
         }

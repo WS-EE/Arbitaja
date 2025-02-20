@@ -75,6 +75,10 @@ public class UserProfileResponse {
     }
 
     public static class PersonalDataResponse {
+        @Schema(description = "Personal data id", example = "1")
+        @JsonProperty("id")
+        private Integer id;
+
         @Schema(description = "Full name of the user", example = "John Doe")
         @JsonProperty("full_name")
         private String fullName;
@@ -86,15 +90,25 @@ public class UserProfileResponse {
         private SchoolResponse school;
 
         public PersonalDataResponse() {
+            this.id = null;
             this.fullName = "";
             this.email = "";
             this.school = new SchoolResponse();
         }
 
-        public PersonalDataResponse(String fullName, String email, SchoolResponse school) {
+        public PersonalDataResponse(Integer id, String fullName, String email, SchoolResponse school) {
+            this.id = id;
             this.fullName = fullName;
             this.email = email;
             this.school = school;
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
         }
 
         public String getFullName() {
