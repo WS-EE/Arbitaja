@@ -2,8 +2,14 @@ package com.arbitaja.backend.users.configurations;
 
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
+import com.arbitaja.backend.competitions.scorings.dataobjects.Scoring_groups_structure;
+import com.arbitaja.backend.competitions.scorings.repositories.ScoringGroupsStructureRepository;
+import com.arbitaja.backend.competitors.dataobjects.Competitor;
+import com.arbitaja.backend.competitors.dataobjects.Competitor_competition;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import com.arbitaja.backend.competitors.dataobjects.School;
+import com.arbitaja.backend.competitors.repositories.CompetitorCompetitionRepository;
+import com.arbitaja.backend.competitors.repositories.CompetitorRepository;
 import com.arbitaja.backend.competitors.repositories.PersonalDataRepository;
 import com.arbitaja.backend.competitors.repositories.SchoolRepository;
 import com.arbitaja.backend.users.RolePermissionService;
@@ -45,13 +51,14 @@ public class PermissionConfig {
             SchoolRepository schoolRepository,
             CompetitionRepository competitionRepository,
             PersonalDataRepository personalDataRepository,
+            ScoringGroupsStructureRepository scoringGroupsStructureRepository,
+            CompetitorRepository competitorRepository,
+            CompetitorCompetitionRepository competitorCompetitionRepository,
             PasswordEncoder passwordEncoder)
 
     {
 
         return args -> {
-
-
             // Create new Permission if it doesn't exist
             if (permissionRepository.count() == 0) {
                 Permission permission = new Permission("basic", "basic", "description");
@@ -82,6 +89,7 @@ public class PermissionConfig {
             }
 
             int personalDataId = -1;
+            int personalDataId2 = -1;
             if(personalDataRepository.count() == 0) {
                 Optional<School> optSchool = schoolRepository.findSchoolByName("RandomSchool");
                 Personal_data personalData = new Personal_data();
@@ -92,6 +100,15 @@ public class PermissionConfig {
                 personalDataRepository.save(personalData);
                 personalDataId = personalData.getId();
                 log.info("Personal-data mapping created: {}", personalData);
+
+                optSchool = schoolRepository.findSchoolByName("RandomSchool");
+                personalData = new Personal_data();
+                personalData.setFull_name("competitor");
+                personalData.setEmail("competitor@competitor.com");
+                personalData.setCreated_at(Timestamp.from(Instant.now()));
+                optSchool.ifPresent(personalData::setSchool);
+                personalDataRepository.save(personalData);
+                personalDataId2 = personalData.getId();
             } else {
                 log.info("personalData already exists, skipping creation.");
             }
@@ -103,6 +120,13 @@ public class PermissionConfig {
                 if (optPersonalData.isPresent()) {
                     Personal_data personalData = optPersonalData.get();
                     User user = new User(personalData, passwordEncoder.encode(adminPassword), adminUsername, null);
+                    userRepository.save(user);
+                    log.info("User created: {}", user);
+                }
+                optPersonalData = personalDataRepository.findById(personalDataId2);
+                if (optPersonalData.isPresent()) {
+                    Personal_data personalData = optPersonalData.get();
+                    User user = new User(personalData, passwordEncoder.encode("123"), "competitor", null);
                     userRepository.save(user);
                     log.info("User created: {}", user);
                 }
@@ -122,18 +146,56 @@ public class PermissionConfig {
                     userRoleRepository.save(userRole);
                     log.info("User-Role mapping created: {}", userRole);
                 }
+                userOpt = userRepository.findByUsername("competitor");
+                roleOpt = roleRepository.findByName("user");
+                if(userOpt.isPresent() && roleOpt.isPresent()) {
+                    User user = userOpt.get();
+                    Role role = roleOpt.get();
+                    User_role userRole = new User_role(user, role, Timestamp.from(Instant.now()));
+                    userRoleRepository.save(userRole);
+                    log.info("User-Role mapping created: {}", userRole);
+                }
             } else {
                 log.info("User-Role mapping already exists, skipping.");
             }
             log.info("Users in the database: {}", userRepository.findAll());
 
+            int competitor_id = -1;
+            if(competitorRepository.count() == 0){
+                Competitor competitor = new Competitor(1 ,personalDataRepository.findById(personalDataId2).orElseThrow(), "arbitaja");
+                competitorRepository.save(competitor);
+                competitor_id = competitor.getId();
+                log.info("competitor created {}", competitor);
+            }
+            log.info(competitorRepository.findAll().toString());
+
+            Optional<Competitor> competitorOpt = competitorRepository.findById(competitor_id);
+            Competitor competitor = null;
+            if (competitorOpt.isPresent()) competitor = competitorOpt.get();
+            else log.error("competitor isn't present");
+
+            if(scoringGroupsStructureRepository.count() == 0){
+                Scoring_groups_structure mainScoringGroup = new Scoring_groups_structure("main", "main scoring group", null, null, 1, null);
+                scoringGroupsStructureRepository.save(mainScoringGroup);
+                Scoring_groups_structure parentScoringGroup = new Scoring_groups_structure("noormeister", "noor meistrer scoring group", null, mainScoringGroup, 2, null);
+                scoringGroupsStructureRepository.save(parentScoringGroup);
+                scoringGroupsStructureRepository.save(new Scoring_groups_structure("admin", "admin scoring group for testing", competitor, parentScoringGroup, 3, null));
+            }
+            log.info(scoringGroupsStructureRepository.findAll().toString());
+
 
             if (competitionRepository.count() == 0) {
                 User organizer = userRepository.findUserByUsername(adminUsername);
-                competitionRepository.save(new Competition("Noor meister", null, Time.valueOf(LocalTime.now()), Time.valueOf(LocalTime.now()), organizer));
+                competitionRepository.save(new Competition("Noor meister", scoringGroupsStructureRepository.findByName("noormeister"), Time.valueOf(LocalTime.now()), Time.valueOf(LocalTime.now()), organizer));
             }
             log.info(competitionRepository.findAll().toString());
+
+
+            if(competitorCompetitionRepository.count() == 0){
+                Competitor_competition competitorCompetition = new Competitor_competition(competitor, competitionRepository.findByName("Noor meister"));
+                competitorCompetitionRepository.save(competitorCompetition);
+            }
+            log.info(competitorCompetitionRepository.findAll().toString());
         };
     }
-
 }

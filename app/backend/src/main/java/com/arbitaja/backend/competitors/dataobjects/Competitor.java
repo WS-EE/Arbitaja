@@ -10,7 +10,7 @@ import java.util.Set;
 public class Competitor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "public_display_name_type")
     private int public_display_name_type;
@@ -25,9 +25,10 @@ public class Competitor {
     @OneToMany(mappedBy = "competitor")
     private Set<Competitor_competition> competitor_competitions = new LinkedHashSet<>();
 
-    public Competitor(int public_display_name_type, Personal_data personal_data) {
+    public Competitor(int public_display_name_type, Personal_data personal_data, String alias) {
         this.public_display_name_type = public_display_name_type;
         this.personal_data = personal_data;
+        this.alias = alias;
     }
 
 

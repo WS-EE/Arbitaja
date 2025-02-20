@@ -20,4 +20,6 @@ public interface ScoringGroupsStructureRepository extends JpaRepository<Scoring_
     );
     """, nativeQuery = true)
     Set<Scoring_groups_structure> findAllByCompetitionId(@Param("competitionId") int competitionId);
+
+    Scoring_groups_structure findByName(String name);
 }
