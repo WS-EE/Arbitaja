@@ -134,8 +134,8 @@ public class CompetitionService {
             scoringGroupsStructureResp.setName(scoring_groups_structure.getName());
             scoringGroupsStructureResp.setDescription(scoring_groups_structure.getDescription());
             scoringGroupsStructureResp.setStructure_group_type(scoring_groups_structure.getStructure_group_type());
-            scoringGroupsStructureResp.setScoring_parent_croup_id(scoring_groups_structure.getParent_scoring_groups_structure().getId());
-            scoringGroupsStructureResp.setCompetitor_id(scoring_groups_structure.getCompetitor().getId());
+            scoringGroupsStructureResp.setScoring_parent_group_id(scoring_groups_structure.getParent_scoring_groups_structure() == null ? null : scoring_groups_structure.getParent_scoring_groups_structure().getId());
+            scoringGroupsStructureResp.setCompetitor_id(scoring_groups_structure.getCompetitor() == null ? null : scoring_groups_structure.getCompetitor().getId());
             scoringGroupsStructureResp.setDynamic_variables(scoring_groups_structure.getDynamic_variables());
             scoring_groups_structure_resps.add(scoringGroupsStructureResp);
         }
@@ -143,7 +143,7 @@ public class CompetitionService {
         return scoring_groups_structure_resps;
     }
 
-    private CompetitionResponse setCompetitionResponse(Competition competition) {
+    public CompetitionResponse setCompetitionResponse(Competition competition) {
         CompetitionResponse competitionResponse = new CompetitionResponse();
         competitionResponse.setId(competition.getId());
         competitionResponse.setName(competition.getName());

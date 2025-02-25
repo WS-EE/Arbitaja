@@ -1,5 +1,6 @@
 package com.arbitaja.backend.competitors.dataobjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.LinkedHashSet;
@@ -23,6 +24,7 @@ public class Competitor {
     private Personal_data personal_data;
 
     @OneToMany(mappedBy = "competitor")
+    @JsonIgnore
     private Set<Competitor_competition> competitor_competitions = new LinkedHashSet<>();
 
     public Competitor(int public_display_name_type, Personal_data personal_data, String alias) {
@@ -35,11 +37,11 @@ public class Competitor {
     public Competitor() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -151,17 +151,17 @@ public class CompetitionResponse {
         private int id;
         private String name;
         private String description;
-        private int competitor_id;
-        private int scoring_parent_croup_id;
+        private Integer competitor_id;
+        private int scoring_parent_group_id;
         private int structure_group_type;
         private Map<String, ?> dynamic_variables;
         public Scoring_groups_structure_resp() {}
 
-        public int getId() {
+        public Integer getId() {
             return id;
         }
 
-        public void setId(int id) {
+        public void setId(Integer id) {
             this.id = id;
         }
 
@@ -181,20 +181,20 @@ public class CompetitionResponse {
             this.description = description;
         }
 
-        public int getCompetitor_id() {
+        public Integer getCompetitor_id() {
             return competitor_id;
         }
 
-        public void setCompetitor_id(int competitor_id) {
+        public void setCompetitor_id(Integer competitor_id) {
             this.competitor_id = competitor_id;
         }
 
-        public int getScoring_parent_croup_id() {
-            return scoring_parent_croup_id;
+        public int getScoring_parent_group_id() {
+            return scoring_parent_group_id;
         }
 
-        public void setScoring_parent_croup_id(int scoring_parent_croup_id) {
-            this.scoring_parent_croup_id = scoring_parent_croup_id;
+        public void setScoring_parent_group_id(Integer scoring_parent_group_id) {
+            this.scoring_parent_group_id = scoring_parent_group_id;
         }
 
         public int getStructure_group_type() {

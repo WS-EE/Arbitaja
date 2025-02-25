@@ -4,6 +4,7 @@ package com.arbitaja.backend.competitions.dataobjects;
 import com.arbitaja.backend.competitions.scorings.dataobjects.Scoring_groups_structure;
 import com.arbitaja.backend.competitors.dataobjects.Competitor_competition;
 import com.arbitaja.backend.users.dataobjects.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
@@ -44,6 +45,7 @@ public class Competition {
 
     @OneToMany(mappedBy = "competition")
     @Schema(description = "List of competitors in the competition")
+    @JsonIgnore
     private List<Competitor_competition> competitorCompetitions;
 
     public Competition() {}
