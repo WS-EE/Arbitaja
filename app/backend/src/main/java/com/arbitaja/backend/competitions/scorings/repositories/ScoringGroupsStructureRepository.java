@@ -15,7 +15,7 @@ public interface ScoringGroupsStructureRepository extends JpaRepository<Scoring_
     WHERE sgs.id IN (
             SELECT cs.id
                     FROM scoring_groups_structure cs
-                    JOIN competition c ON c.scoring_criteria_group_main_id = cs.id
+                    JOIN competition c ON c.scoring_criteria_group_main_id = cs.id or c.scoring_criteria_group_main_id = cs.scoring_parent_group_id
                     WHERE c.id = :competitionId
     );
     """, nativeQuery = true)
