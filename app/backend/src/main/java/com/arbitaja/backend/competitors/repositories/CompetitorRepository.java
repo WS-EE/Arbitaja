@@ -15,4 +15,6 @@ public interface CompetitorRepository extends JpaRepository<Competitor, Integer>
     WHERE c.id = :competitionId
 """, nativeQuery = true)
     Set<Competitor> findByCompetitionId(Integer competitionId);
+
+    Competitor findByAlias(String alias);
 }

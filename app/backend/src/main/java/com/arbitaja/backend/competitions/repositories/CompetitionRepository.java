@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Set;
+
 
 public interface CompetitionRepository extends JpaRepository<Competition, Integer> {
     Competition findByid(Integer id);
@@ -18,4 +20,15 @@ public interface CompetitionRepository extends JpaRepository<Competition, Intege
             id = EXCLUDED.id
     """, nativeQuery = true)
     void updateCompetition(Competition competition);
+
+    @Query(value = """
+    SELECT co.id, co.name, co.organizer_id, co.start_time, co.end_time, co.scoring_criteria_group_main_id
+    FROM competition co
+    JOIN competitor_competition cc ON cc.competition_id = co.id
+    JOIN competitor c ON cc.competitor_id = c.id
+    WHERE c.id = :competitorId
+    
+
+    """, nativeQuery = true)
+    Set<Competition> findByCompetitorId(Integer competitorId);
 }
