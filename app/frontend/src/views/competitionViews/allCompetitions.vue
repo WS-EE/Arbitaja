@@ -4,5 +4,5 @@ import allcompetition from '@/components/generic/competitions/allCompetitions.vu
 </script>
 
 <template>
-    <allcompetition isAdmin="true" />
+    <allcompetition />
 </template>

@@ -11,7 +11,8 @@ import singupApproveView from '@/views/adminViews/Users/singupApproveView.vue';
 import schoolView from '@/views/adminViews/Users/schoolView.vue';
 import AdminUsersView from '@/views/adminViews/Users/adminUsersView.vue';
 import editUserProfile from '@/views/adminViews/Users/editUserProfile.vue';
-import allCompetitions from '@/views/allCompetitions.vue'
+import allCompetitions from '@/views/competitionViews/allCompetitions.vue';
+import competitionShow from '@/views/competitionViews/competitionShow.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,16 @@ const router = createRouter({
                     name: 'userProfile',
                     component: userProfileView
                 },
+                {
+                    path: '/competitions',
+                    name: 'userCompetitions',
+                    component: allCompetitions
+                },
+                {
+                    path: '/competition/:id',
+                    name: 'userCompetitionShow',
+                    component: competitionShow
+                },
             ]
         },
         {
@@ -59,9 +70,20 @@ const router = createRouter({
             component: adminView,
             children: [
                 {
-                    path: 'competitions',
+                    path: 'competitions/',
                     name: 'adminCompetiton',
                     component: allCompetitions 
+                },
+                {
+                    path: 'competition/',
+                    name: 'adminShowCompetiton',
+                    children: [
+                        {
+                            path: 'get/:id',
+                            name: 'userCompetitionShow',
+                            component: competitionShow
+                        },
+                    ]
                 },
                 {
                     path: 'schools',

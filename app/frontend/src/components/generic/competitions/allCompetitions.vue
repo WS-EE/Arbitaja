@@ -1,25 +1,25 @@
 <script setup>
-// Use props to get user profile
-const props = defineProps({
-    isAdmin: {
-        type: Boolean,
-        default: false,
-    },
-})
 
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+
+// check the active link
+const isAdmin = () => {
+    const route = useRoute();
+    return route.path === '/admin/competitions';
+}
 
 const competitions = ref([]);
 const isCompetitions = ref(true)
 
-// Get all signup users
+// Get all competitions
 const getAllCompetition = async() => {
 
-    // Try getting user data
+    // Try getting all competitions
     try{
-        // Try getting the Users
+        // Try getting all competitions
         const response = await axios.get('competition/all/get')
         competitions.value = response.data
         console.log(competitions.value)
@@ -31,7 +31,7 @@ const getAllCompetition = async() => {
 
 onMounted(async () => {
     try {
-        // Get Users with a function
+        // Get competitions function
         await getAllCompetition();
 
     } catch(error) {
@@ -63,7 +63,7 @@ function showAlert(message, type, timeout){
     <!-- Main content-->
     <div class="container">
         <div class="row">
-            <div v-if="isLoadingUsers" class="text-center">
+            <div v-if="isCompetitions" class="text-center">
                     <PulseLoader />
                 </div>
             <div v-else class="col-4 p-2">
@@ -73,8 +73,9 @@ function showAlert(message, type, timeout){
                         <p class="card-text">
                             Organizer: {{ competition.organizer.full_name }}
                         </p>
-                        <RouterLink class="btn btn-dark me-2" :to="'/competition/get?id=' + competition.id">View</RouterLink>
-                        <RouterLink class="btn btn-outline-success" :to="'/admin/competition/edit?id=' + competition.id" v-if="isAdmin">Edit</RouterLink>
+                        <RouterLink v-if="isAdmin()" class="btn btn-dark me-2" :to="'/admin/competition/get/' + competition.id">View</RouterLink>
+                        <RouterLink v-else class="btn btn-dark me-2" :to="'/competition/' + competition.id">View</RouterLink>
+                        <RouterLink class="btn btn-outline-success" :to="'/admin/competition/edit/' + competition.id" v-if="isAdmin()">Edit</RouterLink>
                     </div>
                 </div>
             </div>

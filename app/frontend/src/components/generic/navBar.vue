@@ -161,17 +161,29 @@ const checkUserAdmin = async () => {
                         ]" 
                         >Home</RouterLink>
                         </li>
-                        <li class="nav-item dropdown rounded m-1">
-                        <a class="nav-link dropdown-toggle text-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Competitions
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><RouterLink class="dropdown-item" to="/bogus1">Current Competition</RouterLink></li>
-                            <li><RouterLink class="dropdown-item" to="/bogus2">Last Competition</RouterLink></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><RouterLink class="dropdown-item" to="/bogus3">Competition History</RouterLink></li>
-                        </ul>
+                        <li class="nav-item rounded m-1">
+                            <RouterLink 
+                            to="/competitions" 
+                            :class="[
+                                isLinkActive('/competitions') 
+                                    ? 'active-item' : '',
+                                'nav-link rounded text-center',
+                            ]" 
+                            >Competitions</RouterLink>
                         </li>
+                        <!--
+                        <li class="nav-item dropdown rounded m-1">
+                            <a class="nav-link dropdown-toggle text-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Competitions
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><RouterLink class="dropdown-item" to="/bogus1">Current Competition</RouterLink></li>
+                                <li><RouterLink class="dropdown-item" to="/bogus2">Last Competition</RouterLink></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><RouterLink class="dropdown-item" to="/bogus3">Competition History</RouterLink></li>
+                            </ul>
+                        </li>
+                        -->
                         <li class="nav-item rounded m-1" v-if="isUserAdmin">
                             <RouterLink 
                                 to="/admin"
