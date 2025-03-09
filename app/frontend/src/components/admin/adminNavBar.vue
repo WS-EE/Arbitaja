@@ -29,9 +29,9 @@ import logo from '@/assets/media/logo.svg'
                     <ul class="navbar-nav">
                         <li class="nav-item rounded m-1">
                             <RouterLink 
-                            to="/admin/competition" 
+                            to="/admin/competitions" 
                             :class="[
-                                isLinkActive('/admin/competition') 
+                                isLinkActive('/admin/competitions') 
                                     ? 'active-item' : '',
                                 'nav-link rounded text-center',
                             ]" 
