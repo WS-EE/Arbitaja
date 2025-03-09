@@ -76,6 +76,7 @@ table competition {
   scoring_criteria_group_main_id integer
   start_time time
   end_time time
+  score_showtime time
 }
 ref: user.id < competition.organizer_id
 
@@ -131,6 +132,15 @@ table scoring_criteria {
   is_template bool
   visibility_level int
 }
+
+Table competition_scroing_criteria {
+  id integer
+  competition_id integer
+  criteria_id integer
+}
+ref: scoring_criteria.id < competition_scroing_criteria.criteria_id
+ref: competition.id < competition_scroing_criteria.competition_id
+
 Table criteria_dependency {
   id integer [primary key, increment]
   criteria_id integer
