@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "@primeuix/themes": "^1.0.0",
     "@vueuse/core": "^12.0.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "chart.js": "^4.4.8",
+    "primevue": "^4.3.1",
     "vue": "^3.5.13",
     "vue-cookies": "^1.8.4",
     "vue-router": "^4.5.0",
