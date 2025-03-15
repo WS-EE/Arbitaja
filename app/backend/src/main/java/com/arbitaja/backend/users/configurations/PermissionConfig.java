@@ -25,10 +25,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -189,7 +187,7 @@ public class PermissionConfig {
 
             if (competitionRepository.count() == 0) {
                 User organizer = userRepository.findUserByUsername(adminUsername);
-                competitionRepository.save(new Competition("Noor meister", scoringGroupsStructureRepository.findByName("noormeister"), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), organizer, Timestamp.from(Instant.now())));
+                competitionRepository.save(new Competition("Noor meister", scoringGroupsStructureRepository.findByName("noormeister"), Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusSeconds(24 * 60 * 60)), organizer, Timestamp.from(Instant.now().plusSeconds(20 * 60 * 60))));
             }
             log.info(competitionRepository.findAll().toString());
 
