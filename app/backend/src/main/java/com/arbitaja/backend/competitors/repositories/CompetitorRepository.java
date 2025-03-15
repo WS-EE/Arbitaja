@@ -12,7 +12,7 @@ public interface CompetitorRepository extends JpaRepository<Competitor, Integer>
     FROM competition co
     JOIN competitor_competition cc ON co.id = cc.competition_id
     JOIN competitor c ON cc.competitor_id = c.id
-    WHERE c.id = :competitionId
+    WHERE co.id = :competitionId
 """, nativeQuery = true)
     Set<Competitor> findByCompetitionId(Integer competitionId);
 
