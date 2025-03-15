@@ -13,8 +13,8 @@ public interface CompetitionRepository extends JpaRepository<Competition, Intege
     Competition findByName(String name);
     @Modifying
     @Query(value = """
-    INSERT INTO competition (id, name, organizer_id, start_time, end_time)
-        VALUES (:#{#competition.id}, :#{#competition.name}, :#{#competition.organizer_id}, :#{#competition.start_time}, :#{#competition.end_time})
+    INSERT INTO competition (id, name, organizer_id, start_time, end_time, score_showtime)
+        VALUES (:#{#competition.id}, :#{#competition.name}, :#{#competition.organizer_id}, :#{#competition.start_time}, :#{#competition.end_time}, :#{#competition.score_showtime})
         ON CONFLICT (id)
         DO UPDATE SET
             id = EXCLUDED.id
@@ -22,7 +22,7 @@ public interface CompetitionRepository extends JpaRepository<Competition, Intege
     void updateCompetition(Competition competition);
 
     @Query(value = """
-    SELECT co.id, co.name, co.organizer_id, co.start_time, co.end_time, co.scoring_criteria_group_main_id
+    SELECT co.id, co.name, co.organizer_id, co.start_time, co.end_time, co.scoring_criteria_group_main_id, co.score_showtime
     FROM competition co
     JOIN competitor_competition cc ON cc.competition_id = co.id
     JOIN competitor c ON cc.competitor_id = c.id

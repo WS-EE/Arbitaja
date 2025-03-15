@@ -12,12 +12,14 @@ public class CompetitionResponse {
     private int id;
     @Schema(description = "Name of the competition", example = "Noor meister")
     private String name;
-    @Schema(description = "Start time of the competition", example = "08:00:00")
+    @Schema(description = "Start time of the competition")
     private Timestamp start_time;
-    @Schema(description = "End time of the competition", example = "17:00:00")
+    @Schema(description = "End time of the competition")
     private Timestamp end_time;
     @Schema(description = "Details of the competition organizer")
     private OrganizerResp  organizer;
+    @Schema(description = "score_showtime of the competition")
+    private Timestamp score_showtime;
     @Schema(description = "Competitors of the competition")
     private Set<CompetitorResp> competitors;
     @Schema(description = "Competitors of the competition")
@@ -76,6 +78,14 @@ public class CompetitionResponse {
 
     public Set<Scoring_groups_structure_resp> getScoring_groups() {
         return scoring_groups;
+    }
+
+    public Timestamp getScore_showtime() {
+        return score_showtime;
+    }
+
+    public void setScore_showtime(Timestamp score_showtime) {
+        this.score_showtime = score_showtime;
     }
 
     public void setScoring_groups(Set<Scoring_groups_structure_resp> scoring_groups) {

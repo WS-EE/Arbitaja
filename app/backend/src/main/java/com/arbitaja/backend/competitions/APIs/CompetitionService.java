@@ -151,6 +151,7 @@ public class CompetitionService {
         competitionResponse.setCompetitors(setCompetitors(competition));
         competitionResponse.setStart_time(competition.getStart_time());
         competitionResponse.setEnd_time(competition.getEnd_time());
+        competitionResponse.setScore_showtime(competition.getScore_showtime());
         Set<Scoring_groups_structure> scoringGroupsStructures = scoringGroupsStructureRepository.findAllByCompetitionId(competition.getId());
         competitionResponse.setScoring_groups(setScoring_groups_structure_resp(scoringGroupsStructures));
 
