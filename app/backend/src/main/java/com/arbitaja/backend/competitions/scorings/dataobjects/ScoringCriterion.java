@@ -57,15 +57,13 @@ public class ScoringCriterion {
     @OneToMany(mappedBy = "scoringCriteria")
     private Set<ScoringHistory> scoringHistories = new LinkedHashSet<>();
 
-    public ScoringCriterion(ScoringHost scoringHost, String name, String description, Boolean isManual, Double totalPoints, Boolean isGeneralized, String expectedResult, ScoringCriterion criteriaTemplate, Boolean isTemplate) {
-        this.scoringHost = scoringHost;
+    public ScoringCriterion(String name, String description, Boolean isManual, Double totalPoints, Boolean isGeneralized, String expectedResult, Boolean isTemplate) {
         this.name = name;
         this.description = description;
         this.isManual = isManual;
         this.totalPoints = totalPoints;
         this.isGeneralized = isGeneralized;
         this.expectedResult = expectedResult;
-        this.criteriaTemplate = criteriaTemplate;
         this.isTemplate = isTemplate;
     }
 
@@ -189,19 +187,16 @@ public class ScoringCriterion {
     public String toString() {
         return "ScoringCriterion{" +
                 "id=" + id +
-                ", scoringHost=" + scoringHost +
+                ", scoringHost=" + (scoringHost != null ? scoringHost.getId() : "null") +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", isManual=" + isManual +
                 ", totalPoints=" + totalPoints +
                 ", isGeneralized=" + isGeneralized +
                 ", expectedResult='" + expectedResult + '\'' +
-                ", criteriaTemplate=" + criteriaTemplate +
+                ", criteriaTemplate=" + (criteriaTemplate != null ? criteriaTemplate.getId() : "null") +
                 ", isTemplate=" + isTemplate +
-                ", logicalGroupLinks=" + logicalGroupLinks +
-                ", scoringAgents=" + scoringAgents +
-                ", scoringCriteria=" + scoringCriteria +
-                ", scoringHistories=" + scoringHistories +
+                ", visibilityLevel=" + visibilityLevel +
                 '}';
     }
 }

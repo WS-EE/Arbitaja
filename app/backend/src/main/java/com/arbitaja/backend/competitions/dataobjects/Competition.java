@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
-import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -32,11 +32,15 @@ public class Competition {
 
     @Column(name = "start_time")
     @Schema(description = "Start time of the competition", example = "08:00:00")
-    private Time start_time;
+    private Timestamp start_time;
 
     @Column(name = "end_time")
     @Schema(description = "End time of the competition", example = "17:00:00")
-    private Time end_time;
+    private Timestamp end_time;
+
+    @Column(name = "score_showtime")
+    @Schema(description = "End time of the competition", example = "17:00:00")
+    private Timestamp score_showtime;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organizer_id")
@@ -50,12 +54,21 @@ public class Competition {
 
     public Competition() {}
 
-    public Competition(String name, Scoring_groups_structure scoring_groups_structure, Time start_time, Time end_time, User organizer_id) {
+    public Competition(String name, Scoring_groups_structure scoring_groups_structure, Timestamp start_time, Timestamp end_time, User organizer_id) {
         this.name = name;
         this.scoring_groups_structure = scoring_groups_structure;
         this.start_time = start_time;
         this.end_time = end_time;
         this.organizer_id = organizer_id;
+    }
+
+    public Competition(String name, Scoring_groups_structure scoring_groups_structure, Timestamp start_time, Timestamp end_time, User organizer_id, Timestamp score_showtime) {
+        this.name = name;
+        this.scoring_groups_structure = scoring_groups_structure;
+        this.start_time = start_time;
+        this.end_time = end_time;
+        this.organizer_id = organizer_id;
+        this.score_showtime = score_showtime;
     }
 
     public Integer getId() {
@@ -82,20 +95,28 @@ public class Competition {
         this.scoring_groups_structure = scoring_groups_structure;
     }
 
-    public Time getStart_time() {
+    public Timestamp getStart_time() {
         return start_time;
     }
 
-    public void setStart_time(Time start_time) {
+    public void setStart_time(Timestamp start_time) {
         this.start_time = start_time;
     }
 
-    public Time getEnd_time() {
+    public Timestamp getEnd_time() {
         return end_time;
     }
 
-    public void setEnd_time(Time end_time) {
+    public void setEnd_time(Timestamp end_time) {
         this.end_time = end_time;
+    }
+
+    public Timestamp getScore_showtime() {
+        return score_showtime;
+    }
+
+    public void setScore_showtime(Timestamp score_showtime) {
+        this.score_showtime = score_showtime;
     }
 
     public User getOrganizer_id() {

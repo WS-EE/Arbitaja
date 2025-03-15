@@ -2,7 +2,9 @@ package com.arbitaja.backend.users.configurations;
 
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
+import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import com.arbitaja.backend.competitions.scorings.dataobjects.Scoring_groups_structure;
+import com.arbitaja.backend.competitions.scorings.repositories.ScoringCriterionRepository;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringGroupsStructureRepository;
 import com.arbitaja.backend.competitors.dataobjects.Competitor;
 import com.arbitaja.backend.competitors.dataobjects.Competitor_competition;
@@ -54,6 +56,7 @@ public class PermissionConfig {
             ScoringGroupsStructureRepository scoringGroupsStructureRepository,
             CompetitorRepository competitorRepository,
             CompetitorCompetitionRepository competitorCompetitionRepository,
+            ScoringCriterionRepository scoringCriterionRepository,
             PasswordEncoder passwordEncoder)
 
     {
@@ -186,7 +189,7 @@ public class PermissionConfig {
 
             if (competitionRepository.count() == 0) {
                 User organizer = userRepository.findUserByUsername(adminUsername);
-                competitionRepository.save(new Competition("Noor meister", scoringGroupsStructureRepository.findByName("noormeister"), Time.valueOf(LocalTime.now()), Time.valueOf(LocalTime.now()), organizer));
+                competitionRepository.save(new Competition("Noor meister", scoringGroupsStructureRepository.findByName("noormeister"), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), organizer, Timestamp.from(Instant.now())));
             }
             log.info(competitionRepository.findAll().toString());
 
@@ -196,6 +199,14 @@ public class PermissionConfig {
                 competitorCompetitionRepository.save(competitorCompetition);
             }
             log.info(competitorCompetitionRepository.findAll().toString());
+
+            if(scoringCriterionRepository.count() == 0){
+                scoringCriterionRepository.save(new ScoringCriterion("test", "test", true, 50.0, true, "test", false));
+                scoringCriterionRepository.save(new ScoringCriterion("test", "test", true, 50.0, true, "test", false));
+                scoringCriterionRepository.save(new ScoringCriterion("test", "test", true, 50.0, true, "test", false));
+                scoringCriterionRepository.save(new ScoringCriterion("test", "test", true, 50.0, true, "test", false));
+            }
+            log.info(scoringCriterionRepository.findAll().toString());
         };
     }
 }

@@ -1,6 +1,5 @@
-package com.arbitaja.backend;
+package com.arbitaja.backend.competitions.scorings.dataobjects;
 
-import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import jakarta.persistence.*;
 
 @Entity
