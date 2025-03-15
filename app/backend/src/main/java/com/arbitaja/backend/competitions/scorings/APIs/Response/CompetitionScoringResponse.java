@@ -7,20 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 public class CompetitionScoringResponse {
-    private Dashboard dashboard;
-
-    public CompetitionScoringResponse(Dashboard dashboard) {
-        this.dashboard = dashboard;
-    }
-
-    public Dashboard getDashboard() {
-        return dashboard;
-    }
-
-    public void setDashboard(Dashboard dashboard) {
-        this.dashboard = dashboard;
-    }
-
     public static class Dashboard {
         private Set<Competitor> competitors;
 

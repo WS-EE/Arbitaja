@@ -87,7 +87,7 @@ public class CompetitionScoringService {
     }
 
 
-    public CompetitionScoringResponse getCompetitionScoringHistory(Integer competition_id, Authentication auth) {
+    public CompetitionScoringResponse.Dashboard getCompetitionScoringHistory(Integer competition_id, Authentication auth) {
         Competition competition = getCompetition(competition_id);
         Set<Competitor> competitors = competitorRepository.findByCompetitionId(competition_id);
         if(auth.getAuthorities().contains("ROLE_ADMIN")) {
@@ -122,11 +122,11 @@ public class CompetitionScoringService {
         return competitorSet;
     }
 
-    private CompetitionScoringResponse setDashboard(Competition competition, Set<Competitor> competitors) {
+    private CompetitionScoringResponse.Dashboard setDashboard(Competition competition, Set<Competitor> competitors) {
         return setDashboard(competition, competitors, competition.getEnd_time());
     }
 
-    private CompetitionScoringResponse setDashboard(Competition competition, Set<Competitor> competitors, Timestamp score_showtime) {
-        return new CompetitionScoringResponse(new CompetitionScoringResponse.Dashboard(setCompetitors(competition, competitors, score_showtime)));
+    private CompetitionScoringResponse.Dashboard setDashboard(Competition competition, Set<Competitor> competitors, Timestamp score_showtime) {
+        return new CompetitionScoringResponse.Dashboard(setCompetitors(competition, competitors, score_showtime));
     }
 }

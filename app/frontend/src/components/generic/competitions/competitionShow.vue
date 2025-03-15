@@ -11,6 +11,7 @@ const route = useRoute();
 
 
 const competition = ref([]);
+const results = ref([]);
 const isCompetition = ref(true)
 
 // Get competition data
@@ -29,10 +30,23 @@ const getCompetition = async() => {
     }
 }
 
+const getResults = async() => {
+    try {
+        const competition_id = route.params.id
+
+        const response = await axios.get('dashboard/competition/history?competition_id=' + competition_id)
+        results.value = response.data.competitors
+    } catch(error) {
+        // Throw console log error if fail
+        showAlert('Couldn\'t get data for Users. <br> Error: ' + error, 'danger', 9000)
+    }
+}
+
 onMounted(async () => {
     try {
         // Get competitions
         await getCompetition();
+        await getResults()
 
     } catch(error) {
         showAlert('Something went wrong. <br> Error:' + error, 'danger', 9000)
@@ -84,7 +98,7 @@ function showAlert(message, type, timeout){
                 <!-- Show data about competitions -->
                 <div class="col-sm-12 col-md-10">
                     <h3 class="pt-2 rounded">Results:</h3>
-                    <competitionChartResults />
+                    <competitionChartResults :results="results"/>
                 </div>
             </div>
         </div>
