@@ -5,7 +5,7 @@ import com.arbitaja.backend.competitors.dataobjects.Competitor;
 import com.arbitaja.backend.users.dataobjects.User;
 import jakarta.persistence.*;
 
-import java.time.Instant;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "scoring_history")
@@ -37,25 +37,21 @@ public class ScoringHistory {
     private String result;
 
     @Column(name = "created_at")
-    private Instant createdAt;
+    private Timestamp createdAt;
 
     @Column(name = "deleted_at")
-    private Instant deletedAt;
+    private Timestamp deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "added_by_user_id")
     private User addedByUser;
 
-    public ScoringHistory(Competitor competitor, Competition competition, ScoringHost scoringHost, ScoringCriterion scoringCriteria, Double pointsGiven, String result, Instant createdAt, Instant deletedAt, User addedByUser) {
+    public ScoringHistory(Competitor competitor, Competition competition, ScoringCriterion scoringCriteria, Double pointsGiven, Timestamp createdAt) {
         this.competitor = competitor;
         this.competition = competition;
-        this.scoringHost = scoringHost;
         this.scoringCriteria = scoringCriteria;
         this.pointsGiven = pointsGiven;
-        this.result = result;
         this.createdAt = createdAt;
-        this.deletedAt = deletedAt;
-        this.addedByUser = addedByUser;
     }
 
     public ScoringHistory() {
@@ -117,19 +113,19 @@ public class ScoringHistory {
         this.result = result;
     }
 
-    public Instant getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Instant getDeletedAt() {
+    public Timestamp getDeletedAt() {
         return deletedAt;
     }
 
-    public void setDeletedAt(Instant deletedAt) {
+    public void setDeletedAt(Timestamp deletedAt) {
         this.deletedAt = deletedAt;
     }
 

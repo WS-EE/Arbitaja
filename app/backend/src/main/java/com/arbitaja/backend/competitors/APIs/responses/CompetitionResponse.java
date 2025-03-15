@@ -3,7 +3,7 @@ package com.arbitaja.backend.competitors.APIs.responses;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,9 +13,9 @@ public class CompetitionResponse {
     @Schema(description = "Name of the competition", example = "Noor meister")
     private String name;
     @Schema(description = "Start time of the competition", example = "08:00:00")
-    private Time start_time;
+    private Timestamp start_time;
     @Schema(description = "End time of the competition", example = "17:00:00")
-    private Time end_time;
+    private Timestamp end_time;
     @Schema(description = "Details of the competition organizer")
     private OrganizerResp  organizer;
     @Schema(description = "Competitors of the competition")
@@ -58,19 +58,19 @@ public class CompetitionResponse {
         this.competitors = competitors;
     }
 
-    public Time getStart_time() {
+    public Timestamp getStart_time() {
         return start_time;
     }
 
-    public void setStart_time(Time start_time) {
+    public void setStart_time(Timestamp start_time) {
         this.start_time = start_time;
     }
 
-    public Time getEnd_time() {
+    public Timestamp getEnd_time() {
         return end_time;
     }
 
-    public void setEnd_time(Time end_time) {
+    public void setEnd_time(Timestamp end_time) {
         this.end_time = end_time;
     }
 
