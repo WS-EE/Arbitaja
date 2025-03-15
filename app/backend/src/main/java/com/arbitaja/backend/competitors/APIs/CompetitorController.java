@@ -170,7 +170,7 @@ public class CompetitorController {
     }
 
     @Transactional
-    @PutMapping("/add/to/competition")
+    @PostMapping("/add/to/competition")
     @PreAuthorize("hasAuthority('admin')")
     @Operation(
             summary = "Add existing competitor to existing competition",
@@ -183,9 +183,9 @@ public class CompetitorController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
     })
-    public ResponseEntity<?> addToCompetition(@RequestBody Competition competition, @RequestBody Competitor competitor) {
+    public ResponseEntity<?> addToCompetition(@RequestBody CompetitionCompetitorWrapper wrapper) {
         try {
-            ResponseEntity<?> resp = competitorService.addCompetitorToCompetition(competition, competitor);
+            ResponseEntity<?> resp = competitorService.addCompetitorToCompetition(wrapper.getCompetition(), wrapper.getCompetitor());
             log.info("Sending Response for competitor_competition mapping: {}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e){
