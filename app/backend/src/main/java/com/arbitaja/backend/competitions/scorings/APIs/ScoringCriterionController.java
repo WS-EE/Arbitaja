@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("ScoringCriteria")
@@ -20,6 +21,7 @@ public class ScoringCriterionController {
     }
 
     @PostMapping("/scoring/criteria/add")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> addScoringCriteria(@RequestBody ScoringCriterion scoringCriterion) {
         try {
             ResponseEntity<?> resp = scoringCriterionService.addScoringCriteria(scoringCriterion);
@@ -32,6 +34,7 @@ public class ScoringCriterionController {
     }
 
     @GetMapping("/scoring/criteria/get")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> getScoringCriteria(@RequestParam Integer scoring_id) {
         try {
             ResponseEntity<?> resp = scoringCriterionService.getScoringCriteria(scoring_id);
@@ -44,6 +47,7 @@ public class ScoringCriterionController {
     }
 
     @GetMapping("/scoring/criteria/get/all")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> getAllScoringCriteria() {
         try {
             ResponseEntity<?> resp = scoringCriterionService.getAllScoringCriteria();
@@ -56,6 +60,7 @@ public class ScoringCriterionController {
     }
 
     @GetMapping("/scoring/criteria/by/competition")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> findAllForCompetition(@RequestParam Integer competition_id) {
         try {
             ResponseEntity<?> resp = scoringCriterionService.findAllForCompetition(competition_id);
@@ -68,6 +73,7 @@ public class ScoringCriterionController {
     }
 
     @DeleteMapping("/scoring/criteria/delete")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> deleteScoringCriteria(@RequestParam Integer scoring_id) {
         try {
             ResponseEntity<?> resp = scoringCriterionService.deleteScoringCriteria(scoring_id);
@@ -80,6 +86,7 @@ public class ScoringCriterionController {
     }
 
     @PutMapping("/scoring/criteria/update")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> updateScoringCriteria(@RequestBody ScoringCriterion scoringCriterion) {
         try {
             ResponseEntity<?> resp = scoringCriterionService.updateScoringCriteria(scoringCriterion);
@@ -92,6 +99,7 @@ public class ScoringCriterionController {
     }
 
     @PostMapping("/scoring/criteria/add/to/competition")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> addScoringCriteriaToCompetition(@RequestParam Integer competition_id, @RequestParam Integer scoring_id) {
         try {
             ResponseEntity<?> resp = scoringCriterionService.addScoringCriteriaToCompetition(competition_id, scoring_id);
