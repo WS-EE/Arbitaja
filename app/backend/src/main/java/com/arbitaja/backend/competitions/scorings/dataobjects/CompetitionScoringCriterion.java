@@ -19,6 +19,14 @@ public class CompetitionScoringCriterion {
     @JoinColumn(name = "criteria_id")
     private ScoringCriterion criteria;
 
+    public CompetitionScoringCriterion() {
+    }
+
+    public CompetitionScoringCriterion(Competition competition, ScoringCriterion criteria) {
+        this.competition = competition;
+        this.criteria = criteria;
+    }
+
     public Integer getId() {
         return id;
     }

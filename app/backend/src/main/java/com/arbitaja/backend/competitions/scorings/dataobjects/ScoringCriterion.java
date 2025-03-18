@@ -1,6 +1,11 @@
 package com.arbitaja.backend.competitions.scorings.dataobjects;
 
 import com.arbitaja.backend.agents.dataobjects.ScoringAgent;
+import com.arbitaja.backend.competitions.scorings.APIs.ScoringCriterionDeserializer;
+import com.arbitaja.backend.competitions.scorings.APIs.ScoringCriterionSerializer;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 
 import java.util.LinkedHashSet;
@@ -8,6 +13,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "scoring_criteria")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ScoringCriterion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,6 +21,7 @@ public class ScoringCriterion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scoring_host_id")
+    @JsonIgnore
     private ScoringHost scoringHost;
 
     @Column(name = "name")
@@ -37,6 +44,8 @@ public class ScoringCriterion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "criteria_template_id")
+    @JsonSerialize(using = ScoringCriterionSerializer.class)
+    @JsonDeserialize(using = ScoringCriterionDeserializer.class)
     private ScoringCriterion criteriaTemplate;
 
     @Column(name = "is_template")
@@ -45,15 +54,19 @@ public class ScoringCriterion {
     @Column(name = "visibility_level")
     private int visibilityLevel;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "scoringCriteria")
     private Set<LogicalGroupLink> logicalGroupLinks = new LinkedHashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "scoringCriteria")
     private Set<ScoringAgent> scoringAgents = new LinkedHashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "criteriaTemplate")
     private Set<ScoringCriterion> scoringCriteria = new LinkedHashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "scoringCriteria")
     private Set<ScoringHistory> scoringHistories = new LinkedHashSet<>();
 
