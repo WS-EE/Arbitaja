@@ -51,6 +51,24 @@ const approveUser = async() => {
     }
 }
 
+// approve user
+const deleteUser = async() => {
+    try {
+        await axios.delete('user/signup/approve', 
+            { 
+                params: { 
+                    id: commitedUserData.value.id 
+                }
+            }
+
+        )
+        showAlert('User ' + commitedUserData.value.username + ' has been deleted.', 'success')
+        await emit('approveSignupUser')
+    } catch(error){
+        showAlert('Couldn\'t approve user. <br> Error: '+ error, 'danger');
+    }
+}
+
 // Alert function
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
@@ -79,7 +97,7 @@ function showAlert(message, type, timeout){
         </div>
         <div class="col-lg-4 col-md-4 col-sm-5 ms-auto text-center text-lg-end">
             <button @click.prevent="setCommitedUserData(user)" type="button" class="me-2 btn btn-success" data-bs-toggle="modal" data-bs-target="#ApproveModal">Accept</button>
-            <button class="btn btn-danger">Delete</button>
+            <button @click.prevent="setCommitedUserData(user)" type="button" data-bs-toggle="modal" data-bs-target="#DeleteModal" class="btn btn-danger">Delete</button>
         </div>
     </div>
     <!-- Modal for accept -->
@@ -145,6 +163,59 @@ function showAlert(message, type, timeout){
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click.prevent="approveUser()" class="btn btn-success" data-bs-dismiss="modal">Approve</button>
+                    <button @click.prevent="deleteCommitedUserData()" type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for delete -->
+    <div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div v-if="commitSet" class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <h5>ID: {{  commitedUserData.id }}</h5>
+                        <p class="small">Created at: {{ commitedUserData.createdAt }}</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            Username:
+                        </div>
+                        <div class="col">
+                            <p class="rounded form-control">{{ commitedUserData.username }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-4">
+                            E-Mail:
+                        </div>
+                        <div class="col">
+                            <p class="rounded form-control">{{ commitedUserData.personal_data.email }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-4">
+                            Full name:
+                        </div>
+                        <div class="col">
+                            <p class="rounded form-control">{{ commitedUserData.personal_data.full_name }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-4">
+                            School:
+                        </div>
+                        <div class="col">
+                            <p class="rounded form-control">{{ commitedUserData.personal_data.school.name }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" @click.prevent="deleteUser()" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
                     <button @click.prevent="deleteCommitedUserData()" type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
