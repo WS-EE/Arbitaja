@@ -4,6 +4,7 @@ package com.arbitaja.backend.competitions.scorings.APIs;
 import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
+import com.arbitaja.backend.competitions.scorings.APIs.Request.ScoringCriteriaAdd;
 import com.arbitaja.backend.competitions.scorings.dataobjects.CompetitionScoringCriterion;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import com.arbitaja.backend.competitions.scorings.repositories.CompetitionScoringCriterionRepository;
@@ -43,13 +44,24 @@ public class ScoringCriterionService {
         this.globalExceptionHandler = globalExceptionHandler;
     }
 
-    public ResponseEntity<?> addScoringCriteria(ScoringCriterion scoringCriterion) {
+    public ResponseEntity<?> addScoringCriteria(ScoringCriteriaAdd scoringCriterion) {
         if(scoringCriterion == null) {
             throw new IllegalArgumentException("Invalid input");
         }
-        scoringCriterion.setCriteriaTemplate(getScoringCriterion(scoringCriterion.getCriteriaTemplate().getId()));
-        scoringCriterionRepository.save(scoringCriterion);
-        return ResponseEntity.ok(scoringCriterion);
+        Optional<Competition> competition = Optional.empty();
+        if(scoringCriterion.getCompetitionId() != null) {
+            competition = competitionRepository.findById(scoringCriterion.getCompetitionId());
+            if (competition.isEmpty()) {
+                throw new IllegalArgumentException(String.valueOf(Map.of("error", "Invalid competition id")));
+            }
+        }
+        ScoringCriterion newScoringCriterion = new ScoringCriterion(scoringCriterion);
+        newScoringCriterion.setCriteriaTemplate(getScoringCriterion(scoringCriterion.getCriteriaTemplate()));
+        scoringCriterionRepository.save(newScoringCriterion);
+        if(scoringCriterion.getCompetitionId() != null) {
+            competitionScoringCriterionRepository.save(new CompetitionScoringCriterion(competition.get(), newScoringCriterion));
+        }
+        return ResponseEntity.ok(newScoringCriterion);
     }
 
     public ResponseEntity<?> getScoringCriteria(Integer scoring_id) {

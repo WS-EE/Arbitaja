@@ -1,6 +1,7 @@
 package com.arbitaja.backend.competitions.scorings.dataobjects;
 
 import com.arbitaja.backend.agents.dataobjects.ScoringAgent;
+import com.arbitaja.backend.competitions.scorings.APIs.Request.ScoringCriteriaAdd;
 import com.arbitaja.backend.competitions.scorings.APIs.ScoringCriterionDeserializer;
 import com.arbitaja.backend.competitions.scorings.APIs.ScoringCriterionSerializer;
 import com.fasterxml.jackson.annotation.*;
@@ -70,6 +71,10 @@ public class ScoringCriterion {
     @OneToMany(mappedBy = "scoringCriteria")
     private Set<ScoringHistory> scoringHistories = new LinkedHashSet<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "criteria", cascade = CascadeType.REMOVE)
+    private Set<CompetitionScoringCriterion> competitionScoringCriteria = new LinkedHashSet<>();
+
     public ScoringCriterion(String name, String description, Boolean isManual, Double totalPoints, Boolean isGeneralized, String expectedResult, Boolean isTemplate) {
         this.name = name;
         this.description = description;
@@ -78,6 +83,16 @@ public class ScoringCriterion {
         this.isGeneralized = isGeneralized;
         this.expectedResult = expectedResult;
         this.isTemplate = isTemplate;
+    }
+
+    public ScoringCriterion(ScoringCriteriaAdd scoringCriteriaAdd){
+        this.name = scoringCriteriaAdd.getName();
+        this.description = scoringCriteriaAdd.getDescription();
+        this.isManual = scoringCriteriaAdd.getManual();
+        this.totalPoints = scoringCriteriaAdd.getTotalPoints();
+        this.isGeneralized = scoringCriteriaAdd.getGeneralized();
+        this.expectedResult = scoringCriteriaAdd.getExpectedResult();
+        this.isTemplate = scoringCriteriaAdd.getTemplate();
     }
 
     public ScoringCriterion() {

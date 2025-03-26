@@ -1,6 +1,8 @@
 package com.arbitaja.backend.competitions.scorings.APIs;
 
+import com.arbitaja.backend.competitions.scorings.APIs.Request.ScoringCriteriaAdd;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -22,7 +24,8 @@ public class ScoringCriterionController {
 
     @PostMapping("/scoring/criteria/add")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> addScoringCriteria(@RequestBody ScoringCriterion scoringCriterion) {
+    @Transactional
+    public ResponseEntity<?> addScoringCriteria(@RequestBody ScoringCriteriaAdd scoringCriterion) {
         try {
             ResponseEntity<?> resp = scoringCriterionService.addScoringCriteria(scoringCriterion);
             log.info("Sending Response for adding scoringCriteria: " + "{}", resp);
