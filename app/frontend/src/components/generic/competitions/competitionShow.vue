@@ -3,6 +3,7 @@
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
+import { DateTime } from 'luxon';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 import competitionChartResults from './competitionChartResults.vue';
@@ -13,6 +14,8 @@ const route = useRoute();
 const competition = ref([]);
 const results = ref([]);
 const isCompetition = ref(true)
+const start_time = ref();
+const end_time = ref();
 
 // Get competition data
 const getCompetition = async() => { 
@@ -24,6 +27,15 @@ const getCompetition = async() => {
         // Try competition data
         const response = await axios.get('competition/get?id=' + competition_id)
         competition.value = response.data
+
+        // Format dates
+        start_time.value = DateTime.fromISO(competition.value.start_time, { zone: "utc" })
+            .setZone(DateTime.local().zoneName)
+            .toFormat("dd/MM/yyyy HH:mm");
+        end_time.value = DateTime.fromISO(competition.value.end_time, { zone: "utc" })
+            .setZone(DateTime.local().zoneName)
+            .toFormat("dd/MM/yyyy HH:mm");
+
     } catch(error) {
         // Throw console log error if fail
         showAlert('Couldn\'t get data for Users. <br> Error: ' + error, 'danger', 9000)
@@ -90,8 +102,8 @@ function showAlert(message, type, timeout){
                         <div class="p-2">
                             <p class="pt-2">ID: {{ competition.id }}</p>
                             <p>Organizer: {{ competition.organizer.full_name }}</p>
-                            <p>Start Time: {{ competition.start_time }}</p>
-                            <p>End Time: {{ competition.end_time }}</p>
+                            <p>Start Time: {{ start_time }}</p>
+                            <p>End Time: {{ end_time }}</p>
                         </div>
                     </div>
                 </div>
