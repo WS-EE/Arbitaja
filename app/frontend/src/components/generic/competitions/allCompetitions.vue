@@ -25,7 +25,7 @@ const getAllCompetition = async() => {
         console.log(competitions.value)
     } catch(error) {
         // Throw console log error if fail
-        showAlert('Couldn\'t get data for Users. <br> Error: ' + error, 'danger', 9000)
+        showAlert('Couldn\'t get data for competitions. <br> Error: ' + error, 'danger', 9000)
     }
 }
 
@@ -80,5 +80,6 @@ function showAlert(message, type, timeout){
                 </div>
             </div>
         </div>
+        <RouterLink class="btn btn-outline-success z-0 pb-2 pt-2 sticky-bottom" :to="'/admin/competition/new'" v-if="isAdmin()">Add Competition</RouterLink>
     </div>
 </template>

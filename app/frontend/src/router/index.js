@@ -13,6 +13,8 @@ import AdminUsersView from '@/views/adminViews/Users/adminUsersView.vue';
 import editUserProfile from '@/views/adminViews/Users/editUserProfile.vue';
 import allCompetitions from '@/views/competitionViews/allCompetitions.vue';
 import competitionShow from '@/views/competitionViews/competitionShow.vue';
+import addCompetitionView from '@/views/adminViews/competitions/addCompetitionView.vue';
+import editCompetitionView from '@/views/adminViews/competitions/editCompetitionView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -82,6 +84,16 @@ const router = createRouter({
                             path: 'get/:id',
                             name: 'userCompetitionShow',
                             component: competitionShow
+                        },
+                        {
+                            path: 'edit/:id',
+                            name: 'editCompetition',
+                            component: editCompetitionView
+                        },
+                        {
+                            path: 'new',
+                            name: 'addCompetition',
+                            component: addCompetitionView
                         },
                     ]
                 },
