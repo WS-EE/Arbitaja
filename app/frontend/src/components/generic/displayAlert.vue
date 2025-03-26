@@ -54,7 +54,7 @@ function displayAlert(message, type, timeout){
 
 <template>
     <!-- Alert when needed -->
-  <div class="container text-center fixed-top">
+  <div class="container text-center fixed-bottom">
     <div class="row justify-content-center align-items-center align-self-center">
       <Transition class="m-2 col-10 col-md-8 col-lg-6" name="alert">
         <div
