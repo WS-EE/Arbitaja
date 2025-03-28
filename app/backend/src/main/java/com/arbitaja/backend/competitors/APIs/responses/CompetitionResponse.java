@@ -16,8 +16,8 @@ public class CompetitionResponse {
     private Timestamp start_time;
     @Schema(description = "End time of the competition")
     private Timestamp end_time;
-    @Schema(description = "Details of the competition organizer")
-    private OrganizerResp  organizer;
+    @Schema(description = "Details of the competition organizer_id")
+    private Organizer_idResp  organizer_id;
     @Schema(description = "score_showtime of the competition")
     private Timestamp score_showtime;
     @Schema(description = "Competitors of the competition")
@@ -44,12 +44,12 @@ public class CompetitionResponse {
         this.name = name;
     }
 
-    public OrganizerResp getOrganizer() {
-        return organizer;
+    public Organizer_idResp getOrganizer_id() {
+        return organizer_id;
     }
 
-    public void setOrganizer(OrganizerResp organizer) {
-        this.organizer = organizer;
+    public void setOrganizer_id(Organizer_idResp organizer_id) {
+        this.organizer_id = organizer_id;
     }
 
     public Set<CompetitorResp> getCompetitors() {
@@ -92,12 +92,12 @@ public class CompetitionResponse {
         this.scoring_groups = scoring_groups;
     }
 
-    public static class OrganizerResp{
+    public static class Organizer_idResp{
         private int user_id;
         private String full_name;
         private String username;
 
-        public OrganizerResp() {
+        public Organizer_idResp() {
         }
 
         public int getUser_id() {

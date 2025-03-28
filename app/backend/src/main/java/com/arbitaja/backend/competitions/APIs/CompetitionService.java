@@ -8,6 +8,7 @@ import com.arbitaja.backend.competitors.APIs.responses.CompetitionResponse;
 import com.arbitaja.backend.competitors.dataobjects.Competitor;
 import com.arbitaja.backend.competitors.repositories.CompetitorRepository;
 import com.arbitaja.backend.users.dataobjects.User;
+import com.arbitaja.backend.users.repositories.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class CompetitionService {
     private CompetitorRepository competitorRepository;
     @Autowired
     private ScoringGroupsStructureRepository scoringGroupsStructureRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public ResponseEntity<Set<CompetitionResponse>> getAllCompetitions() {
         List<Competition> competitions = competitionRepository.findAll();
@@ -64,6 +67,11 @@ public class CompetitionService {
             }
             if(competitionRepository.findByid(competition.getId()) != null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this id already exists"));
+            }
+            if(competition.getOrganizer_id() != null) {
+                User user = getByUsernameOrId(competition);
+                if(user == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Organizer not found"));
+                competition.setOrganizer_id(user);
             }
             competitionRepository.save(competition);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("success", "Competition added"));
@@ -104,8 +112,9 @@ public class CompetitionService {
 
 
 
-    private CompetitionResponse.OrganizerResp setOrganizer(User user) {
-        CompetitionResponse.OrganizerResp organizerResp = new CompetitionResponse.OrganizerResp();
+    private CompetitionResponse.Organizer_idResp setOrganizer(User user) {
+        if (user == null) return null;
+        CompetitionResponse.Organizer_idResp organizerResp = new CompetitionResponse.Organizer_idResp();
         organizerResp.setFull_name(user.getPersonal_data().getFull_name());
         organizerResp.setUser_id(user.getId());
         organizerResp.setUsername(user.getUsername());
@@ -147,7 +156,7 @@ public class CompetitionService {
         CompetitionResponse competitionResponse = new CompetitionResponse();
         competitionResponse.setId(competition.getId());
         competitionResponse.setName(competition.getName());
-        competitionResponse.setOrganizer(setOrganizer(competition.getOrganizer_id()));
+        competitionResponse.setOrganizer_id(setOrganizer(competition.getOrganizer_id()));
         competitionResponse.setCompetitors(setCompetitors(competition));
         competitionResponse.setStart_time(competition.getStart_time());
         competitionResponse.setEnd_time(competition.getEnd_time());
@@ -156,5 +165,12 @@ public class CompetitionService {
         competitionResponse.setScoring_groups(setScoring_groups_structure_resp(scoringGroupsStructures));
 
         return competitionResponse;
+    }
+
+    public User getByUsernameOrId(Competition competition){
+        User user = null;
+        if(competition.getOrganizer_id() != null && competition.getOrganizer_id().getId() != null) user = userRepository.findById(competition.getOrganizer_id().getId()).orElse(null);
+        if(user == null && competition.getOrganizer_id() != null && competition.getOrganizer_id().getUsername() != null) user = userRepository.findByUsername(competition.getOrganizer_id().getUsername()).orElse(null);
+        return user;
     }
 }
