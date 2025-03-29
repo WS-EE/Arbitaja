@@ -101,7 +101,7 @@ function showAlert(message, type, timeout){
                     <div class="border rounded">
                         <div class="p-2">
                             <p class="pt-2">ID: {{ competition.id }}</p>
-                            <p>Organizer: {{ competition.organizer.full_name }}</p>
+                            <p>Organizer: {{ competition.organizer_id.full_name }}</p>
                             <p>Start Time: {{ start_time }}</p>
                             <p>End Time: {{ end_time }}</p>
                         </div>

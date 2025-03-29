@@ -70,7 +70,7 @@ onMounted(async () => {
                 start_time: null,
                 end_time: null,
                 score_showtime: null,
-                organizer: { full_name: 'Not set' }
+                organizer_id: { full_name: 'Not set' }
             })
         }
 
@@ -99,7 +99,7 @@ onMounted(async () => {
 
 // Change organizer
 const setOrganizer = (user) => {
-    competition.value.organizer = user
+    competition.value.organizer_id = user
 }
 
 // Add/Save function
@@ -111,15 +111,16 @@ const saveComp = async() => {
             .setZone(DateTime.local().zoneName)
             .toUTC()
             .toISO()
-        competition.value.start_time = DateTime.fromISO(start_time.value)
+        competition.value.end_time = DateTime.fromISO(end_time.value)
             .setZone(DateTime.local().zoneName)
             .toUTC()
             .toISO()
-        competition.value.start_time = DateTime.fromISO(start_time.value)
+        competition.value.score_showtime = DateTime.fromISO(score_showtime.value)
             .setZone(DateTime.local().zoneName)
             .toUTC()
             .toISO()
 
+        // Try to edit or add competition
         if (props.isEdit === true){
             await axios.put('competition/edit', competition.value)
         } else {
@@ -127,7 +128,8 @@ const saveComp = async() => {
         }
 
         // Show success when everything is done
-        showAlert('Succesfully saved', 'success')
+        await showAlert('Succesfully saved', 'success')
+        router.back();
     } catch(error) {
         console.log(error)
         // Throw console log error if fail
@@ -225,7 +227,7 @@ const saveComp = async() => {
                 
                 <div class="btn-group">
                     <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ competition.organizer.full_name }}
+                        {{ competition.organizer_id.full_name }}
                     </button>
                     <ul class="dropdown-menu">
                         <li 
