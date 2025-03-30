@@ -122,7 +122,7 @@ function showAlert(message, type, timeout){
                         <RouterLink v-if="isAdmin()" class="btn btn-success" :to="'/admin/competition/get/' + competition.id">View</RouterLink>
                         <RouterLink v-else class="btn btn-dark" :to="'/competition/' + competition.id">View</RouterLink>
                         <RouterLink class="btn btn-outline-dark ms-2" :to="'/admin/competition/edit/' + competition.id" v-if="isAdmin()">Edit</RouterLink>
-                        <button @click.prevent="setCompetitionToDelete(competition.id, competition.name)" type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteCompetition">Delete</button>
+                        <button @click.prevent="setCompetitionToDelete(competition.id, competition.name)" type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteCompetition" v-if="isAdmin()">Delete</button>
                     </div>
                 </div>
             </div>
