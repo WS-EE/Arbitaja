@@ -29,7 +29,7 @@ onMounted(async() =>{
 
 <template>
     <!-- Main content-->
-    <div v-if="isLoading" class="text-center pt-5">
+    <div v-if="isLoading" class="position-absolute top-50 start-50">
         <PulseLoader />
     </div>
     <userProfile v-else :user="user" :isAdmin=true />

@@ -90,7 +90,7 @@ function showAlert(message, type, timeout){
     <div class="container">
         <div class="row">
             <!-- Show loader when data not ready -->
-            <div v-if="isCompetition" class="text-center">
+            <div v-if="isCompetition" class="position-absolute top-50 start-50">
                 <PulseLoader />
             </div>
             <!-- Show competition data -->

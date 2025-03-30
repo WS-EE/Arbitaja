@@ -156,7 +156,7 @@ watch(
             </div>
         </div>
     </div>
-    <div v-else class="text-center">
+    <div v-else class="position-absolute top-50 start-50">
         <PulseLoader />
     </div>
     <!-- Delete school modal -->

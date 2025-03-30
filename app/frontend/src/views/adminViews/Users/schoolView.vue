@@ -56,7 +56,7 @@ function showAlert(message, type, timeout){
         <!-- Alert when needed -->
         <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
         <!-- Main content -->
-        <div v-if="isLoadingSchools" class="text-center pt-5">
+        <div v-if="isLoadingSchools" class="position-absolute top-50 start-50">
             <PulseLoader />
         </div>
         <allSchools v-else :schools="schools" />

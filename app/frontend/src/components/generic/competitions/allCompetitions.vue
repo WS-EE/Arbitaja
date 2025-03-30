@@ -109,7 +109,7 @@ function showAlert(message, type, timeout){
     <!-- Main content-->
     <div class="container">
         <div class="row">
-            <div v-if="isLoading" class="text-center">
+            <div v-if="isLoading" class="position-absolute top-50 start-50">
                     <PulseLoader />
                 </div>
             <div v-else class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-3 mb-sm-0" v-for="competition in sortedCompetitions">

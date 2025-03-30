@@ -104,7 +104,7 @@ const onAddSchool = async() => {
                         <addSchool modalId="lg-Modal" @addSchool="onAddSchool" />
                     </div>
                 </div>
-                <div v-if="isLoadingUsers" class="text-center">
+                <div v-if="isLoadingUsers" class="position-fixed top-50 start-50">
                     <PulseLoader />
                 </div>
                 <approveModal v-else :users="singupUsers" :schools="schools" @approveSignupUser="onApproveSignupUser" />
@@ -116,7 +116,7 @@ const onAddSchool = async() => {
                     </div>
                 </div>
                 <div class="row">
-                    <div v-if="isLoadingUsers" class="text-center">
+                    <div v-if="isLoadingUsers" class="position-static">
                         <PulseLoader />
                     </div>
                     <allSchools v-else :schools="schools" :addDelete="false" :limitItems="limitSchools" />
