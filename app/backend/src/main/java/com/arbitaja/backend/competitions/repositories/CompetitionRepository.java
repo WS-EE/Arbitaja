@@ -11,15 +11,6 @@ import java.util.Set;
 public interface CompetitionRepository extends JpaRepository<Competition, Integer> {
     Competition findByid(Integer id);
     Competition findByName(String name);
-    @Modifying
-    @Query(value = """
-    INSERT INTO competition (id, name, organizer_id, start_time, end_time, score_showtime)
-        VALUES (:#{#competition.id}, :#{#competition.name}, :#{#competition.organizer_id}, :#{#competition.start_time}, :#{#competition.end_time}, :#{#competition.score_showtime})
-        ON CONFLICT (id)
-        DO UPDATE SET
-            id = EXCLUDED.id
-    """, nativeQuery = true)
-    void updateCompetition(Competition competition);
 
     @Query(value = """
     SELECT co.id, co.name, co.organizer_id, co.start_time, co.end_time, co.scoring_criteria_group_main_id, co.score_showtime

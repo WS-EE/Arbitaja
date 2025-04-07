@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +118,7 @@ public class CompetitionController {
 
     @PutMapping("/edit")
     @PreAuthorize("hasAuthority('admin')")
+    @Transactional
     @Operation(
             summary = "Updates competition parameters",
             description = "Updates parameters of a given competition",
@@ -132,7 +134,7 @@ public class CompetitionController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
     })
-    public ResponseEntity<?> updateCompetition(@RequestBody Competition competition) throws JsonProcessingException {
+    public ResponseEntity<?> updateCompetition(@RequestBody CompetitionResponse competition) throws JsonProcessingException {
         ResponseEntity<?> resp = competitionService.updateCompetitionData(competition);
         log.debug("Sending Response for updated competition: " + "{}", objectMapper.writeValueAsString(resp));
         return resp;
@@ -140,6 +142,7 @@ public class CompetitionController {
 
     @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('admin')")
+    @Transactional
     @Operation(
             summary = "Deletes competition",
             description = "Deletes competition with the id",

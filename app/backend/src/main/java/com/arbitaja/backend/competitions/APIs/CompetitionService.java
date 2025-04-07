@@ -16,10 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CompetitionService {
@@ -80,7 +77,7 @@ public class CompetitionService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
         }
     }
-    public ResponseEntity<?> updateCompetitionData(Competition competition) {
+    public ResponseEntity<?> updateCompetitionData(CompetitionResponse competition) {
         Competition updatedCompetition = competitionRepository.findByid(competition.getId());
         if (updatedCompetition == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
@@ -88,11 +85,15 @@ public class CompetitionService {
         if(competitionRepository.findByName(competition.getName()) != null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this name already exists"));
         }
+        Optional<User> userOptional = userRepository.findById(competition.getOrganizer_id().getUser_id());
+        if(userOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Organizer with this id does not exist"));
+        }
         updatedCompetition.setName(competition.getName());
-        updatedCompetition.setOrganizer_id(competition.getOrganizer_id());
+        updatedCompetition.setOrganizer_id(userOptional.get());
         updatedCompetition.setStart_time(competition.getStart_time());
         updatedCompetition.setEnd_time(competition.getEnd_time());
-        updateCompetition(updatedCompetition);
+        competitionRepository.save(updatedCompetition);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Competition updated"));
     }
 
@@ -103,10 +104,6 @@ public class CompetitionService {
         }
         competitionRepository.delete(competition);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Competition deleted"));
-    }
-
-    public void updateCompetition(Competition competition){
-        competitionRepository.updateCompetition(competition);
     }
 
 
