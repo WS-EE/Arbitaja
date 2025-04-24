@@ -15,6 +15,7 @@ import allCompetitions from '@/views/competitionViews/allCompetitions.vue';
 import competitionShow from '@/views/competitionViews/competitionShow.vue';
 import addCompetitionView from '@/views/adminViews/competitions/addCompetitionView.vue';
 import editCompetitionView from '@/views/adminViews/competitions/editCompetitionView.vue';
+import editCompetitionCompetitorView from '@/views/adminViews/competitions/editCompetitionCompetitorView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -82,13 +83,18 @@ const router = createRouter({
                     children: [
                         {
                             path: 'get/:id',
-                            name: 'userCompetitionShow',
+                            name: 'adminCompetitionShow',
                             component: competitionShow
                         },
                         {
                             path: 'edit/:id',
                             name: 'editCompetition',
                             component: editCompetitionView
+                        },
+                        {  
+                            path: 'edit/competitors/:id',
+                            name: 'editCompetitionCompetitors',
+                            component: editCompetitionCompetitorView
                         },
                         {
                             path: 'new',

@@ -2,7 +2,7 @@
 // Import modules
 import axios from 'axios';
 import { ref, onMounted, defineProps } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, RouterLink } from 'vue-router';
 import { DateTime } from "luxon";
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
@@ -37,8 +37,11 @@ const end_time = ref();
 const score_showtime = ref();
 const adminUsers = ref([]);
 
-onMounted(async () => {
+// function for getting the competition
+const getCompetition = async() => {
     try {
+        // set loading to be true
+        isLoading.value = true;
         // check the active link
         if (props.isEdit === true){
             // Get id of the competition
@@ -95,11 +98,21 @@ onMounted(async () => {
         // Show content when done loading
         isLoading.value = false
     }
+}
+
+// actions on mount
+onMounted(async () => {
+    getCompetition();
 })
 
 // Change organizer
 const setOrganizer = (user) => {
     competition.value.organizer_id = user
+}
+
+// discard change and reload the competition values again
+const discardChanges = async() => {
+    getCompetition();
 }
 
 // Add/Save function
@@ -142,7 +155,7 @@ const saveComp = async() => {
 <template>
     <!-- Alert when needed -->
     <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout"/>
-    <div v-if="isLoading" class="text-center pt-5">
+    <div v-if="isLoading" class="position-absolute top-50 start-50">
         <PulseLoader/>
     </div>
     <div v-else class="container p-3 container-bottom">
@@ -217,7 +230,7 @@ const saveComp = async() => {
             
         </div>
 
-        <!-- System data start block -->
+        <!-- Organizer data start block -->
         <h5 class="pt-3">Organizer</h5>
         <div class="row pt-3">
             <div class="col">
@@ -240,7 +253,35 @@ const saveComp = async() => {
                     </ul>
                 </div>
             </div>
-        </div> 
+        </div>
+        <!-- Competitors -->
+        <h5 class="pt-3">Competitors</h5>
+        <div class="row pt-3">
+            <div class="col">
+                <label></label>
+            </div>
+            <div class="col">
+                <!-- Horizontal under breakpoint -->
+                <ul class="list-group list-group-horizontal">
+                    <RouterLink :to="'/admin/competition/edit/competitors/' + competition.id" class="btn btn-outline-dark me-1">Edit Competitors</RouterLink>
+                </ul>       
+            </div>
+            <table class="table table-striped mt-3">
+                    <thead>
+                        <th scope="col">ID</th>
+                        <th scope="col">Alias</th>
+                        <th scope="col">Full Name</th>
+                    </thead>
+                    <tbody>
+                        <tr v-for="competitior in competition.competitors">
+                            <th scope="row">{{ competitior.id }}</th>
+                            <td>{{ competitior.alias }}</td>
+                            <td>{{ competitior.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+
     </div>
     <!-- Action Buttons -->
     <div class="container d-flex justify-content-end align-items-end pt-3 pb-3">
