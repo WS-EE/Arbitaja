@@ -54,9 +54,10 @@ public class CompetitorController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
     })
-    public ResponseEntity<?> addCompetitor(@RequestBody Competitor competitor, @RequestParam(required = false) Integer competition_id) {
+    public ResponseEntity<?> addCompetitor(@RequestBody Competitor competitor, @RequestParam(required = false) Integer competition_id, @RequestParam(required = false) Boolean isLinked) {
         try {
-            ResponseEntity<?> resp = competitorService.addCompetitor(competitor, competition_id);
+            if (isLinked == null) isLinked = true;
+            ResponseEntity<?> resp = competitorService.addCompetitor(competitor, competition_id, isLinked);
             log.info("Sending Response for added competitor: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e){
@@ -80,9 +81,10 @@ public class CompetitorController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
     })
-    public ResponseEntity<?> editCompetitor(@RequestBody Competitor competitor) {
+    public ResponseEntity<?> editCompetitor(@RequestBody Competitor competitor, @RequestParam(required = false) Boolean isLinked) {
         try{
-            ResponseEntity<?> resp = competitorService.editCompetitor(competitor);
+            if(isLinked == null) isLinked = true;
+            ResponseEntity<?> resp = competitorService.editCompetitor(competitor, isLinked);
             log.info("Sending Response for edited competitor: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e){

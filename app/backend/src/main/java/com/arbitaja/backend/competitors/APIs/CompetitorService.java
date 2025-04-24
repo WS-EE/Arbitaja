@@ -41,35 +41,39 @@ public class CompetitorService {
         this.competitionService = competitionService;
     }
 
-    public ResponseEntity<?> addCompetitor(Competitor competitor, Integer competitionId) throws Exception {
-        addCompetitor(competitor);
+    public ResponseEntity<?> addCompetitor(Competitor competitor, Integer competitionId, Boolean isLinked) throws Exception {
+        addCompetitor(competitor, isLinked);
         Competition competition = competitionRepository.findByid(competitionId);
         addCompetitorToCompetition(competition, competitor);
         return new ResponseEntity<>(competitor, HttpStatus.CREATED);
     }
 
-    public void addCompetitor(Competitor competitor) throws Exception {
+    public void addCompetitor(Competitor competitor, Boolean isLinked) throws Exception {
         log.info("Adding competitor: {}", competitor);
         Competitor localCompetitor = competitorRepository.findByAlias(competitor.getAlias());
         if(localCompetitor != null) throw new Exception("Competitor with alias already exists");
-        setCompetitor(competitor, competitor.getAlias(), competitor.getPublic_display_name_type(), competitor.getPersonal_data());
+        setCompetitor(competitor, competitor.getAlias(), competitor.getPublic_display_name_type(), competitor.getPersonal_data(), isLinked);
         new ResponseEntity<>(competitor, HttpStatus.CREATED);
     }
 
 
-    public ResponseEntity<?> editCompetitor(Competitor competitor) throws Exception {
+    public ResponseEntity<?> editCompetitor(Competitor competitor, Boolean isLinked) throws Exception {
         Optional<Competitor> competitorOpt = competitorRepository.findById(competitor.getId());
         if (competitorOpt.isEmpty()) throw new Exception("Competitor doesn't exists");
         Competitor competitorEdited = competitorOpt.get();
-        setCompetitor(competitorEdited, competitor.getAlias(), competitor.getPublic_display_name_type(), competitor.getPersonal_data());
+        setCompetitor(competitorEdited, competitor.getAlias(), competitor.getPublic_display_name_type(), competitor.getPersonal_data(), isLinked);
         return new ResponseEntity<>(competitorEdited, HttpStatus.OK);
     }
 
 
-    private void setCompetitor(Competitor competitor, String alias, Integer public_display_name_type, Personal_data personal_data){
+    private void setCompetitor(Competitor competitor, String alias, Integer public_display_name_type, Personal_data personal_data, Boolean isLinked) {
         competitor.setAlias(alias);
         competitor.setPublic_display_name_type(public_display_name_type);
-        personal_data = personalDataRepository.findById(personal_data.getId()).orElse(null);
+        if(isLinked) {
+            personal_data = personalDataRepository.findById(personal_data.getId()).orElse(null);
+        } else{
+            personal_data = new Personal_data(personal_data);
+        }
         competitor.setPersonal_data(personal_data);
         competitorRepository.save(competitor);
     }
