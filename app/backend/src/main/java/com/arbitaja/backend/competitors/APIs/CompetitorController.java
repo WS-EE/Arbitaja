@@ -54,9 +54,9 @@ public class CompetitorController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
     })
-    public ResponseEntity<?> addCompetitor(@RequestBody Competitor competitor) {
+    public ResponseEntity<?> addCompetitor(@RequestBody Competitor competitor, @RequestParam(required = false) Integer competition_id) {
         try {
-            ResponseEntity<?> resp = competitorService.addCompetitor(competitor);
+            ResponseEntity<?> resp = competitorService.addCompetitor(competitor, competition_id);
             log.info("Sending Response for added competitor: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e){

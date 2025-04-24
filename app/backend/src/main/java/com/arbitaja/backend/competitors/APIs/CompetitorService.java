@@ -41,13 +41,19 @@ public class CompetitorService {
         this.competitionService = competitionService;
     }
 
+    public ResponseEntity<?> addCompetitor(Competitor competitor, Integer competitionId) throws Exception {
+        addCompetitor(competitor);
+        Competition competition = competitionRepository.findByid(competitionId);
+        addCompetitorToCompetition(competition, competitor);
+        return new ResponseEntity<>(competitor, HttpStatus.CREATED);
+    }
 
-    public ResponseEntity<?> addCompetitor(Competitor competitor) throws Exception {
+    public void addCompetitor(Competitor competitor) throws Exception {
         log.info("Adding competitor: {}", competitor);
         Competitor localCompetitor = competitorRepository.findByAlias(competitor.getAlias());
         if(localCompetitor != null) throw new Exception("Competitor with alias already exists");
         setCompetitor(competitor, competitor.getAlias(), competitor.getPublic_display_name_type(), competitor.getPersonal_data());
-        return new ResponseEntity<>(competitor, HttpStatus.CREATED);
+        new ResponseEntity<>(competitor, HttpStatus.CREATED);
     }
 
 
