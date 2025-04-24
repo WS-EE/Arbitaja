@@ -14,7 +14,7 @@ const props = defineProps({
 const emit = defineEmits(['userUpdate'])
 
 // import ref and onmount
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 
 // Get school list
 import axios from 'axios';
@@ -59,6 +59,17 @@ onMounted(async () => {
         showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p>Couldn\'t get user data! </p class=mb-0><p>Error:' + error + '</p>', 'danger', 4500);
     }
 });
+
+// Filter schools based on search
+const searchSchools = ref('');
+
+// filter schools based on name
+const filteredSchools = computed(() => {
+  const query = searchSchools.value.toLowerCase()
+  return allSchools.value.filter(school =>
+    school.name.toLowerCase().includes(query)
+  )
+})
 
 // Save and discard functions
 const saveProfile = (async () =>{
@@ -188,13 +199,20 @@ function showAlert(message, type, timeout){
                         {{ school.name }}
                     </button>
                     <ul class="dropdown-menu">
+                        <!-- Search bar for schools -->
+                        <div class="input-group rounded">
+                            <input type="search" class="form-control rounded ms-1 me-1" 
+                                placeholder="Search" aria-label="Search" aria-describedby="search-addon"
+                                v-model="searchSchools"
+                            />
+                        </div>
                         <!-- Dropdown menu links -->
                         <li 
-                            v-for="allSchool in allSchools" 
-                            @click="changeSchool(allSchool.id, allSchool.name)" 
+                            v-for="school in filteredSchools" 
+                            @click="changeSchool(school.id, school.name)" 
                             class="dropdown-item"
                         >
-                            {{ allSchool.name }}
+                            {{ school.name }}
                         </li>
                     </ul>
                 </div>
