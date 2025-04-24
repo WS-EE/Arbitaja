@@ -82,7 +82,7 @@ public class CompetitionService {
         if (updatedCompetition == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
         }
-        if(competitionRepository.findByName(competition.getName()) != null){
+        if(competitionRepository.findByName(competition.getName()) != null && !competition.getName().equals(updatedCompetition.getName())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this name already exists"));
         }
         Optional<User> userOptional = userRepository.findById(competition.getOrganizer_id().getUser_id());
