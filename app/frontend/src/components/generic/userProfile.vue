@@ -15,6 +15,7 @@ const emit = defineEmits(['userUpdate'])
 
 // import ref and onmount
 import { onMounted, ref, computed } from 'vue';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Get school list
 import axios from 'axios';
@@ -28,6 +29,7 @@ const username = ref('')
 const roles = ref('')
 const school = ref('')
 const successAlert = ref('')
+const isLoading = ref(true)
 
 const getSchools = async() => {
     try {
@@ -57,6 +59,8 @@ onMounted(async () => {
         school.value = userParameters.personal_data.school
     } catch(error) {
         showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p>Couldn\'t get user data! </p class=mb-0><p>Error:' + error + '</p>', 'danger', 4500);
+    } finally {
+        isLoading.value = false
     }
 });
 
@@ -152,106 +156,111 @@ function showAlert(message, type, timeout){
 </script>
 
 <template>
-    <!-- Alert when needed -->
-    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
-    <div class="container p-3 container-bottom">
-        <h1 class="">User Profile</h1>
-        <hr>
+    <div v-if="isLoading" class="position-absolute top-50 start-50">
+        <PulseLoader />
+    </div>
+    <div v-else>
+        <!-- Alert when needed -->
+        <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+        <div class="container p-3 container-bottom">
+            <h1 class="">User Profile</h1>
+            <hr>
 
-        <!-- Personal data start block -->
-        <h5>Personal Data</h5>
-        <div class="row justify-content-start pt-3">
-            <div class="col">
-                <label for="fullName" class="form-label">Full Name</label>
+            <!-- Personal data start block -->
+            <h5>Personal Data</h5>
+            <div class="row justify-content-start pt-3">
+                <div class="col">
+                    <label for="fullName" class="form-label">Full Name</label>
+                </div>
+                <div class="col">
+                    <input
+                        type="text"
+                        class="form-control"
+                        name=""
+                        id="fullName"
+                        v-model="fullName"
+                    />
+                </div>
             </div>
-            <div class="col">
-                <input
-                    type="text"
-                    class="form-control"
-                    name=""
-                    id="fullName"
-                    v-model="fullName"
-                />
+            <div class="row justify-content-start pt-3">
+                <div class="col">
+                    <label for="email" class="form-label">Email</label>
+                </div>
+                <div class="col">
+                    <input
+                        type="email"
+                        class="form-control"
+                        v-model="email"
+                        id="email"
+                    />
+                </div>
             </div>
-        </div>
-        <div class="row justify-content-start pt-3">
-            <div class="col">
-                <label for="email" class="form-label">Email</label>
-            </div>
-            <div class="col">
-                <input
-                    type="email"
-                    class="form-control"
-                    v-model="email"
-                    id="email"
-                />
-            </div>
-        </div>
-        <!-- School logic -->
-        <div class="row pt-3">
-            <div class="col">
-                <label for="">School</label>
-            </div>
-            <div class="col">
-                <!-- Default dropright button -->
-                <div class="btn-group">
-                    <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ school.name }}
-                    </button>
-                    <ul class="dropdown-menu">
-                        <!-- Search bar for schools -->
-                        <div class="input-group rounded">
-                            <input type="search" class="form-control rounded ms-1 me-1" 
-                                placeholder="Search" aria-label="Search" aria-describedby="search-addon"
-                                v-model="searchSchools"
-                            />
-                        </div>
-                        <!-- Dropdown menu links -->
-                        <li 
-                            v-for="school in filteredSchools" 
-                            @click="changeSchool(school.id, school.name)" 
-                            class="dropdown-item"
-                        >
+            <!-- School logic -->
+            <div class="row pt-3">
+                <div class="col">
+                    <label for="">School</label>
+                </div>
+                <div class="col">
+                    <!-- Default dropright button -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ school.name }}
-                        </li>
-                    </ul>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <!-- Search bar for schools -->
+                            <div class="input-group rounded">
+                                <input type="search" class="form-control rounded ms-1 me-1" 
+                                    placeholder="Search" aria-label="Search" aria-describedby="search-addon"
+                                    v-model="searchSchools"
+                                />
+                            </div>
+                            <!-- Dropdown menu links -->
+                            <li 
+                                v-for="school in filteredSchools" 
+                                @click="changeSchool(school.id, school.name)" 
+                                class="dropdown-item"
+                            >
+                                {{ school.name }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System data start block -->
+            <h5 class="pt-3">System Data</h5>
+            <div class="row pt-3">
+                <div class="col">
+                    <label for="username" class="form-label">Logon Username</label>
+                </div>
+                <div class="col">
+                    <input
+                        type="text"
+                        class="form-control"
+                        v-model="username"
+                        id="username"
+                    />
+                </div>
+            </div>
+
+            <!-- List roles given to the user -->
+            <div class="row pt-3">
+                <div class="col">
+                    <label for="">System Roles</label>
+                </div>
+                <div class="col">
+                    <!-- Horizontal under breakpoint -->
+                    <ul class="list-group list-group-horizontal">
+                        <li v-for="role in roles" class="list-group-item disabled">{{ role.name }}</li>
+                    </ul>          
                 </div>
             </div>
         </div>
-
-        <!-- System data start block -->
-        <h5 class="pt-3">System Data</h5>
-        <div class="row pt-3">
-            <div class="col">
-                <label for="username" class="form-label">Logon Username</label>
-            </div>
-            <div class="col">
-                <input
-                    type="text"
-                    class="form-control"
-                    v-model="username"
-                    id="username"
-                />
-            </div>
+        <!-- Action Buttons -->
+        <div class="container d-flex justify-content-end align-items-end pt-3 pb-3">
+            <button @click.prevent="saveProfile" class="btn btn-success me-3">Save<i class="ms-1 bi bi-floppy"></i></button>
+            <button @click="discardChanges" class="btn btn-outline-danger me-3">Discard<i class="ms-1 bi bi-trash"></i></button>
+            <button v-if="isAdmin" @click="router.back()" class="btn btn-outline-dark me-3">Go Back</button>
         </div>
-
-        <!-- List roles given to the user -->
-        <div class="row pt-3">
-            <div class="col">
-                <label for="">System Roles</label>
-            </div>
-            <div class="col">
-                <!-- Horizontal under breakpoint -->
-                <ul class="list-group list-group-horizontal">
-                    <li v-for="role in roles" class="list-group-item disabled">{{ role.name }}</li>
-                </ul>          
-            </div>
-        </div>
-    </div>
-    <!-- Action Buttons -->
-    <div class="container d-flex justify-content-end align-items-end pt-3 pb-3">
-        <button @click.prevent="saveProfile" class="btn btn-success me-3">Save<i class="ms-1 bi bi-floppy"></i></button>
-        <button @click="discardChanges" class="btn btn-outline-danger me-3">Discard<i class="ms-1 bi bi-trash"></i></button>
-        <button v-if="isAdmin" @click="router.back()" class="btn btn-outline-dark me-3">Go Back</button>
     </div>
 </template>
