@@ -97,7 +97,7 @@ const onAddCompetitor = () => {
             
             <!-- Buttons for action of adding -->
             <div class="row">
-                <addCompetitior 
+                <addCompetitior
                     buttonName="Add Competitor"
                     modalId="addCompetitor"
                     :isLinked=false
@@ -105,12 +105,12 @@ const onAddCompetitor = () => {
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
                     @addItem="onAddCompetitor()"
                 />
-                <addCompetitior 
+                <addCompetitior
                     buttonName="Add Linked Competitor"
                     modalId="addLinkedCompetitor"
                     :isLinked=true
                     :existingCompetitors="competitiors"
-                    :apiEndpoint="'/competitor/add?&competition_id=' + competition_id"
+                    :apiEndpoint="'/competitor/add?isLinked=true&competition_id=' + competition_id"
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
                     @addItem="onAddCompetitor()"
                 />
