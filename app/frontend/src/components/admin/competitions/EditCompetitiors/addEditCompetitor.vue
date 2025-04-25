@@ -199,17 +199,16 @@ const filteredUsers = computed(() => {
     <!-- Alert when needed -->
     <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
     <!-- Button trigger modal -->
-    <div :class="addButtonDivClass">
-        <button
-            type="button"
-            class="btn btn-success"
-            data-bs-toggle="modal"
-            :data-bs-target="'#' + myModalId"
-            
-        >
-            {{ props.buttonName }}
-        </button>
-    </div>
+    <button
+        type="button"
+        :class="addButtonDivClass"
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        :data-bs-target="'#' + myModalId"
+        
+    >
+        {{ props.buttonName }}
+    </button>
     <div v-if="isLoadingSchool && isLoadingUsers" class="position-absolute top-50 start-50">
         <PulseLoader />
     </div>
