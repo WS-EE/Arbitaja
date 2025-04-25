@@ -43,7 +43,9 @@ public class CompetitorService {
 
     public ResponseEntity<?> addCompetitor(Competitor competitor, Integer competitionId, Boolean isLinked) throws Exception {
         addCompetitor(competitor, isLinked);
+        if(competitionId == null) return new ResponseEntity<>(competitor, HttpStatus.CREATED);
         Competition competition = competitionRepository.findByid(competitionId);
+        if(competition == null) throw new Exception("Competition doesn't exists");
         addCompetitorToCompetition(competition, competitor);
         return new ResponseEntity<>(competitor, HttpStatus.CREATED);
     }
@@ -73,6 +75,7 @@ public class CompetitorService {
             personal_data = personalDataRepository.findById(personal_data.getId()).orElse(null);
         } else{
             personal_data = new Personal_data(personal_data);
+            personalDataRepository.save(personal_data);
         }
         competitor.setPersonal_data(personal_data);
         competitorRepository.save(competitor);
@@ -124,10 +127,12 @@ public class CompetitorService {
         return new ResponseEntity<>(competitionResponses, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> removeCompetitorFromCompetition(Competition competition, Competitor competitor) throws Exception {
-        Competitor localCompetitor = getCompetitorFromDatabase(competitor);
-        Competition localCompetition = getCompetitionFromDatabase(competition);
-        Competitor_competition competitor_competition = competitorCompetitionRepository.findByCompetitorAndCompetition(localCompetitor, localCompetition);
+    public ResponseEntity<?> removeCompetitorFromCompetition(Integer competitionId, Integer competitorId) throws Exception {
+        Optional<Competition> localCompetition = competitionRepository.findById(competitionId);
+        Optional<Competitor> localCompetitor = competitorRepository.findById(competitorId);
+        if(localCompetition.isEmpty()) throw new Exception("Competition doesn't exists");
+        if(localCompetitor.isEmpty()) throw new Exception("Competitor doesn't exists");
+        Competitor_competition competitor_competition = competitorCompetitionRepository.findByCompetitorAndCompetition(localCompetitor.get(), localCompetition.get());
         competitorCompetitionRepository.delete(competitor_competition);
         return new ResponseEntity<>(Map.of("message", "Competitor removed from competition successfully"), HttpStatus.OK);
     }

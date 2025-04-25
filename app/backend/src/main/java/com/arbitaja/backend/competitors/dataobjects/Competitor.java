@@ -1,5 +1,6 @@
 package com.arbitaja.backend.competitors.dataobjects;
 
+import com.arbitaja.backend.competitions.scorings.dataobjects.Scoring_groups_structure;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -23,9 +24,13 @@ public class Competitor {
     @JoinColumn(name = "personal_data_id")
     private Personal_data personal_data;
 
-    @OneToMany(mappedBy = "competitor")
+    @OneToMany(mappedBy = "competitor", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private Set<Competitor_competition> competitor_competitions = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "competitor", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private Set<Scoring_groups_structure> scoring_groups_structures = new LinkedHashSet<>();
 
     public Competitor(int public_display_name_type, Personal_data personal_data, String alias) {
         this.public_display_name_type = public_display_name_type;
@@ -67,6 +72,22 @@ public class Competitor {
 
     public void setPersonal_data(Personal_data personal_data) {
         this.personal_data = personal_data;
+    }
+
+    public Set<Competitor_competition> getCompetitor_competitions() {
+        return competitor_competitions;
+    }
+
+    public void setCompetitor_competitions(Set<Competitor_competition> competitor_competitions) {
+        this.competitor_competitions = competitor_competitions;
+    }
+
+    public Set<Scoring_groups_structure> getScoring_groups_structures() {
+        return scoring_groups_structures;
+    }
+
+    public void setScoring_groups_structures(Set<Scoring_groups_structure> scoring_groups_structures) {
+        this.scoring_groups_structures = scoring_groups_structures;
     }
 
     @Override

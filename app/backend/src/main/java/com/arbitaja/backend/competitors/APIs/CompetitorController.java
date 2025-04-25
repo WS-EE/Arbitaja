@@ -1,7 +1,6 @@
 package com.arbitaja.backend.competitors.APIs;
 
 
-import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitors.APIs.responses.CompetitionResponse;
 import com.arbitaja.backend.competitors.dataobjects.Competitor;
 import com.arbitaja.backend.competitors.dataobjects.Competitor_competition;
@@ -211,9 +210,9 @@ public class CompetitorController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
     })
-    public ResponseEntity<?> removeFromCompetition(@RequestBody Competition competition, @RequestBody Competitor competitor) {
+    public ResponseEntity<?> removeFromCompetition(@RequestParam Integer competitionId, @RequestParam Integer competitorId) {
         try {
-            ResponseEntity<?> resp = competitorService.removeCompetitorFromCompetition(competition, competitor);
+            ResponseEntity<?> resp = competitorService.removeCompetitorFromCompetition(competitionId, competitorId);
             log.info("Sending Response for competitor removal from competition: {}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e){
