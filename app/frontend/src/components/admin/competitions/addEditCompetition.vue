@@ -190,6 +190,11 @@ const saveComp = async() => {
     </div>
     <div v-else class="container p-3 container-bottom">
         <h1 class="">Competition</h1>
+        <p>
+            ID: <strong>{{ competition.id }}</strong> 
+            |
+            Name: <strong>{{ competition.name }}</strong></p>
+        <p></p>
         <hr>
 
         <!-- Personal data start block -->
