@@ -17,7 +17,7 @@ const props = defineProps({
     },
     apiEndpoint: {
         type: String,
-        require: true,
+        required: true,
     },
     isLinked: {
         type: Boolean,
@@ -60,6 +60,7 @@ const changeType = (id) => {
     publicDisplayType.value = id
 }
 
+// Create either linked competitor or a "dummy" competitor
 const createItem = async(newPersonalData, linkedPersonalDataId) => {
     try {
         // Convert to plain object
@@ -85,7 +86,7 @@ const createItem = async(newPersonalData, linkedPersonalDataId) => {
         }
         
         // show alert of success
-        await showAlert(props.buttonName + ' <strong>' + personalData.name + '</strong> was a success.', 'success')
+        await showAlert(props.buttonName + ' <strong>' + newPersonalData.full_name + '</strong> was a success.', 'success')
         
         // emit event to parent
         emit('addItem')
@@ -99,7 +100,8 @@ const createItem = async(newPersonalData, linkedPersonalDataId) => {
             }
         }
     } catch(e) {
-        showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e, 'danger')
+        showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e.response.data.error, 'danger', 9000)
+        console.log(e)
     }
 }
 
@@ -148,9 +150,11 @@ const getAllUsers = async() => {
     }
 }
 
-const changeLinkedUser = (id, name) => {
+// Do change the linked user displayed on the dropdown of the modal
+const changeLinkedUser = (id, name, newPersonalData) => {
     userPersonalDataId.value = id
     userName.value = name
+    personalData.value = newPersonalData
 }
 
 
@@ -295,7 +299,7 @@ const filteredUsers = computed(() => {
                                         <!-- Dropdown menu links -->
                                         <li 
                                             v-for="user in filteredUsers" 
-                                            @click="changeLinkedUser(user.personal_data.id, user.personal_data.full_name)" 
+                                            @click="changeLinkedUser(user.personal_data.id, user.personal_data.full_name, user.personal_data)" 
                                             class="dropdown-item"
                                         >
                                             {{ user.personal_data.full_name }}

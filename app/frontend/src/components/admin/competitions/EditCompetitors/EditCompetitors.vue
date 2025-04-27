@@ -7,7 +7,8 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
 
 // Import components
-import addCompetitior from '@/components/admin/competitions/EditCompetitiors/addEditCompetitor.vue';
+import addCompetitor from '@/components/admin/competitions/EditCompetitors/addEditCompetitor.vue';
+import removeCompetitor from '@/components/admin/competitions/EditCompetitors/removeCompetitor.vue';
 
 // Import displayalert
 // Alert function
@@ -26,9 +27,9 @@ function showAlert(message, type, timeout){
 // Main Content
 const isLoading = ref(true)
 const competition = ref([]);
-const competitiors = ref([]);
+const competitors = ref([]);
 const route = useRoute();
-const isLoadingCompetitiors = ref(true)
+const isLoadingcompetitors = ref(true)
 
 // Get id of the competition
 const competition_id = route.params.id
@@ -55,21 +56,21 @@ const getCompetition = async() => {
 const getCompetitors = async() => {
     try {
         // Set competitor loading to true when starting function
-        isLoadingCompetitiors.value = true
+        isLoadingcompetitors.value = true
 
-        // Get competition id to get competitiors
+        // Get competition id to get competitors
         const competition_id = route.params.id
 
-        // Get and set competitiors
+        // Get and set competitors
         const response = await axios.get('competitor/get/all/in/competition?id=' + competition_id);
-        competitiors.value = response.data
+        competitors.value = response.data
 
     } catch(error) {
         // Throw console log error if fail
-        showAlert('No Competitiors found!', 'warning')
+        showAlert('No competitors found!', 'warning')
     } finally {
         // Show content when done loading
-        isLoadingCompetitiors.value = false
+        isLoadingcompetitors.value = false
     }
 }
 
@@ -79,6 +80,10 @@ onMounted(async() => {
 })
 
 const onAddCompetitor = () => {
+    getCompetitors();
+}
+
+const onRemoveCompetitor = () => {
     getCompetitors();
 }
 </script>
@@ -97,7 +102,7 @@ const onAddCompetitor = () => {
             
             <!-- Buttons for action of adding -->
             <div class="row">
-                <addCompetitior 
+                <addCompetitor
                     buttonName="Add Competitor"
                     modalId="addCompetitor"
                     :isLinked=false
@@ -105,21 +110,21 @@ const onAddCompetitor = () => {
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
                     @addItem="onAddCompetitor()"
                 />
-                <addCompetitior 
+                <addCompetitor
                     buttonName="Add Linked Competitor"
                     modalId="addLinkedCompetitor"
                     :isLinked=true
-                    :existingCompetitors="competitiors"
-                    :apiEndpoint="'/competitor/add?&competition_id=' + competition_id"
+                    :existingCompetitors="competitors"
+                    :apiEndpoint="'/competitor/add?isLinked=true&competition_id=' + competition_id"
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
                     @addItem="onAddCompetitor()"
                 />
                 
             </div>
-            <div v-if="isLoadingCompetitiors" class="position-absolute top-50 start-50">
+            <div v-if="isLoadingcompetitors" class="position-absolute top-50 start-50">
                 <PulseLoader />
             </div>
-            <!-- Competitiors show -->
+            <!-- competitors show -->
             <div v-else>
                 <table class="table table-striped mt-3">
                     <thead>
@@ -131,14 +136,20 @@ const onAddCompetitor = () => {
                         <th scope="col">Actions</th>
                     </thead>
                     <tbody>
-                        <tr v-for="competitior in competitiors">
+                        <tr v-for="competitior in competitors">
                             <th scope="row">{{ competitior.id }}</th>
                             <td>{{ competitior.alias }}</td>
                             <td>{{ competitior.personal_data.full_name }}</td>
                             <td class="d-none d-lg-table-cell">{{ competitior.personal_data.email }}</td>
                             <td class="d-none d-md-table-cell">{{ competitior.personal_data.school.name }}</td>
                             <td>
-                                <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                                <removeCompetitor 
+                                    addButtonDivClass="btn btn-danger bi bi-trash"
+                                    modalId="DeleteModal"
+                                    :competitorId="competitior.id"
+                                    :competitorName="competitior.personal_data.full_name"
+                                    @removeCompetitor="onRemoveCompetitor()"
+                                />
                             </td>
                         </tr>
                     </tbody>

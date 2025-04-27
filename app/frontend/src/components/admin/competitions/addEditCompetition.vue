@@ -14,6 +14,7 @@ const alertMessage = ref('')
 const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
+import CriteriaTabel from './EditCriterias/CriteriaTabel.vue';
 
 function showAlert(message, type, timeout){
     alertMessage.value = message
@@ -29,26 +30,57 @@ const props = defineProps({
     },
 })
 
+// Set empty ref variables
 const route = useRoute();
 const isLoading = ref(true);
+const isLoadingCriteria = ref(true)
 const competition = ref();
 const start_time = ref();
 const end_time = ref();
 const score_showtime = ref();
 const adminUsers = ref([]);
+const criterias = ref([])
+
+// Get id of the competition
+const competition_id = route.params.id
+
+// function for getting criterias based on competition
+const getCriteriasByCompetition = async(competitionId) => {
+    try {
+
+        // Get criterias based on competition id
+        const response = await axios.get(
+            'scoring/criteria/by/competition',
+            { 
+                params: { 
+                    competition_id: competitionId 
+                } 
+            }
+        )
+
+        // Set criterias based on the response
+        criterias.value = response.data
+
+        //TEMP REMOVE
+        console.log(response)
+        
+    } catch (error) {
+        showAlert('Something went wrong while loading criterias.', 'danger')
+    } finally {
+        isLoadingCriteria.value = false
+    }
+}
 
 // function for getting the competition
-const getCompetition = async() => {
+const getCompetitionById = async(id) => {
     try {
         // set loading to be true
         isLoading.value = true;
         // check the active link
         if (props.isEdit === true){
-            // Get id of the competition
-            const competition_id = route.params.id
 
             // If prop schools is not defined try to get them ourselves
-            const response = await axios.get('competition/get?id=' + competition_id);
+            const response = await axios.get('competition/get?id=' + id);
             competition.value = response.data
 
             // Format dates
@@ -61,9 +93,6 @@ const getCompetition = async() => {
             score_showtime.value = DateTime.fromISO(competition.value.score_showtime, { zone: "utc" })
                 .setZone(DateTime.local().zoneName)
                 .toFormat("yyyy-MM-dd'T'HH:mm");
-
-            // TEMP REMOVE
-            console.log(competition.value)
         }
         
         if (props.isEdit === false){
@@ -92,8 +121,8 @@ const getCompetition = async() => {
         });
 
     } catch(error) {
-        // Throw console log error if fail
-        showAlert('Something went wrong while loading.', 'danger')
+        // Throw error if fail
+        showAlert('Something went wrong while loading competition.', 'danger')
     } finally {
         // Show content when done loading
         isLoading.value = false
@@ -102,7 +131,8 @@ const getCompetition = async() => {
 
 // actions on mount
 onMounted(async () => {
-    getCompetition();
+    getCompetitionById(competition_id);
+    getCriteriasByCompetition(competition_id);
 })
 
 // Change organizer
@@ -280,6 +310,20 @@ const saveComp = async() => {
                         </tr>
                     </tbody>
                 </table>
+        </div>
+        <!-- Criterias -->
+        <h5 class="pt-3">Criteria</h5>
+        <div class="row pt-3">
+            <div class="col">
+                <label></label>
+            </div>
+            <div class="col">
+                <!-- Horizontal under breakpoint -->
+                <ul class="list-group list-group-horizontal">
+                    <RouterLink :to="'/admin/competition/edit/criterias/' + competition.id" class="btn btn-outline-dark me-1">Edit Criteria</RouterLink>
+                </ul>       
+            </div>
+            <CriteriaTabel :criterias="criterias" :competitionId="competition.id"/>
         </div>
 
     </div>
