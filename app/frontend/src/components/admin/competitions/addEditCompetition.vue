@@ -325,14 +325,14 @@ const saveComp = async() => {
             <table class="table table-striped mt-3">
                     <thead>
                         <th scope="col">ID</th>
-                        <th scope="col">Alias</th>
-                        <th scope="col">Full Name</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Max Points</th>
                     </thead>
                     <tbody>
-                        <tr v-for="competitior in competition.competitors">
-                            <th scope="row">{{ competitior.id }}</th>
-                            <td>{{ competitior.alias }}</td>
-                            <td>{{ competitior.name }}</td>
+                        <tr v-for="criteria in criterias">
+                            <th scope="row">{{ criteria.id }}</th>
+                            <td>{{ criteria.name }}</td>
+                            <td>{{ criteria.totalPoints }}</td>
                         </tr>
                     </tbody>
                 </table>
