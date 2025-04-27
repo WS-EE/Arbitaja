@@ -105,7 +105,7 @@ public class ScoringCriterionService {
         }
         Optional<ScoringCriterion> existingScoringCriterion = scoringCriterionRepository.findById(scoringCriterion.getId());
         if (existingScoringCriterion.isPresent()) {
-            scoringCriterion.setCriteriaTemplate(getScoringCriterion(scoringCriterion.getCriteriaTemplate().getId()));
+            scoringCriterion.setCriteriaTemplate(scoringCriterion.getCriteriaTemplate() == null ? null : getScoringCriterion(scoringCriterion.getCriteriaTemplate().getId()));
             scoringCriterionRepository.save(scoringCriterion);
             return ResponseEntity.ok(scoringCriterion);
         }
