@@ -14,6 +14,7 @@ const alertMessage = ref('')
 const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
+import CriteriaTabel from './EditCriterias/CriteriaTabel.vue';
 
 function showAlert(message, type, timeout){
     alertMessage.value = message
@@ -322,20 +323,7 @@ const saveComp = async() => {
                     <RouterLink :to="'/admin/competition/edit/criterias/' + competition.id" class="btn btn-outline-dark me-1">Edit Criteria</RouterLink>
                 </ul>       
             </div>
-            <table class="table table-striped mt-3">
-                    <thead>
-                        <th scope="col">ID</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Max Points</th>
-                    </thead>
-                    <tbody>
-                        <tr v-for="criteria in criterias">
-                            <th scope="row">{{ criteria.id }}</th>
-                            <td>{{ criteria.name }}</td>
-                            <td>{{ criteria.totalPoints }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <CriteriaTabel :criterias="criterias" :competitionId="competition.id"/>
         </div>
 
     </div>
