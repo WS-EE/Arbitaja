@@ -7,7 +7,8 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
 
 // Import components
-import addCompetitior from '@/components/admin/competitions/EditCompetitiors/addEditCompetitor.vue';
+import addCompetitor from '@/components/admin/competitions/EditCompetitiors/addEditCompetitor.vue';
+import removeCompetitor from '@/components/admin/competitions/EditCompetitiors/removeCompetitor.vue';
 
 // Import displayalert
 // Alert function
@@ -81,6 +82,10 @@ onMounted(async() => {
 const onAddCompetitor = () => {
     getCompetitors();
 }
+
+const onRemoveCompetitor = () => {
+    getCompetitors();
+}
 </script>
 
 <template>
@@ -97,7 +102,7 @@ const onAddCompetitor = () => {
             
             <!-- Buttons for action of adding -->
             <div class="row">
-                <addCompetitior
+                <addCompetitor
                     buttonName="Add Competitor"
                     modalId="addCompetitor"
                     :isLinked=false
@@ -105,7 +110,7 @@ const onAddCompetitor = () => {
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
                     @addItem="onAddCompetitor()"
                 />
-                <addCompetitior
+                <addCompetitor
                     buttonName="Add Linked Competitor"
                     modalId="addLinkedCompetitor"
                     :isLinked=true
@@ -138,7 +143,13 @@ const onAddCompetitor = () => {
                             <td class="d-none d-lg-table-cell">{{ competitior.personal_data.email }}</td>
                             <td class="d-none d-md-table-cell">{{ competitior.personal_data.school.name }}</td>
                             <td>
-                                <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                                <removeCompetitor 
+                                    addButtonDivClass="btn btn-danger bi bi-trash"
+                                    modalId="DeleteModal"
+                                    :competitorId="competitior.id"
+                                    :competitorName="competitior.personal_data.full_name"
+                                    @removeCompetitor="onRemoveCompetitor()"
+                                />
                             </td>
                         </tr>
                     </tbody>

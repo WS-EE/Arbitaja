@@ -17,7 +17,7 @@ const props = defineProps({
     },
     apiEndpoint: {
         type: String,
-        require: true,
+        required: true,
     },
     isLinked: {
         type: Boolean,
@@ -60,6 +60,7 @@ const changeType = (id) => {
     publicDisplayType.value = id
 }
 
+// Create either linked competitor or a "dummy" competitor
 const createItem = async(newPersonalData, linkedPersonalDataId) => {
     try {
         // Convert to plain object
@@ -99,7 +100,8 @@ const createItem = async(newPersonalData, linkedPersonalDataId) => {
             }
         }
     } catch(e) {
-        showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e, 'danger')
+        showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e.response.data.error, 'danger')
+        console.log(e)
     }
 }
 
@@ -148,6 +150,7 @@ const getAllUsers = async() => {
     }
 }
 
+// Do change the linked user displayed on the dropdown of the modal
 const changeLinkedUser = (id, name, newPersonalData) => {
     userPersonalDataId.value = id
     userName.value = name
