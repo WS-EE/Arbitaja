@@ -15,6 +15,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 import CriteriaTabel from './EditCriterias/CriteriaTabel.vue';
+import competitorTable from './EditCompetitors/competitorTable.vue';
 
 function showAlert(message, type, timeout){
     alertMessage.value = message
@@ -34,7 +35,9 @@ const props = defineProps({
 const route = useRoute();
 const isLoading = ref(true);
 const isLoadingCriteria = ref(true)
+const isLoadingcompetitors = ref(true)
 const competition = ref();
+const competitors = ref()
 const start_time = ref();
 const end_time = ref();
 const score_showtime = ref();
@@ -60,9 +63,6 @@ const getCriteriasByCompetition = async(competitionId) => {
 
         // Set criterias based on the response
         criterias.value = response.data
-
-        //TEMP REMOVE
-        console.log(response)
         
     } catch (error) {
         showAlert('Something went wrong while loading criterias.', 'danger')
@@ -129,10 +129,34 @@ const getCompetitionById = async(id) => {
     }
 }
 
+// Get Competitors
+const getCompetitorsByCompetition = async(competitionId) => {
+    try {
+        // Set competitor loading to true when starting function
+        isLoadingcompetitors.value = true
+
+        // Get and set competitors
+        const response = await axios.get(
+            'competitor/get/all/in/competition', 
+            { params: { id: competitionId } } 
+        );
+        competitors.value = response.data
+
+    } catch(error) {
+        // Throw console log error if fail
+        showAlert('No competitors found!', 'warning')
+    } finally {
+        // Show content when done loading
+        isLoadingcompetitors.value = false
+    }
+}
+
+
 // actions on mount
 onMounted(async () => {
     getCompetitionById(competition_id);
     getCriteriasByCompetition(competition_id);
+    getCompetitorsByCompetition(competition_id)
 })
 
 // Change organizer
@@ -301,20 +325,7 @@ const saveComp = async() => {
                     <RouterLink :to="'/admin/competition/edit/competitors/' + competition.id" class="btn btn-outline-dark me-1">Edit Competitors</RouterLink>
                 </ul>       
             </div>
-            <table class="table table-striped mt-3">
-                    <thead>
-                        <th scope="col">ID</th>
-                        <th scope="col">Alias</th>
-                        <th scope="col">Full Name</th>
-                    </thead>
-                    <tbody>
-                        <tr v-for="competitior in competition.competitors">
-                            <th scope="row">{{ competitior.id }}</th>
-                            <td>{{ competitior.alias }}</td>
-                            <td>{{ competitior.name }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <competitorTable :competitors="competitors" :addActions="false"/>
         </div>
         <!-- Criterias -->
         <h5 class="pt-3">Criteria</h5>

@@ -8,7 +8,7 @@ import router from '@/router';
 
 // Import components
 import addCompetitor from '@/components/admin/competitions/EditCompetitors/addEditCompetitor.vue';
-import removeCompetitor from '@/components/admin/competitions/EditCompetitors/removeCompetitor.vue';
+import competitorTable from './competitorTable.vue';
 
 // Import displayalert
 // Alert function
@@ -126,34 +126,7 @@ const onRemoveCompetitor = () => {
             </div>
             <!-- competitors show -->
             <div v-else>
-                <table class="table table-striped mt-3">
-                    <thead>
-                        <th scope="col">ID</th>
-                        <th scope="col">Alias</th>
-                        <th scope="col">Full Name</th>
-                        <th scope="col" class="d-none d-lg-table-cell">E-Mail</th>
-                        <th scope="col" class="d-none d-md-table-cell">School</th>
-                        <th scope="col">Actions</th>
-                    </thead>
-                    <tbody>
-                        <tr v-for="competitior in competitors">
-                            <th scope="row">{{ competitior.id }}</th>
-                            <td>{{ competitior.alias }}</td>
-                            <td>{{ competitior.personal_data.full_name }}</td>
-                            <td class="d-none d-lg-table-cell">{{ competitior.personal_data.email }}</td>
-                            <td class="d-none d-md-table-cell">{{ competitior.personal_data.school.name }}</td>
-                            <td>
-                                <removeCompetitor 
-                                    addButtonDivClass="btn btn-danger bi bi-trash"
-                                    modalId="DeleteModal"
-                                    :competitorId="competitior.id"
-                                    :competitorName="competitior.personal_data.full_name"
-                                    @removeCompetitor="onRemoveCompetitor()"
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <competitorTable :competitors="competitors" :addActions="true" />
             </div>
         </div>
     </div>
