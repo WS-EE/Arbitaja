@@ -1,5 +1,5 @@
 <script setup>
-import EditCompCompetitors from '@/components/admin/competitions/EditCompetitors/EditCompetitors.vue';
+import EditCompCompetitors from '@/components/admin/competitions/EditCompetitors/editCompetitorsMain.vue';
 </script>
 
 <template>
