@@ -83,7 +83,7 @@ const onAddCompetitor = () => {
     getCompetitors();
 }
 
-const onRemoveCompetitor = () => {
+const onTableChanged = () => {
     getCompetitors();
 }
 </script>
@@ -126,7 +126,11 @@ const onRemoveCompetitor = () => {
             </div>
             <!-- competitors show -->
             <div v-else>
-                <competitorTable :competitors="competitors" :addActions="true" />
+                <competitorTable 
+                    :competitors="competitors" 
+                    :addActions="true" 
+                    @tableChanged="onTableChanged()" 
+                />
             </div>
         </div>
     </div>
