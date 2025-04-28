@@ -29,7 +29,7 @@ const props = defineProps({
         type: String,
         required: true
     },
-    propCriteria: {
+    criteria: {
         type: Object,
         default: {
             name: '',
@@ -91,7 +91,7 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
 
 onMounted(() => {
     try {
-        modalCriteria.value = props.propCriteria
+        modalCriteria.value = props.criteria
     } catch(error){
         showAlert('Failed to get criteria info.', 'danger')
     } finally {

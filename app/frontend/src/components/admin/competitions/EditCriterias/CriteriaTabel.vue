@@ -52,7 +52,7 @@ const onRemoveCriteria = () => {
                     <addEditCriteria
                         buttonName=""
                         :modalId="'editCriteria' + criteria.id"
-                        :propCriteria="criteria"
+                        :criteria="criteria"
                         :modalHeader="'Edit criteria ' + criteria.name"
                         :useButtonNameAsModalHeader="false"
                         :isAdd="false"
