@@ -6,9 +6,7 @@ import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
 import com.arbitaja.backend.competitions.scorings.APIs.Response.CompetitionScoringResponse;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringHistory;
-import com.arbitaja.backend.competitions.scorings.repositories.CompetitionScoringCriterionRepository;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringCriterionRepository;
-import com.arbitaja.backend.competitions.scorings.repositories.ScoringGroupsStructureRepository;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringHistoryRepository;
 import com.arbitaja.backend.competitors.dataobjects.Competitor;
 import com.arbitaja.backend.competitors.repositories.CompetitorRepository;
@@ -34,13 +32,9 @@ public class CompetitionScoringService {
     @Autowired
     private CompetitorRepository competitorRepository;
     @Autowired
-    private ScoringGroupsStructureRepository scoringGroupsStructureRepository;
-    @Autowired
     private ScoringCriterionRepository scoringCriterionRepository;
     @Autowired
     private ScoringHistoryRepository scoringHistoryRepository;
-    @Autowired
-    private CompetitionScoringCriterionRepository competitionScoringCriterionRepository;
 
     private Competition getCompetition(Integer competition_id) {
         if(competition_id == null) {
@@ -87,13 +81,14 @@ public class CompetitionScoringService {
     }
 
 
-    public CompetitionScoringResponse.Dashboard getCompetitionScoringHistory(Integer competition_id, Authentication auth) {
+    public CompetitionScoringResponse.Dashboard getCompetitionScoringHistory(Integer competition_id, Authentication auth) throws Exception {
         Competition competition = getCompetition(competition_id);
         Set<Competitor> competitors = competitorRepository.findByCompetitionId(competition_id);
+        Set<Competitor> competitorsWithCorrectName = setCompetitorAlias(competitors);
         if(auth.getAuthorities().contains("ROLE_ADMIN")) {
-            return setDashboard(competition, competitors);
+            return setDashboard(competition, competitorsWithCorrectName);
         }
-        return setDashboard(competition, competitors, competition.getScore_showtime());
+        return setDashboard(competition, competitorsWithCorrectName, competition.getScore_showtime());
     }
 
 
@@ -128,5 +123,26 @@ public class CompetitionScoringService {
 
     private CompetitionScoringResponse.Dashboard setDashboard(Competition competition, Set<Competitor> competitors, Timestamp score_showtime) {
         return new CompetitionScoringResponse.Dashboard(setCompetitors(competition, competitors, score_showtime));
+    }
+
+    private Set<Competitor> setCompetitorAlias(Set<Competitor> competitors) throws Exception {
+        Set<Competitor> competitorsWithCorrectName = new HashSet<>();
+        try {
+            for (Competitor competitor : competitors) {
+                Competitor newCompetitor = new Competitor(competitor);
+                switch (newCompetitor.getPublic_display_name_type()) {
+                    case 1 -> newCompetitor.setAlias(competitor.getPersonal_data().getFull_name());
+                    case 2 -> newCompetitor.setAlias(competitor.getPersonal_data().getSchool().getName());
+                    case 3 -> newCompetitor.setAlias(competitor.getAlias());
+                    default ->
+                            throw new IllegalStateException("Unexpected value: " + newCompetitor.getPublic_display_name_type());
+                }
+                competitorsWithCorrectName.add(newCompetitor);
+            }
+        } catch (Exception e) {
+            log.error("Error getting competitors in competition: {}", e.getMessage());
+            throw new Exception("Error competitor doesn't have personal data or school");
+        }
+        return competitorsWithCorrectName;
     }
 }

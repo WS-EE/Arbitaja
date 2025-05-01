@@ -31,7 +31,7 @@ export default defineComponent({
             });
 
         return {
-          label: competitor.name,
+          label: competitor.alias,
           data,
           borderColor: getRandomColor(),
           fill: false,

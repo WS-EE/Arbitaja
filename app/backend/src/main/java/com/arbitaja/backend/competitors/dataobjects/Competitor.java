@@ -37,6 +37,12 @@ public class Competitor {
         this.personal_data = personal_data;
         this.alias = alias;
     }
+    public Competitor(Competitor competitor) {
+        this.id = competitor.getId();
+        this.public_display_name_type = competitor.getPublic_display_name_type();
+        this.personal_data = competitor.getPersonal_data();
+        this.alias = competitor.getAlias();
+    }
 
 
     public Competitor() {
