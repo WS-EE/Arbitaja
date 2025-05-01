@@ -68,6 +68,12 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
             // show alert of success
             await showAlert(props.buttonName + ' <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
 
+            // Add empty value to fields
+            modalCriteria.value.id = ''
+            modalCriteria.value.name = ''
+            modalCriteria.value.totalPoints = ''
+            modalCriteria.value.description = ''
+
         } else {
             const updateCriteria = {
                 id: addEditCriteria.id,
@@ -82,7 +88,9 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
             await showAlert('Editing criteria <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
         }
 
+        // Notify table changed
         emit('addEditCriteria');
+        
     } catch(e) {
         showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e.response.data.error, 'danger', 9000)
         console.log(e)
