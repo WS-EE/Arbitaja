@@ -315,7 +315,7 @@ const saveComp = async() => {
         </div>
         <!-- Competitors -->
         <h5 class="pt-3">Competitors</h5>
-        <div class="row pt-3">
+        <div class="row pt-3" v-if="isEdit">
             <div class="col">
                 <label></label>
             </div>
@@ -329,7 +329,7 @@ const saveComp = async() => {
         </div>
         <!-- Criterias -->
         <h5 class="pt-3">Criteria</h5>
-        <div class="row pt-3">
+        <div class="row pt-3" v-if="isEdit">
             <div class="col">
                 <label></label>
             </div>
