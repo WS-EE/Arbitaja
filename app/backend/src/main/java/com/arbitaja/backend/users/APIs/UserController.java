@@ -277,6 +277,20 @@ public class UserController {
         }
     }
 
+    @Transactional
+    @PostMapping
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            ResponseEntity<?> resp = userService.createUser(user);
+            log.debug("Sending Response for successful user creation: " + "{}", objectMapper.writeValueAsString(resp));
+            return resp;
+        } catch (Exception e) {
+            log.error(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("An error occurred"));
+        }
+    }
+
 
     public static class ErrorResponse {
         @Schema(description = "error message", example = "An error occurred")

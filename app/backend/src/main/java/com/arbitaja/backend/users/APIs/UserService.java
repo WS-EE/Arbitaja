@@ -326,6 +326,22 @@ public class UserService {
     }
 
 
+    public ResponseEntity<?> createUser(User sentUser) {
+        try {
+            log.info("Creating new user: {}", sentUser);
+            if (userRepository.findByUsername(sentUser.getUsername()).isPresent()) throw new Exception("User with username already exists");
+            String salted_password = passwordEncoder.encode(sentUser.getSalted_password());
+            sentUser.setSalted_password(salted_password);
+            savePersonalData(sentUser.getPersonal_data());
+            userRepository.save(sentUser);
+            return ResponseEntity.ok(Map.of("message", "User created successfully"));
+        } catch (Exception e) {
+            log.error("An error occurred while creating user{}", e.getMessage());
+            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
+        }
+    }
+
+
     /**
      * Helper method for creating error ResponseEntities
      *
@@ -357,5 +373,17 @@ public class UserService {
         newUser.setIsApproved(true);
         signupUserRepository.save(newUser);
         return newUser;
+    }
+
+    private void savePersonalData(Personal_data personalData) {
+        if (personalData == null) return;
+        if (personalData.getSchool() != null) saveSchool(personalData.getSchool());
+        personalDataRepository.save(personalData);
+    }
+
+    private void saveSchool(School school) {
+        if (school != null) {
+            schoolRepository.save(school);
+        }
     }
 }
