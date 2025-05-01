@@ -1,5 +1,5 @@
 <script setup>
-import EditCompCriterias from '@/components/admin/competitions/EditCriterias/EditCriterias.vue';
+import EditCompCriterias from '@/components/admin/competitions/EditCriterias/editCriteriasMain.vue';
 </script>
 
 <template>

@@ -119,7 +119,7 @@ const onTableChanged = () => {
             <!-- Buttons for action of adding -->
             <div class="row">
                 <addEditCriteria
-                    buttonName="Add Criteria"
+                    buttonName="Add Criteria"propCriteria
                     modalId="addCriteria"
                     :isAdd="true"
                     :competitionId="competition_id"
@@ -132,7 +132,7 @@ const onTableChanged = () => {
             </div>
             <!-- Criteria show -->
             <div v-else>
-                <CriteriaTabel :criterias="criterias" :competitionId="competition_id" :addActions="true" @tableChanged="onTableChanged"/>
+                <CriteriaTabel :criterias="criterias" :competitionId="competition_id" :addActions="true" @tableChanged="onTableChanged()"/>
             </div>
         </div>
     </div>

@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import axios from 'axios';
 const props = defineProps({
     modalId: {
@@ -30,7 +29,7 @@ const props = defineProps({
         type: String,
         required: true
     },
-    propCriteria: {
+    criteria: {
         type: Object,
         default: {
             name: '',
@@ -64,7 +63,6 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
             }
         
             // add the new criteria
-            console.log(modalCriteria.value)
             await axios.post('scoring/criteria/add', newCriteria)
 
             // show alert of success
@@ -81,7 +79,7 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
             await axios.put('scoring/criteria/update', updateCriteria)
 
             // Edit alert success
-            await showAlert(props.modalHeader + 'was a success.', 'success')
+            await showAlert('Editing criteria <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
         }
 
         emit('addEditCriteria');
@@ -93,7 +91,7 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
 
 onMounted(() => {
     try {
-        modalCriteria.value = props.propCriteria
+        modalCriteria.value = props.criteria
     } catch(error){
         showAlert('Failed to get criteria info.', 'danger')
     } finally {
@@ -204,7 +202,8 @@ function showAlert(message, type, timeout){
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button @click.prevent="addEditCriteria(modalCriteria, props.competitionId)" type="button" class="btn btn-success" data-bs-dismiss="modal">Add</button>
+                    <button v-if="isAdd" @click.prevent="addEditCriteria(modalCriteria, props.competitionId)" type="button" class="btn btn-success" data-bs-dismiss="modal">Add</button>
+                    <button v-else @click.prevent="addEditCriteria(modalCriteria, props.competitionId)" type="button" class="btn btn-success" data-bs-dismiss="modal">Edit</button>
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
