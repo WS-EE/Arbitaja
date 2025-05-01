@@ -98,7 +98,6 @@ function startAutoRefresh() {
 
     intervalHandle = setInterval(() => {
         getCompetitionResults(props.competitionId)
-        showAlert('Refreshed results on tabel.')
     }, props.refreshInterval)
 }
 

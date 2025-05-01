@@ -35,9 +35,7 @@ function startAutoRefresh() {
     stopAutoRefresh() // Clear any existing one
 
     intervalHandle = setInterval(() => {
-        console.log('Update interval: '+ props.refreshInterval)
         getResultsByCompetitionId(props.competitionId)
-        showAlert('Refreshed results on chart.')
     }, props.refreshInterval)
 }
 
