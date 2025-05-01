@@ -17,7 +17,7 @@ const props = defineProps({
     }
 })
 // Import vue modules
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch, computed } from 'vue'
 
 // Import axios
 import axios from 'axios';
@@ -112,7 +112,10 @@ onUnmounted(() => {
     stopAutoRefresh() // Clean up interval on component destroy
 })
 
-
+// Sort competitors
+const sortedComptitors = computed(() => {
+    return [...results.value].sort((a, b) =>  b.total_score - a.total_score);
+});
 
 // Alert function
 const alertTimeout = ref(3000)
@@ -144,8 +147,8 @@ function showAlert(message, type, timeout){
             <th scope="col">Total Points</th>
         </thead>
         <tbody>
-            <tr v-for="(competitor, index) in results">
-                <th scope="row">{{ index }}</th>
+            <tr v-for="(competitor, index) in sortedComptitors">
+                <th scope="row">{{ index + 1 }}</th>
                 <td>{{ competitor.name }}</td>
                 <td>{{ competitor.total_score }}</td>
             </tr>

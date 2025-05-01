@@ -187,6 +187,7 @@ const saveComp = async() => {
             .toUTC()
             .toISO()
 
+        console.log(competition.value)
         // Try to edit or add competition
         if (props.isEdit === true){
             await axios.put('competition/edit', competition.value)
@@ -196,7 +197,6 @@ const saveComp = async() => {
 
         // Show success when everything is done
         await showAlert('Succesfully saved', 'success')
-        router.back();
     } catch(error) {
         console.log(error)
         // Throw console log error if fail
@@ -345,8 +345,8 @@ const saveComp = async() => {
     </div>
     <!-- Action Buttons -->
     <div class="container d-flex justify-content-end align-items-end pt-3 pb-3">
-        <button @click.prevent="saveComp" class="btn btn-success me-3">Save<i class="ms-1 bi bi-floppy"></i></button>
-        <button @click="discardChanges" class="btn btn-outline-danger me-3">Discard<i class="ms-1 bi bi-trash"></i></button>
+        <button @click.prevent="saveComp()" class="btn btn-success me-3">Save<i class="ms-1 bi bi-floppy"></i></button>
+        <button @click="getCompetitionById(competition_id)" class="btn btn-outline-danger me-3">Discard<i class="ms-1 bi bi-trash"></i></button>
         <button @click="router.back()" class="btn btn-outline-dark me-3">Go Back</button>
     </div>
 </template>
