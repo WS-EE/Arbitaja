@@ -306,10 +306,10 @@ public class UserService {
 
     @Transactional
     public ResponseEntity<?> changePassword(User sentUser, Authentication auth) {
-        Optional<User> userOpt = userRepository.findByUsername(sentUser.getUsername());
+        Optional<User> userOpt = userRepository.findById(sentUser.getId());
         if(userOpt.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
         User user = userOpt.get();
-        if(auth != null && auth.getName().equals(user.getUsername()) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) return errorResponse(HttpStatus.FORBIDDEN, "You are not allowed to change password");
+        if(!auth.getName().equals(user.getUsername()) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) return errorResponse(HttpStatus.FORBIDDEN, "You are not allowed to change other users passwords");
         user.setSalted_password(passwordEncoder.encode(sentUser.getSalted_password()));
         updateUser(user);
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));

@@ -50,12 +50,9 @@ public class CompetitorService {
         return new ResponseEntity<>(competitor, HttpStatus.CREATED);
     }
 
-    public void addCompetitor(Competitor competitor, Boolean isLinked) throws Exception {
+    public void addCompetitor(Competitor competitor, Boolean isLinked){
         log.info("Adding competitor: {}", competitor);
-        Competitor localCompetitor = competitorRepository.findByAlias(competitor.getAlias());
-        if(localCompetitor != null) throw new Exception("Competitor with alias already exists");
         setCompetitor(competitor, competitor.getAlias(), competitor.getPublic_display_name_type(), competitor.getPersonal_data(), isLinked);
-        new ResponseEntity<>(competitor, HttpStatus.CREATED);
     }
 
 
