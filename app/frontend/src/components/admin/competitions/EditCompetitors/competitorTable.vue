@@ -17,9 +17,14 @@ const emit = defineEmits(['tableChanged'])
 
 // Import components
 import removeCompetitor from './removeCompetitor.vue';
+import addEditCompetitor from './addEditCompetitor.vue';
 
 // On event handler
 const onRemoveCompetitor = () => {
+    // When competitor remove tell table changed
+    emit('tableChanged');
+}
+const onEditCompetitor = () => {
     // When competitor remove tell table changed
     emit('tableChanged');
 }
@@ -44,6 +49,15 @@ const onRemoveCompetitor = () => {
                 <td class="d-none d-lg-table-cell">{{ competitor.personal_data.email }}</td>
                 <td class="d-none d-md-table-cell">{{ competitor.personal_data.school.name }}</td>
                 <td v-if="addActions">
+                    <addEditCompetitor
+                        addButtonDivClass="btn btn-dark bi bi-pencil me-1"
+                        buttonName=""
+                        :modalId="'editCompetitor' + competitor.id"
+                        :modalHeader="'Edit Competitor \'' + competitor.personal_data.full_name + '\''"
+                        :isEdit="true"
+                        :competitor="competitor"
+                        @editCompetitor="onEditCompetitor()"
+                    />
                     <removeCompetitor 
                         addButtonDivClass="btn btn-danger bi bi-trash"
                         modalId="DeleteModal"

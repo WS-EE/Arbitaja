@@ -17,18 +17,28 @@ const props = defineProps({
     },
     apiEndpoint: {
         type: String,
-        required: true,
     },
     isLinked: {
         type: Boolean,
         default: false,
     },
+    isEdit: {
+        type: Boolean,
+        default: false
+    },
     existingCompetitors: {
         type: Object,
         default: []
+    },
+    competitor: {
+        type: Object,
+        default: []
+    },
+    modalHeader: {
+        type: String,
+        default: 'Edit Competitor'
     }
 })
-const myModalId = props.modalId
 
 // personal data mappings
 const personalData = ref({
@@ -39,33 +49,61 @@ const personalData = ref({
         "name": "Chose a school"
     }
 })
+const isLoadingMain = ref(true)
 const isLoadingSchool = ref(true)
 const isLoadingUsers = ref(true)
-const publicDisplayType = ref('1')
+const publicDisplayType = ref()
 const publicAlias = ref('')
 const avaliableDisplayTypes = [
     { id: "1", name: "Full Name" },
     { id: "2", name: "School" },
     { id: "3", name: "Alias" }
 ]
-const allSchools = ref()
-const allUsers = ref()
+const allSchools = ref([])
+const allUsers = ref([])
 const userPersonalDataId = ref()
 const userName = ref()
 
-const emit = defineEmits(['addItem'])
+const emit = defineEmits(['addItem', 'editCompetitor'])
 
 // Change public displayname type
 const changeType = (id) => {
     publicDisplayType.value = id
 }
 
+// Edit a competitor
+const editCompetitor = async(id, displayTypeId, alias, personalDataId) => {
+    try {
+        
+        // Create edit competitor data object
+        const editedCompetitor = {
+            id: id, 
+            public_display_name_type: displayTypeId, 
+            alias: alias, 
+            personal_data: {
+                id: personalDataId
+            }
+        }
+
+        // Edit data of competitor
+        await axios.put('competitor/edit', editedCompetitor)
+
+        // Show success on edit
+        showAlert('Edit competitor <strong>' + alias + '</strong> was a success.', 'success')
+
+        // Emit competitor edited event
+        emit('editCompetitor')
+    } catch (error) {
+        showAlert("An error. Couldn't update competitor. Error" + error, 'danger')
+    }
+}
+
 // Create either linked competitor or a "dummy" competitor
-const createItem = async(newPersonalData, linkedPersonalDataId) => {
+const createCompetitor = async(newPersonalData, linkedPersonalDataId) => {
     try {
         // Convert to plain object
         const plainPersonalData = JSON.parse(JSON.stringify(newPersonalData))
-
+        
         // Make the api call
         if (props.isLinked) {
             const customItem = {
@@ -86,7 +124,7 @@ const createItem = async(newPersonalData, linkedPersonalDataId) => {
         }
         
         // show alert of success
-        await showAlert(props.buttonName + ' <strong>' + newPersonalData.full_name + '</strong> was a success.', 'success')
+        showAlert(props.buttonName + ' <strong>' + newPersonalData.full_name + '</strong> was a success.', 'success')
         
         // emit event to parent
         emit('addItem')
@@ -166,9 +204,29 @@ const changeSchool = async(id, name) => {
 
 // On mount get certain things
 onMounted(async() => {
-    await getSchools();
-    await getAllUsers();
+    try {
+
+        // Get schools and users for competitor add
+        await getSchools();
+        await getAllUsers();
+
+        // Get competitor data for competitor edit
+        if(props.isEdit) {
+            // Add values to existing competitors
+            publicDisplayType.value = ''+props.competitor.public_display_name_type // this needs to be string otherwise it breaks.
+            publicAlias.value = props.competitor.alias
+        }
+
+    // Catch error
+    } catch (error) {
+        showAlert("Couldn't get competitor data. Error:" + error, "danger")
+    } finally {
+        // Load main body of the modal
+        isLoadingMain.value = false
+    }
+
 })
+
 
 // Search bar function
 // filter schools based on name
@@ -197,6 +255,7 @@ const filteredUsers = computed(() => {
   )
 })
 
+
 </script>
 
 <template>
@@ -208,17 +267,13 @@ const filteredUsers = computed(() => {
         :class="addButtonDivClass"
         class="btn btn-success"
         data-bs-toggle="modal"
-        :data-bs-target="'#' + myModalId"
+        :data-bs-target="'#' + modalId"
         
     >
         {{ props.buttonName }}
     </button>
-    <div v-if="isLoadingSchool && isLoadingUsers" class="position-absolute top-50 start-50">
-        <PulseLoader />
-    </div>
     <!-- Modal -->
     <div 
-        v-else
         class="modal fade"
         :id="modalId"
         tabindex="-1"
@@ -227,9 +282,15 @@ const filteredUsers = computed(() => {
         aria-hidden="true"
     >
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div v-if="isLoadingSchool && isLoadingUsers && isLoadingMain" class="position-absolute top-50 start-50">
+                <PulseLoader />
+            </div>
+            <div v-else class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitleId">
+                    <h5 v-if="isEdit" class="modal-title" id="modalTitleId">
+                        {{ props.modalHeader }}
+                    </h5>
+                    <h5 v-else class="modal-title" id="modalTitleId">
                         {{ props.buttonName }}
                     </h5>
                     <button
@@ -259,7 +320,7 @@ const filteredUsers = computed(() => {
                                 <!-- Dropdown menu links -->
                                 <li 
                                     v-for="type in avaliableDisplayTypes" 
-                                    @click="changeType(type.id)" 
+                                    @click="changeType(type.id)"
                                     class="dropdown-item"
                                 >
                                     {{ type.name }}
@@ -278,7 +339,7 @@ const filteredUsers = computed(() => {
                     </div>
 
                     <!-- Start linked user block -->
-                    <div v-if="isLinked">
+                    <div v-if="isLinked && !isEdit">
                         <div class="row mt-2 mb-2">
                             <div class="col-4">
                                 Linked User:
@@ -310,7 +371,7 @@ const filteredUsers = computed(() => {
                         </div>
                     </div>
                     <!-- Start unlinked user block -->
-                    <div v-else>
+                    <div v-if="!isLinked && !isEdit">
                         <div class="row mt-2 mb-2">
                             <div class="col-4">
                                 Full Name:
@@ -360,7 +421,24 @@ const filteredUsers = computed(() => {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button @click.prevent="createItem(personalData, userPersonalDataId)" type="button" class="btn btn-success" data-bs-dismiss="modal">Add</button>
+                    <button
+                        @click.prevent="createCompetitor(personalData, userPersonalDataId)"
+                        type="button" 
+                        class="btn btn-success" 
+                        data-bs-dismiss="modal"
+                        v-if="!isEdit"
+                    >
+                        Add
+                    </button>
+                    <button 
+                        @click.prevent="editCompetitor(competitor.id, publicDisplayType, publicAlias, competitor.personal_data.id)"
+                        type="button" 
+                        class="btn btn-success" 
+                        data-bs-dismiss="modal"
+                        v-if="isEdit"
+                    >
+                        Edit
+                    </button>
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
