@@ -326,7 +326,7 @@ public class UserService {
     }
 
 
-    public ResponseEntity<?> createUser(User sentUser) {
+    public ResponseEntity<?> createUser(User sentUser, Boolean isAdmin) {
         try {
             log.info("Creating new user: {}", sentUser);
             if (userRepository.findByUsername(sentUser.getUsername()).isPresent()) throw new Exception("User with username already exists");
@@ -334,13 +334,13 @@ public class UserService {
             sentUser.setSalted_password(salted_password);
             savePersonalData(sentUser.getPersonal_data());
             userRepository.save(sentUser);
+            if(isAdmin) makeUserAdmin(sentUser);
             return ResponseEntity.ok(Map.of("message", "User created successfully"));
         } catch (Exception e) {
             log.error("An error occurred while creating user{}", e.getMessage());
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
         }
     }
-
 
     /**
      * Helper method for creating error ResponseEntities
@@ -385,5 +385,11 @@ public class UserService {
         if (school != null) {
             schoolRepository.save(school);
         }
+    }
+
+    private void makeUserAdmin(User user) {
+        Role role = roleRepository.findByName("admin").orElseThrow(() -> new RuntimeException("Role not found"));
+        User_role userRole = new User_role(user, role);
+        userRoleRepository.save(userRole);
     }
 }

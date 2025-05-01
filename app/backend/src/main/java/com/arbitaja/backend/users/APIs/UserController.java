@@ -278,11 +278,11 @@ public class UserController {
     }
 
     @Transactional
-    @PostMapping("/profile/create")
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody User user, @RequestParam(required = false) Boolean isAdmin){
         try {
-            ResponseEntity<?> resp = userService.createUser(user);
+            ResponseEntity<?> resp = userService.createUser(user, isAdmin);
             log.debug("Sending Response for successful user creation: " + "{}", objectMapper.writeValueAsString(resp));
             return resp;
         } catch (Exception e) {
