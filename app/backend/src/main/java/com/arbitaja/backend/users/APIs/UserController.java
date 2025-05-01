@@ -278,7 +278,7 @@ public class UserController {
     }
 
     @Transactional
-    @PostMapping
+    @PostMapping("/profile/create")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> createUser(@RequestBody User user) {
         try {
