@@ -3,6 +3,7 @@ import { getCurrentInstance } from 'vue'
 
 const { appContext } = getCurrentInstance()
 const appVersion = appContext.config.globalProperties.$arbitajaVersion
+const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
 
 </script>
 
@@ -10,7 +11,7 @@ const appVersion = appContext.config.globalProperties.$arbitajaVersion
     <footer>
         <div class="text-body" id="footer-text">
             <p class="footer-center">
-                &copy; 2024 WorldSkills Estonia
+                {{ copyrightHeader }}
             </p>
             <p class="footer-version">
                 {{ appVersion }}

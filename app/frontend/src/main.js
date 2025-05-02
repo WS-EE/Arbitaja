@@ -23,5 +23,8 @@ app.use(VueCookies, { expires: '7d'}, PrimeVue);
 // Set arbitaja version
 app.config.globalProperties.$arbitajaVersion = "v1.0.0-dev"
 
+// Set copyright Header to use
+app.config.globalProperties.$copyrightHeader = "Copyright (c) 2025 WorldSkills Estonia"
+
 app.use(router);
 app.mount('#app');

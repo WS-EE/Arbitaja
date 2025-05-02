@@ -71,6 +71,12 @@ const checkUserAdmin = async () => {
         return false
     }
 }
+
+// Get copyright header
+import { getCurrentInstance } from 'vue'
+const { appContext } = getCurrentInstance()
+const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
+
 </script>
 
 <template>
@@ -86,7 +92,7 @@ const checkUserAdmin = async () => {
                 <div class="modal-body">
                     <p>MIT License</p>
 
-                    <p>Copyright (c) 2024 WorldSkills Estonia</p>
+                    <p>{{ copyrightHeader }}</p>
 
                     <p>
                         Permission is hereby granted, free of charge, to any person obtaining a copy
