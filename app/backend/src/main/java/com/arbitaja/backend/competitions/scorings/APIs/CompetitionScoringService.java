@@ -14,6 +14,7 @@ import com.arbitaja.backend.competitors.repositories.CompetitorRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 
@@ -64,7 +65,7 @@ public class CompetitionScoringService {
     private Competitor getCompetitor(Integer competitor_id) throws GlobalExceptionHandler.NotFoundException {
         log.info("Fetching competitor with ID: " + competitor_id);
         if(competitor_id == null) {
-            throw new IllegalArgumentException("Invalid input");
+            throw new IllegalArgumentException("Invalid competitor Id");
         }
         Optional<Competitor> competitor = competitorRepository.findById(competitor_id);
         if(competitor.isPresent()) {
@@ -78,11 +79,14 @@ public class CompetitionScoringService {
     public void addCompetitionScoringCriteriaHistory(Integer competition_id, Integer criteria_id, Integer competitor_id, Double points) throws GlobalExceptionHandler.NotFoundException {
         Competition competition = getCompetition(competition_id);
         ScoringCriterion scoringCriterion = getScoringCriterion(criteria_id);
-        if(scoringCriterion.getTotalPoints() < points) {
-            throw new IllegalArgumentException("Points given are greater than total points");
+        if(scoringCriterion.getTotalPoints() < points || points < 0) {
+            throw new IllegalArgumentException("Points given have to be between 0 and " + scoringCriterion.getTotalPoints());
         }
         Competitor competitor = getCompetitor(competitor_id);
-
+        competitor.getCompetitor_competitions().stream().filter(competitorCompetition -> Objects.equals(competitorCompetition.getCompetition().getId(), competition_id)).findFirst().orElseThrow(() -> new IllegalArgumentException("Competitor not found in this competition"));
+        if(Instant.now().isBefore(competition.getStart_time().toInstant()) || Instant.now().isAfter(competition.getEnd_time().toInstant())) {
+            throw new IllegalArgumentException("Competition is not active");
+        }
         ScoringHistory scoringHistory = new ScoringHistory(competitor, competition, scoringCriterion, points, Timestamp.from(Instant.now()));
         scoringHistoryRepository.save(scoringHistory);
     }
@@ -92,7 +96,7 @@ public class CompetitionScoringService {
         Competition competition = getCompetition(competition_id);
         Set<Competitor> competitors = competitorRepository.findByCompetitionId(competition_id);
         Set<Competitor> competitorsWithCorrectName = setCompetitorAlias(competitors);
-        if(auth.getAuthorities().contains("ROLE_ADMIN")) {
+        if(auth != null && auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) {
             return setDashboard(competition, competitorsWithCorrectName);
         }
         return setDashboard(competition, competitorsWithCorrectName, competition.getScore_showtime());
