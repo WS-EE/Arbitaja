@@ -40,7 +40,6 @@ public class CompetitionController {
 
 
     @GetMapping("/all/get")
-    @PreAuthorize("hasAuthority('basic')")
     @Operation(
             summary = "All of the competitions",
             description = "Returns all of the Competitions",
@@ -60,7 +59,6 @@ public class CompetitionController {
 
 
     @GetMapping("/get")
-    @PreAuthorize("hasAuthority('basic')")
     @Operation(
             summary = "Single competition",
             description = "Returns a competition with a corresponding id or name",

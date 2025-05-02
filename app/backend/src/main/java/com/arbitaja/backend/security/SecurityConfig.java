@@ -80,7 +80,7 @@ public class SecurityConfig{
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-user", "/error", "/user/signup/create", "/swagger-ui/**", "/context-path/**", "/v3/**", "/health", "/competition/criteria/**").permitAll()
+                        .requestMatchers("/login", "/login-user", "/error", "/user/signup/create", "/swagger-ui/**", "/context-path/**", "/v3/**", "/health", "/competition/criteria/**", "competition/get", "competition/all/get", "/dashboard/competition/history").permitAll()
                         .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
