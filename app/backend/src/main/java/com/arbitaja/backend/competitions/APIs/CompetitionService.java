@@ -96,6 +96,7 @@ public class CompetitionService {
         updatedCompetition.setOrganizer_id(userOptional.get());
         updatedCompetition.setStart_time(competition.getStart_time());
         updatedCompetition.setEnd_time(competition.getEnd_time());
+        updatedCompetition.setScore_showtime(competition.getScore_showtime());
         competitionRepository.save(updatedCompetition);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Competition updated"));
     }
