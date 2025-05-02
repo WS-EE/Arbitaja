@@ -19,5 +19,9 @@ axios.defaults.headers.put['Content-Type'] = 'application/json';
 
 const app = createApp(App);
 app.use(VueCookies, { expires: '7d'}, PrimeVue);
+
+// Set arbitaja version
+app.config.globalProperties.$arbitajaVersion = "v1.0.0-dev"
+
 app.use(router);
 app.mount('#app');

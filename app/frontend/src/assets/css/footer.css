@@ -18,5 +18,23 @@ footer {
 }
 
 #footer-text {
-    padding-top: 0.5rem;
+    display: flex;
+    justify-content: center; /* Center items horizontally */
+    align-items: center;     /* Center items vertically */
+    height: 100%;
+    position: relative;
 }
+
+.footer-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+}
+
+.footer-version {
+    position: absolute;
+    right: 1rem;
+    margin: 0;
+}
+  
