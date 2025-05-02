@@ -47,7 +47,7 @@ public class CompetitionService {
     public ResponseEntity<?> getCompetitionsByCompetitionId(int competitionId) {
         Competition competition = competitionRepository.findByid(competitionId);
         if (competition == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+            throw new GlobalExceptionHandler.NotFoundException("Competition not found");
         }
         return ResponseEntity.ok(setCompetitionResponse(competition));
     }
@@ -55,7 +55,7 @@ public class CompetitionService {
     public ResponseEntity<?> getCompetitionsByCompetitionName(String competitionName) {
         Competition competition = competitionRepository.findByName(competitionName);
         if (competition == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+            throw new GlobalExceptionHandler.NotFoundException("Competition not found");
         }
         return ResponseEntity.ok(setCompetitionResponse(competition));
     }
@@ -63,14 +63,14 @@ public class CompetitionService {
     public ResponseEntity<?> addCompetition(Competition competition) {
         try{
             if(competitionRepository.findByName(competition.getName()) != null){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this name already exists"));
+                throw new GlobalExceptionHandler.DuplicateException("Competition with this name already exists");
             }
             if(competitionRepository.findByid(competition.getId()) != null){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this id already exists"));
+                throw new GlobalExceptionHandler.DuplicateException("Competition with this id already exists");
             }
             if(competition.getOrganizer_id() != null) {
                 User user = getByUsernameOrId(competition);
-                if(user == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Organizer not found"));
+                if(user == null) throw new GlobalExceptionHandler.NotFoundException("Organizer not found");
                 competition.setOrganizer_id(user);
             }
             competitionRepository.save(competition);
@@ -83,14 +83,14 @@ public class CompetitionService {
     public ResponseEntity<?> updateCompetitionData(CompetitionResponse competition) {
         Competition updatedCompetition = competitionRepository.findByid(competition.getId());
         if (updatedCompetition == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+            throw new GlobalExceptionHandler.NotFoundException("Competition not found");
         }
         if(competitionRepository.findByName(competition.getName()) != null && !competition.getName().equals(updatedCompetition.getName())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Competition with this name already exists"));
+            throw new GlobalExceptionHandler.DuplicateException("Competition with this name already exists");
         }
         Optional<User> userOptional = userRepository.findById(competition.getOrganizer_id().getUser_id());
         if(userOptional.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Organizer with this id does not exist"));
+            throw new GlobalExceptionHandler.NotFoundException("Organizer with this id does not exist");
         }
         updatedCompetition.setName(competition.getName());
         updatedCompetition.setOrganizer_id(userOptional.get());
@@ -103,7 +103,7 @@ public class CompetitionService {
     public ResponseEntity<?> deleteCompetition(int competitionId) {
         Competition competition = competitionRepository.findByid(competitionId);
         if (competition == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+            throw new GlobalExceptionHandler.NotFoundException("Competition not found");
         }
         competitionRepository.delete(competition);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Competition deleted"));
