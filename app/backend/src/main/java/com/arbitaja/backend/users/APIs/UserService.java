@@ -1,5 +1,6 @@
 package com.arbitaja.backend.users.APIs;
 
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.PersonalDataRepository;
@@ -154,7 +155,7 @@ public class UserService {
     @Transactional
     public ResponseEntity<?> deleteUser(int id) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
+        if (user.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
         userRepository.delete(user.get());
         return ResponseEntity.ok(Map.of("message", "User was deleted successfully"));
     }
@@ -169,52 +170,47 @@ public class UserService {
      */
     public ResponseEntity<?> updatePersonalData(Authentication auth, User sentUser) {
         log.info("Updating user profile: {}", sentUser);
-        try {
-            User user = getUserById(sentUser.getId());
-            if (user == null) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
-            if(!auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")) && !auth.getName().equals(user.getUsername())) {
-                return errorResponse(HttpStatus.FORBIDDEN, "User not authorized to change other user");
-            }
-            String newUsername = sentUser.getUsername();
-
-            
-            if (newUsername == null) return errorResponse(HttpStatus.BAD_REQUEST, "Invalid username");
-            user.setUsername(newUsername);
-
-
-            Personal_data personalData = user.getPersonal_data();
-            if (personalData == null) personalData = new Personal_data();
-
-
-            Personal_data personalDataMap = sentUser.getPersonal_data();
-            if (personalDataMap == null) return errorResponse(HttpStatus.BAD_REQUEST, "Invalid personal data");
-
-
-            School schoolMap = personalDataMap.getSchool();
-            if (schoolMap == null) return errorResponse(HttpStatus.BAD_REQUEST, "Invalid school");
-
-
-            if (personalDataMap.getEmail().isEmpty() || personalDataMap.getFull_name().isEmpty()) return errorResponse(HttpStatus.BAD_REQUEST, "Invalid full name or email");
-            personalData.setFull_name(personalDataMap.getFull_name());
-            personalData.setEmail(personalDataMap.getEmail());
-
-
-            School school = getSchoolById(schoolMap.getId());
-            if (school == null) return errorResponse(HttpStatus.NOT_FOUND, "School not found");
-            personalData.setSchool(school);
-
-
-            if(personalData.getCreated_at() == null) personalData.setCreated_at(Timestamp.from(Instant.now()));
-
-            updatePersonalData(personalData);
-            user.setPersonal_data(personalData);
-            updateUser(user);
-
-            return ResponseEntity.ok(mapPersonalData(personalData, user));
-        } catch (Exception e) {
-            log.error("An error occurred while updating personal data", e);
-            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred");
+        User user = getUserById(sentUser.getId());
+        if (user == null) throw new GlobalExceptionHandler.NotFoundException("User not found");
+        if(!auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")) && !auth.getName().equals(user.getUsername())) {
+            throw new GlobalExceptionHandler.UnauthorizedException("User not authorized to change other user");
         }
+        String newUsername = sentUser.getUsername();
+
+
+        if (newUsername == null) throw new IllegalArgumentException("Invalid username");
+        user.setUsername(newUsername);
+
+
+        Personal_data personalData = user.getPersonal_data();
+        if (personalData == null) personalData = new Personal_data();
+
+
+        Personal_data personalDataMap = sentUser.getPersonal_data();
+        if (personalDataMap == null) throw new IllegalArgumentException("Invalid personal data");
+
+
+        School schoolMap = personalDataMap.getSchool();
+        if (schoolMap == null) throw new IllegalArgumentException("Invalid school");
+
+
+        if (personalDataMap.getEmail().isEmpty() || personalDataMap.getFull_name().isEmpty()) throw new IllegalArgumentException("Invalid full name or email");
+        personalData.setFull_name(personalDataMap.getFull_name());
+        personalData.setEmail(personalDataMap.getEmail());
+
+
+        School school = getSchoolById(schoolMap.getId());
+        if (school == null) throw new GlobalExceptionHandler.NotFoundException("School not found");
+        personalData.setSchool(school);
+
+
+        if(personalData.getCreated_at() == null) personalData.setCreated_at(Timestamp.from(Instant.now()));
+
+        updatePersonalData(personalData);
+        user.setPersonal_data(personalData);
+        updateUser(user);
+
+        return ResponseEntity.ok(mapPersonalData(personalData, user));
     }
 
 
@@ -226,21 +222,16 @@ public class UserService {
      * @return ResponseEntity of if the creation of the signup user was successful
      */
     public ResponseEntity<Map<String, ?>> signupUser(SignupUser sentUser) {
-        try{
-            log.info("Signing up user: {}", sentUser);
-            if(signupUserRepository.findByUsername(sentUser.getUsername()).isPresent()
-                    || userRepository.findUserByUsername(sentUser.getUsername()) != null) throw new Exception("User with username already exists");
-            String salted_password = passwordEncoder.encode(sentUser.getSalted_password());
-            sentUser.setSalted_password(salted_password);
-            sentUser.setCreatedAt(Instant.now());
-            sentUser.setIsApproved(false);
-            log.info("Creating new user: {}", sentUser);
-            signupUserRepository.save(sentUser);
-            return ResponseEntity.ok(Map.of("message", "User created successfully"));
-        } catch (Exception e){
-            log.error("An error occurred while creating user{}", e.getMessage());
-            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
-        }
+        log.info("Signing up user: {}", sentUser);
+        if(signupUserRepository.findByUsername(sentUser.getUsername()).isPresent()
+                || userRepository.findUserByUsername(sentUser.getUsername()) != null) throw new GlobalExceptionHandler.DuplicateException("User with username already exists");
+        String salted_password = passwordEncoder.encode(sentUser.getSalted_password());
+        sentUser.setSalted_password(salted_password);
+        sentUser.setCreatedAt(Instant.now());
+        sentUser.setIsApproved(false);
+        log.info("Creating new user: {}", sentUser);
+        signupUserRepository.save(sentUser);
+        return ResponseEntity.ok(Map.of("message", "User created successfully"));
     }
 
     /**
@@ -252,15 +243,10 @@ public class UserService {
      * @return ResponseEntity of if the deletion was successful
      */
     public ResponseEntity<Map<String, ?>> declineUser(Integer id) {
-        try{
-            Optional<SignupUser> deletableUser = signupUserRepository.findById(id);
-            if(deletableUser.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
-            signupUserRepository.delete(deletableUser.get());
-            return ResponseEntity.ok(Map.of("message", "User declined successfully"));
-        } catch (Exception e){
-            log.error("An error occurred while declining user{}", e.getMessage());
-            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
-        }
+        Optional<SignupUser> deletableUser = signupUserRepository.findById(id);
+        if(deletableUser.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
+        signupUserRepository.delete(deletableUser.get());
+        return ResponseEntity.ok(Map.of("message", "User declined successfully"));
     }
 
     /**
@@ -272,44 +258,33 @@ public class UserService {
      * @return ResponseEntity of if the approval was successful
      */
     public ResponseEntity<Map<String, ?>> approveUser(SignupUser sentUser) {
-        try {
-            // Update SignupUser
-            SignupUser user = setSignupUserChanges(sentUser);
+        // Update SignupUser
+        SignupUser user = setSignupUserChanges(sentUser);
 
-            // Create and save new Personal_data
-            Personal_data personalData = new Personal_data(user.getPersonal_data());
-            personalData.setCreated_at(Timestamp.from(Instant.now()));
-            personalData = personalDataRepository.save(personalData);
+        // Create and save new Personal_data
+        Personal_data personalData = new Personal_data(user.getPersonal_data());
+        personalData.setCreated_at(Timestamp.from(Instant.now()));
+        personalData = personalDataRepository.save(personalData);
 
-            // Create User with managed Personal_data
-            User newUser = new User(user, personalData);
-            newUser = userRepository.save(newUser);
+        // Create User with managed Personal_data
+        User newUser = new User(user, personalData);
+        newUser = userRepository.save(newUser);
 
-            // Fetch role and create User_role
-            Optional<Role> role = roleRepository.findByName("user");
-            if (role.isEmpty()) {
-                return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "role user not found");
-            }
+        // Fetch role and create User_role
+        giveUserBasicRole(newUser);
 
-            User_role basic = new User_role(newUser, role.get());
-            userRoleRepository.save(basic);
+        // Delete SignupUser
+        signupUserRepository.delete(user);
 
-            // Delete SignupUser
-            signupUserRepository.delete(user);
-
-            return ResponseEntity.ok(Map.of("message", "User approved successfully"));
-        } catch (Exception e) {
-            log.error("An error occurred while confirming user: {}", e.getMessage(), e);
-            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
-        }
+        return ResponseEntity.ok(Map.of("message", "User approved successfully"));
     }
 
     @Transactional
     public ResponseEntity<?> changePassword(User sentUser, Authentication auth) {
         Optional<User> userOpt = userRepository.findById(sentUser.getId());
-        if(userOpt.isEmpty()) return errorResponse(HttpStatus.NOT_FOUND, "User not found");
+        if(userOpt.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
         User user = userOpt.get();
-        if(!auth.getName().equals(user.getUsername()) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) return errorResponse(HttpStatus.FORBIDDEN, "You are not allowed to change other users passwords");
+        if(!auth.getName().equals(user.getUsername()) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) throw new GlobalExceptionHandler.UnauthorizedException("Non admin accounts are not allowed to change other users passwords");
         user.setSalted_password(passwordEncoder.encode(sentUser.getSalted_password()));
         updateUser(user);
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
@@ -327,32 +302,15 @@ public class UserService {
 
 
     public ResponseEntity<?> createUser(User sentUser, Boolean isAdmin) {
-        try {
-            log.info("Creating new user: {}", sentUser);
-            if (userRepository.findByUsername(sentUser.getUsername()).isPresent()) throw new Exception("User with username already exists");
-            String salted_password = passwordEncoder.encode(sentUser.getSalted_password());
-            sentUser.setSalted_password(salted_password);
-            savePersonalData(sentUser.getPersonal_data());
-            userRepository.save(sentUser);
-            if(isAdmin) makeUserAdmin(sentUser);
-            return ResponseEntity.ok(Map.of("message", "User created successfully"));
-        } catch (Exception e) {
-            log.error("An error occurred while creating user{}", e.getMessage());
-            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "An error occurred");
-        }
-    }
-
-    /**
-     * Helper method for creating error ResponseEntities
-     *
-     * @param status status code for error
-     * @param errorMessage message for error
-     *
-     * @return ResponseEntity of the error
-     */
-    private ResponseEntity<Map<String, ?>> errorResponse(HttpStatus status, String errorMessage) {
-        log.error(errorMessage);
-        return ResponseEntity.status(status).body(Map.of("error", errorMessage));
+        log.info("Creating new user: {}", sentUser);
+        if (userRepository.findByUsername(sentUser.getUsername()).isPresent()) throw new GlobalExceptionHandler.DuplicateException("User with username already exists");
+        String salted_password = passwordEncoder.encode(sentUser.getSalted_password());
+        sentUser.setSalted_password(salted_password);
+        savePersonalData(sentUser.getPersonal_data());
+        userRepository.save(sentUser);
+        giveUserBasicRole(sentUser);
+        if(isAdmin) makeUserAdmin(sentUser);
+        return ResponseEntity.ok(Map.of("message", "User created successfully"));
     }
 
 
@@ -363,9 +321,9 @@ public class UserService {
      *
      * @return updated signupUser
      */
-    private SignupUser setSignupUserChanges(SignupUser sentUser) throws Exception {
+    private SignupUser setSignupUserChanges(SignupUser sentUser){
         Optional<SignupUser> signupUser = signupUserRepository.findById(sentUser.getId());
-        if(signupUser.isEmpty()) throw new Exception("User not found");
+        if(signupUser.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
         SignupUser newUser = signupUser.get();
         newUser.setUsername(sentUser.getUsername());
         newUser.setPersonal_data(sentUser.getPersonal_data());
@@ -387,8 +345,17 @@ public class UserService {
         }
     }
 
+    private void giveUserBasicRole(User user) {
+        Optional<Role> role = roleRepository.findByName("user");
+        if (role.isEmpty()) {
+            throw new GlobalExceptionHandler.NotFoundException("User role not found");
+        }
+        User_role basic = new User_role(user, role.get());
+        userRoleRepository.save(basic);
+    }
+
     private void makeUserAdmin(User user) {
-        Role role = roleRepository.findByName("admin").orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role = roleRepository.findByName("admin").orElseThrow(() -> new GlobalExceptionHandler.NotFoundException("Admin role not found"));
         User_role userRole = new User_role(user, role);
         userRoleRepository.save(userRole);
     }

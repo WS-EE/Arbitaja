@@ -67,6 +67,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateException(DuplicateException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Duplicate entry");
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
         Map<String, String> response = new HashMap<>();
@@ -93,4 +101,17 @@ public class GlobalExceptionHandler {
             super(message, HttpStatus.NOT_FOUND);
         }
     }
+
+    public static class DuplicateException extends ApiException {
+        public DuplicateException(String message) {
+            super(message, HttpStatus.CONFLICT);
+        }
+    }
+
+    public static class UnauthorizedException extends ApiException {
+        public UnauthorizedException(String message) {
+            super(message, HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 }
