@@ -1,6 +1,7 @@
 package com.arbitaja.backend.competitions.scorings.APIs;
 
 
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
 import com.arbitaja.backend.competitions.scorings.APIs.Response.CompetitionScoringResponse;
@@ -37,8 +38,9 @@ public class CompetitionScoringService {
     private ScoringHistoryRepository scoringHistoryRepository;
 
     private Competition getCompetition(Integer competition_id) {
+        log.info("Fetching competition with ID: " + competition_id);
         if(competition_id == null) {
-            throw new IllegalArgumentException("Invalid input");
+            throw new IllegalArgumentException("Competition Id should not be null");
         }
         Optional<Competition> competition = competitionRepository.findById(competition_id);
         if(competition.isPresent()) {
@@ -47,18 +49,20 @@ public class CompetitionScoringService {
         throw new IllegalArgumentException("Competition not found");
     }
 
-    private ScoringCriterion getScoringCriterion(Integer criteria_id) {
+    private ScoringCriterion getScoringCriterion(Integer criteria_id) throws GlobalExceptionHandler.NotFoundException {
+        log.info("Fetching scoring criterion with ID: " + criteria_id);
         if(criteria_id == null) {
-            throw new IllegalArgumentException("Invalid input");
+            throw new IllegalArgumentException("Criteria Id should not be null");
         }
         Optional<ScoringCriterion> scoringCriterion = scoringCriterionRepository.findById(criteria_id);
         if(scoringCriterion.isPresent()) {
             return scoringCriterion.get();
         }
-        throw new IllegalArgumentException("Scoring criterion not found");
+        throw new GlobalExceptionHandler.NotFoundException("Scoring criterion not found");
     }
 
-    private Competitor getCompetitor(Integer competitor_id) {
+    private Competitor getCompetitor(Integer competitor_id) throws GlobalExceptionHandler.NotFoundException {
+        log.info("Fetching competitor with ID: " + competitor_id);
         if(competitor_id == null) {
             throw new IllegalArgumentException("Invalid input");
         }
@@ -66,14 +70,17 @@ public class CompetitionScoringService {
         if(competitor.isPresent()) {
             return competitor.get();
         }
-        throw new IllegalArgumentException("Competitor not found");
+        throw new GlobalExceptionHandler.NotFoundException("Competitor not found");
     }
 
 
 
-    public void addCompetitionScoringCriteriaHistory(Integer competition_id, Integer criteria_id, Integer competitor_id, Double points) {
+    public void addCompetitionScoringCriteriaHistory(Integer competition_id, Integer criteria_id, Integer competitor_id, Double points) throws GlobalExceptionHandler.NotFoundException {
         Competition competition = getCompetition(competition_id);
         ScoringCriterion scoringCriterion = getScoringCriterion(criteria_id);
+        if(scoringCriterion.getTotalPoints() < points) {
+            throw new IllegalArgumentException("Points given are greater than total points");
+        }
         Competitor competitor = getCompetitor(competitor_id);
 
         ScoringHistory scoringHistory = new ScoringHistory(competitor, competition, scoringCriterion, points, Timestamp.from(Instant.now()));
@@ -81,7 +88,7 @@ public class CompetitionScoringService {
     }
 
 
-    public CompetitionScoringResponse.Dashboard getCompetitionScoringHistory(Integer competition_id, Authentication auth) throws Exception {
+    public CompetitionScoringResponse.Dashboard getCompetitionScoringHistory(Integer competition_id, Authentication auth){
         Competition competition = getCompetition(competition_id);
         Set<Competitor> competitors = competitorRepository.findByCompetitionId(competition_id);
         Set<Competitor> competitorsWithCorrectName = setCompetitorAlias(competitors);
@@ -125,23 +132,18 @@ public class CompetitionScoringService {
         return new CompetitionScoringResponse.Dashboard(setCompetitors(competition, competitors, score_showtime));
     }
 
-    private Set<Competitor> setCompetitorAlias(Set<Competitor> competitors) throws Exception {
+    private Set<Competitor> setCompetitorAlias(Set<Competitor> competitors){
         Set<Competitor> competitorsWithCorrectName = new HashSet<>();
-        try {
-            for (Competitor competitor : competitors) {
-                Competitor newCompetitor = new Competitor(competitor);
-                switch (newCompetitor.getPublic_display_name_type()) {
-                    case 1 -> newCompetitor.setAlias(competitor.getPersonal_data().getFull_name());
-                    case 2 -> newCompetitor.setAlias(competitor.getPersonal_data().getSchool().getName());
-                    case 3 -> newCompetitor.setAlias(competitor.getAlias());
-                    default ->
-                            throw new IllegalStateException("Unexpected value: " + newCompetitor.getPublic_display_name_type());
-                }
-                competitorsWithCorrectName.add(newCompetitor);
+        for (Competitor competitor : competitors) {
+            Competitor newCompetitor = new Competitor(competitor);
+            switch (newCompetitor.getPublic_display_name_type()) {
+                case 1 -> newCompetitor.setAlias(competitor.getPersonal_data().getFull_name());
+                case 2 -> newCompetitor.setAlias(competitor.getPersonal_data().getSchool().getName());
+                case 3 -> newCompetitor.setAlias(competitor.getAlias());
+                default ->
+                        throw new IllegalStateException("Unexpected value for public display name: " + newCompetitor.getPublic_display_name_type());
             }
-        } catch (Exception e) {
-            log.error("Error getting competitors in competition: {}", e.getMessage());
-            throw new Exception("Error competitor doesn't have personal data or school");
+            competitorsWithCorrectName.add(newCompetitor);
         }
         return competitorsWithCorrectName;
     }

@@ -1,11 +1,11 @@
 package com.arbitaja.backend.competitors.APIs;
 
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.SchoolRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -21,42 +21,44 @@ public class SchoolService {
     @Autowired
     private SchoolRepository schoolRepository;
 
-    public ResponseEntity<?> addSchool(School school) throws Exception {
-        if(school.getName() == null) throw new Exception("School name cannot be null");
-        if(schoolRepository.findSchoolByName(school.getName()).isPresent()) throw new Exception("School already exists");
+    public ResponseEntity<?> addSchool(School school){
+        if(school.getName() == null) throw new IllegalArgumentException("School name cannot be null");
+        if(schoolRepository.findSchoolByName(school.getName()).isPresent()) throw new IllegalArgumentException("School already exists");
         school.setCreated_at(Timestamp.from(Instant.now()));
+        log.info("Adding school: {}", school);
         schoolRepository.save(school);
         return ResponseEntity.status(200).body(Map.of("message", "School registered successfully"));
     }
 
-    public ResponseEntity<?> updateSchool(School sentSchool) throws Exception {
-        if(sentSchool.getId() == null) throw new Exception("School id cannot be null");
-        if(sentSchool.getName() == null) throw new Exception("School name cannot be null");
+    public ResponseEntity<?> updateSchool(School sentSchool){
+        if(sentSchool.getId() == null) throw new IllegalArgumentException("School id cannot be null");
+        if(sentSchool.getName() == null) throw new IllegalArgumentException("School name cannot be null");
         School school = getSchool(sentSchool);
-        if(school == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error","School not found"));
+        if(school == null) throw new GlobalExceptionHandler.NotFoundException("School not found");
         school.setName(sentSchool.getName());
+        log.info("Updating school: {}", school);
         schoolRepository.updateSchool(school);
         return ResponseEntity.status(200).body(school);
     }
 
-    public ResponseEntity<?> deleteSchool(Integer id) throws Exception {
+    public ResponseEntity<?> deleteSchool(Integer id){
         School localSchool = getSchool(id);
-        if(localSchool == null) ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error","School not found"));
+        if(localSchool == null) throw new GlobalExceptionHandler.NotFoundException("School not found");
         else schoolRepository.delete(localSchool);
         return ResponseEntity.status(200).body(Map.of("message", "School deleted successfully"));
     }
 
-    public ResponseEntity<?> getSchoolResp(Integer id) throws Exception {
+    public ResponseEntity<?> getSchoolResp(Integer id){
         School localSchool = getSchool(id);
-        if(localSchool == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error","School not found"));
+        if(localSchool == null) throw new GlobalExceptionHandler.NotFoundException("School not found");
         else return ResponseEntity.status(200).body(localSchool);
     }
 
 
-    public School getSchool(School sentSchool) throws Exception {
+    public School getSchool(School sentSchool){
         Optional<School> localSchool;
         if(sentSchool.getId() != null) localSchool = schoolRepository.findById(sentSchool.getId());
-        else throw new Exception("school id cannot be null");
+        else throw new IllegalArgumentException("school id cannot be null");
         return localSchool.orElse(null);
     }
 

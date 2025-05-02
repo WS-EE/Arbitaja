@@ -1,7 +1,9 @@
 package com.arbitaja.backend.users.APIs;
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.users.APIs.responses.UserProfileResponse;
 import com.arbitaja.backend.users.dataobjects.SignupUser;
 import com.arbitaja.backend.users.dataobjects.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -65,18 +67,18 @@ public class UserController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user;
         if(id != null && auth != null){
-            if(!auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            if(!auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) throw new IllegalArgumentException("Non admin can not request other users profile");
             user = userService.getUserById(id);
         }
         else {
-            if(auth == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("unauthorized"));
+            if(auth == null) throw new IllegalArgumentException("User not authenticated");
             user = userService.getUserByUsername(auth.getName());
         }
         if (user != null) {
             UserProfileResponse userProfileResponse = userService.mapPersonalData(user.getPersonal_data(), user);
             return new ResponseEntity<>(userProfileResponse, HttpStatus.OK);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not Found"));
+        throw new GlobalExceptionHandler.NotFoundException("User not found");
     }
 
     @GetMapping("/profile/all")
@@ -90,17 +92,12 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved user profiles",
                     content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserProfileResponse.class)))),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> getAllUserProfile(){
-        try{
-             ResponseEntity<?> resp = userService.getAllUsers();
-             log.debug("Sending Response for all users: " + "{}", objectMapper.writeValueAsString(resp));
-             return resp;
-        }catch (Exception e) {
-            log.error("Failed to update user profile", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
-        }
+    public ResponseEntity<?> getAllUserProfile() throws JsonProcessingException {
+         ResponseEntity<?> resp = userService.getAllUsers();
+         log.debug("Sending Response for all users: " + "{}", objectMapper.writeValueAsString(resp));
+         return resp;
     }
 
     @Transactional
@@ -119,17 +116,12 @@ public class UserController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"error\": \"User not found\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> deleteUserProfile(@RequestParam Integer id){
-        try{
-            ResponseEntity<?> resp = userService.deleteUser(id);
-            log.debug("Sending Response for delete user profile: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e){
-            log.error("Failed to delete user profile", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("An error occurred"));
-        }
+    public ResponseEntity<?> deleteUserProfile(@RequestParam Integer id) throws JsonProcessingException {
+        ResponseEntity<?> resp = userService.deleteUser(id);
+        log.debug("Sending Response for delete user profile: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
     @Transactional
@@ -147,17 +139,12 @@ public class UserController {
                     content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(value = "{\"error\": \"User not found\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> updateUserProfile(@RequestBody User sentUser) {
-        try {
-            ResponseEntity<?> resp = userService.updatePersonalData(SecurityContextHolder.getContext().getAuthentication(), sentUser);
-            log.debug("Sending Response for updated user: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e) {
-            log.error("Failed to update user profile", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
-        }
+    public ResponseEntity<?> updateUserProfile(@RequestBody User sentUser) throws JsonProcessingException {
+        ResponseEntity<?> resp = userService.updatePersonalData(SecurityContextHolder.getContext().getAuthentication(), sentUser);
+        log.debug("Sending Response for updated user: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
     @Transactional
@@ -172,16 +159,12 @@ public class UserController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"message\": \"User created successfully\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> createSignupUser(@RequestBody SignupUser signupUser){
-        try{
-            ResponseEntity<Map<String, ?>> resp = userService.signupUser(signupUser);
-            log.debug("Sending Response for SignupUser: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
-        }
+    public ResponseEntity<?> createSignupUser(@RequestBody SignupUser signupUser) throws JsonProcessingException {
+        ResponseEntity<Map<String, ?>> resp = userService.signupUser(signupUser);
+        log.debug("Sending Response for SignupUser: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
     @Transactional
@@ -197,17 +180,12 @@ public class UserController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"message\": \"User approved successfully\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> approveSignupUser(@RequestBody SignupUser signupUser){
-        try{
-            ResponseEntity<Map<String, ?>> resp = userService.approveUser(signupUser);
-            log.debug("Sending Response for user confirmation: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        }catch (Exception e){
-            log.error("An error occurred while confirming user", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
-        }
+    public ResponseEntity<?> approveSignupUser(@RequestBody SignupUser signupUser) throws JsonProcessingException {
+        ResponseEntity<Map<String, ?>> resp = userService.approveUser(signupUser);
+        log.debug("Sending Response for user confirmation: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
     @Transactional
@@ -223,17 +201,12 @@ public class UserController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"message\": \"User declined successfully\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> deleteSignupUser(@RequestParam Integer id){
-        try{
-            ResponseEntity<Map<String, ?>> resp = userService.declineUser(id);
-            log.debug("Sending Response for declining user: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e){
-            log.error("An error occurred while confirming user", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
-        }
+    public ResponseEntity<?> deleteSignupUser(@RequestParam Integer id) throws JsonProcessingException {
+        ResponseEntity<Map<String, ?>> resp = userService.declineUser(id);
+        log.debug("Sending Response for declining user: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
 
@@ -248,63 +221,31 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Returns all user signups",
                     content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SignupUser.class)))),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> getSignups(){
-        try{
-            List<SignupUser> signupUsers = userService.signupUserList();
-            ResponseEntity<Map<String, ?>> resp = ResponseEntity.ok(Map.of("signup_users", signupUsers));
-            log.debug("Sending Response for Signups: {}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e) {
-            log.error(e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage() != null ? e.getMessage() : "An error occurred"));
-        }
+    public ResponseEntity<?> getSignups() throws JsonProcessingException {
+        List<SignupUser> signupUsers = userService.signupUserList();
+        ResponseEntity<Map<String, ?>> resp = ResponseEntity.ok(Map.of("signup_users", signupUsers));
+        log.debug("Sending Response for Signups: {}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
     @Transactional
     @PutMapping("/profile/update_password")
     @PreAuthorize("hasAuthority('basic')")
-    public ResponseEntity<?> updatePassword(@RequestBody User user){
-        try{
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            ResponseEntity<?> resp = userService.changePassword(user, auth);
-            log.debug("Sending Response for successful password change: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e) {
-            log.error(e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("An error occurred"));
-        }
+    public ResponseEntity<?> updatePassword(@RequestBody User user) throws JsonProcessingException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        ResponseEntity<?> resp = userService.changePassword(user, auth);
+        log.debug("Sending Response for successful password change: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
     @Transactional
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> createUser(@RequestBody User user, @RequestParam(required = false) Boolean isAdmin){
-        try {
-            ResponseEntity<?> resp = userService.createUser(user, isAdmin);
-            log.debug("Sending Response for successful user creation: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e) {
-            log.error(e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("An error occurred"));
-        }
-    }
-
-
-    public static class ErrorResponse {
-        @Schema(description = "error message", example = "An error occurred")
-        String error;
-
-        public ErrorResponse(String error) {
-            this.error = error;
-        }
-        public String getError() {
-            return error;
-        }
-
-        public void setError(String error) {
-            this.error = error;
-        }
+    public ResponseEntity<?> createUser(@RequestBody User user, @RequestParam(required = false) Boolean isAdmin) throws JsonProcessingException {
+        ResponseEntity<?> resp = userService.createUser(user, isAdmin);
+        log.debug("Sending Response for successful user creation: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 }

@@ -1,9 +1,9 @@
 package com.arbitaja.backend.competitions.APIs;
 
 
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitors.APIs.responses.CompetitionResponse;
-import com.arbitaja.backend.users.APIs.UserController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,17 +50,12 @@ public class CompetitionController {
             @ApiResponse(responseCode = "200", description = "Responds with all of the competitions in JSON array",
                     content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CompetitionResponse.class)))),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<?> getCompetitions() throws JsonProcessingException {
-        try{
-            ResponseEntity<?> resp = competitionService.getAllCompetitions();
-            log.debug("Sending Response for all competitions: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e){
-            log.error(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ResponseEntity<?> resp = competitionService.getAllCompetitions();
+        log.debug("Sending Response for all competitions: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
 
@@ -78,20 +73,15 @@ public class CompetitionController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"error\": \"competition not found\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<?> getCompetition(@RequestParam(required = false) Integer id, @RequestParam(required = false) String name) throws JsonProcessingException {
-        try{
-            ResponseEntity<?> resp;
-            if(id != null) resp = competitionService.getCompetitionsByCompetitionId(id);
-            else if(name != null) resp = competitionService.getCompetitionsByCompetitionName(name);
-            else resp = ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
-            log.debug("Sending Response for competition: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e){
-            log.error(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ResponseEntity<?> resp;
+        if(id != null) resp = competitionService.getCompetitionsByCompetitionId(id);
+        else if(name != null) resp = competitionService.getCompetitionsByCompetitionName(name);
+        else resp = ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Competition not found"));
+        log.debug("Sending Response for competition: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
     @PostMapping("/add")
@@ -108,7 +98,7 @@ public class CompetitionController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"error\": \"competition with name or id already exists\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<?> addCompetition(@RequestBody Competition competition) throws JsonProcessingException {
         ResponseEntity<?> resp = competitionService.addCompetition(competition);
@@ -132,7 +122,7 @@ public class CompetitionController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"error\": \"competition with name already exists\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<?> updateCompetition(@RequestBody CompetitionResponse competition) throws JsonProcessingException {
         ResponseEntity<?> resp = competitionService.updateCompetitionData(competition);
@@ -156,7 +146,7 @@ public class CompetitionController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"error\": \"competition not found\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<?> deleteCompetition(@RequestParam Integer id) throws JsonProcessingException {
         ResponseEntity<?> resp = competitionService.deleteCompetition(id);

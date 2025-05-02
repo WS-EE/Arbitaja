@@ -1,5 +1,6 @@
 package com.arbitaja.backend.competitors.APIs;
 
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitions.APIs.CompetitionService;
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
@@ -41,11 +42,11 @@ public class CompetitorService {
         this.competitionService = competitionService;
     }
 
-    public ResponseEntity<?> addCompetitor(Competitor competitor, Integer competitionId, Boolean isLinked) throws Exception {
+    public ResponseEntity<?> addCompetitor(Competitor competitor, Integer competitionId, Boolean isLinked){
         addCompetitor(competitor, isLinked);
         if(competitionId == null) return new ResponseEntity<>(competitor, HttpStatus.CREATED);
         Competition competition = competitionRepository.findByid(competitionId);
-        if(competition == null) throw new Exception("Competition doesn't exists");
+        if(competition == null) throw new GlobalExceptionHandler.NotFoundException("Competition doesn't exists");
         addCompetitorToCompetition(competition, competitor);
         return new ResponseEntity<>(competitor, HttpStatus.CREATED);
     }
@@ -56,9 +57,9 @@ public class CompetitorService {
     }
 
 
-    public ResponseEntity<?> editCompetitor(Competitor competitor, Boolean isLinked) throws Exception {
+    public ResponseEntity<?> editCompetitor(Competitor competitor, Boolean isLinked){
         Optional<Competitor> competitorOpt = competitorRepository.findById(competitor.getId());
-        if (competitorOpt.isEmpty()) throw new Exception("Competitor doesn't exists");
+        if (competitorOpt.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("Competitor doesn't exists");
         Competitor competitorEdited = competitorOpt.get();
         setCompetitor(competitorEdited, competitor.getAlias(), competitor.getPublic_display_name_type(), competitor.getPersonal_data(), isLinked);
         return new ResponseEntity<>(competitorEdited, HttpStatus.OK);
@@ -78,22 +79,22 @@ public class CompetitorService {
         competitorRepository.save(competitor);
     }
 
-    public ResponseEntity<?> deleteCompetitor(Integer id) throws Exception {
+    public ResponseEntity<?> deleteCompetitor(Integer id){
         Competitor competitor = competitorRepository.findById(id).orElse(null);
-        if(competitor == null) throw new Exception("Competitor doesn't exists");
+        if(competitor == null) throw new GlobalExceptionHandler.NotFoundException("Competitor doesn't exists");
         competitorRepository.delete(competitor);
         return new ResponseEntity<>(Map.of("message", "Competitor deleted successfully"), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getCompetitor(Integer id) throws Exception {
+    public ResponseEntity<?> getCompetitor(Integer id){
         Competitor competitor = competitorRepository.findById(id).orElse(null);
-        if(competitor == null) throw new Exception("Competitor doesn't exists");
+        if(competitor == null) throw new GlobalExceptionHandler.NotFoundException("Competitor doesn't exists");
         return new ResponseEntity<>(competitor, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getCompetitor(String alias) throws Exception {
+    public ResponseEntity<?> getCompetitor(String alias){
     Competitor competitor = competitorRepository.findByAlias(alias);
-    if(competitor == null) throw new Exception("Competitor doesn't exists");
+    if(competitor == null) throw new GlobalExceptionHandler.NotFoundException("Competitor doesn't exists");
     return new ResponseEntity<>(competitor, HttpStatus.OK);
     }
 
@@ -102,7 +103,7 @@ public class CompetitorService {
     }
 
 
-    public ResponseEntity<?> addCompetitorToCompetition(Competition competition, Competitor competitor) throws Exception {
+    public ResponseEntity<?> addCompetitorToCompetition(Competition competition, Competitor competitor){
         Competitor localCompetitor = getCompetitorFromDatabase(competitor);
         Competition localCompetition = getCompetitionFromDatabase(competition);
 
@@ -124,30 +125,30 @@ public class CompetitorService {
         return new ResponseEntity<>(competitionResponses, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> removeCompetitorFromCompetition(Integer competitionId, Integer competitorId) throws Exception {
+    public ResponseEntity<?> removeCompetitorFromCompetition(Integer competitionId, Integer competitorId){
         Optional<Competition> localCompetition = competitionRepository.findById(competitionId);
         Optional<Competitor> localCompetitor = competitorRepository.findById(competitorId);
-        if(localCompetition.isEmpty()) throw new Exception("Competition doesn't exists");
-        if(localCompetitor.isEmpty()) throw new Exception("Competitor doesn't exists");
+        if(localCompetition.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("Competition doesn't exists");
+        if(localCompetitor.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("Competitor doesn't exists");
         Competitor_competition competitor_competition = competitorCompetitionRepository.findByCompetitorAndCompetition(localCompetitor.get(), localCompetition.get());
         competitorCompetitionRepository.delete(competitor_competition);
         return new ResponseEntity<>(Map.of("message", "Competitor removed from competition successfully"), HttpStatus.OK);
     }
 
 
-    private Competitor getCompetitorFromDatabase(Competitor competitor) throws Exception {
+    private Competitor getCompetitorFromDatabase(Competitor competitor){
         Competitor localCompetitor = null;
         if(competitor.getId() != null) localCompetitor = competitorRepository.findById(competitor.getId()).orElse(null);
         if(localCompetitor == null) localCompetitor = competitorRepository.findByAlias(competitor.getAlias());
-        if(localCompetitor == null) throw new Exception("Competitor doesn't exists");
+        if(localCompetitor == null) throw new GlobalExceptionHandler.NotFoundException("Competitor doesn't exists");
         return localCompetitor;
     }
 
-    private Competition getCompetitionFromDatabase(Competition competition) throws Exception {
+    private Competition getCompetitionFromDatabase(Competition competition){
         Competition localCompetition = null;
         if(competition.getId() != null) localCompetition = competitionRepository.findByid(competition.getId());
         if(localCompetition == null) localCompetition = competitionRepository.findByName(competition.getName());
-        if(localCompetition == null) throw new Exception("Competition doesn't exists");
+        if(localCompetition == null) throw new GlobalExceptionHandler.NotFoundException("Competition doesn't exists");
         return localCompetition;
     }
 }

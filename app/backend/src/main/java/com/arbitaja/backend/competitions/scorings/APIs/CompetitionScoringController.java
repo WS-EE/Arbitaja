@@ -23,24 +23,16 @@ public class CompetitionScoringController {
 
     @PostMapping("/competition/criteria/history/add")
     public ResponseEntity<?> addCompetitionScoringCriteriaHistory(@RequestParam Integer competition_id, @RequestParam Integer criteria_id, @RequestParam Integer competitor_id, @RequestParam Double points) {
-        try {
-            competitionScoringService.addCompetitionScoringCriteriaHistory(competition_id, criteria_id, competitor_id, points);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Error adding competition scoring criteria history", e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        competitionScoringService.addCompetitionScoringCriteriaHistory(competition_id, criteria_id, competitor_id, points);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
     @GetMapping("/dashboard/competition/history")
     @PreAuthorize("hasAuthority('basic')")
     public ResponseEntity<?> getCompetitionScoringHistory(@RequestParam Integer competition_id) {
-        try {
-            return new ResponseEntity<>(competitionScoringService.getCompetitionScoringHistory(competition_id, SecurityContextHolder.getContext().getAuthentication()), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Error getting competition scoring history", e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ResponseEntity<?> response = ResponseEntity.ok(competitionScoringService.getCompetitionScoringHistory(competition_id, SecurityContextHolder.getContext().getAuthentication()));
+        log.info("Sending response for competition scoring history: {}", response);
+        return response;
     }
 }

@@ -1,7 +1,7 @@
 package com.arbitaja.backend.security;
 
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitors.dataobjects.Personal_data;
-import com.arbitaja.backend.users.APIs.UserController;
 import com.arbitaja.backend.users.APIs.UserService;
 import com.arbitaja.backend.users.APIs.responses.UserProfileResponse;
 import com.arbitaja.backend.users.dataobjects.User;
@@ -35,6 +35,8 @@ public class AuthController {
     private ObjectMapper objectMapper;
     @Autowired
     private UserService userService;
+    @Autowired
+    private GlobalExceptionHandler globalExceptionHandler;
 
     @GetMapping("/login")
     @Operation(
@@ -48,7 +50,7 @@ public class AuthController {
             @ApiResponse(responseCode = "204", description = "Successfully user logout",
                     content = @Content(schema = @Schema(example = "user with username: {username} logged out."))),
             @ApiResponse(responseCode = "400", description = "Invalid username or password",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<?> loginPage(@RequestParam(value = "error", required = false) boolean error, @RequestParam(value = "logout", required = false) boolean logout) throws JsonProcessingException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -68,7 +70,7 @@ public class AuthController {
             log.info("Sending response for successful logout: " + "{}", objectMapper.writeValueAsString(response));
             return response;
         }
-        ResponseEntity<UserController.ErrorResponse> response = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserController.ErrorResponse("Invalid username or password"));
+        ResponseEntity<?> response = globalExceptionHandler.handleIllegalArgumentException(new IllegalArgumentException("Invalid username or password"));
         log.info("Sending Response for unsuccessful login: " + "{}", objectMapper.writeValueAsString(response));
         return response;
     }

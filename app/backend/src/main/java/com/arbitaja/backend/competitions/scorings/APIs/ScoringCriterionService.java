@@ -9,10 +9,13 @@ import com.arbitaja.backend.competitions.scorings.dataobjects.CompetitionScoring
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import com.arbitaja.backend.competitions.scorings.repositories.CompetitionScoringCriterionRepository;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringCriterionRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -20,22 +23,13 @@ import java.util.Optional;
 @Service
 public class ScoringCriterionService {
 
+    private static final Logger log = LogManager.getLogger(ScoringCriterionService.class);
+
 
     private final ScoringCriterionRepository scoringCriterionRepository;
     private final CompetitionScoringCriterionRepository competitionScoringCriterionRepository;
     private final CompetitionRepository competitionRepository;
     private final GlobalExceptionHandler globalExceptionHandler;
-
-    private ScoringCriterion getScoringCriterion(Integer criteria_id) {
-        if(criteria_id == null || criteria_id < 0) {
-            return null;
-        }
-        Optional<ScoringCriterion> scoringCriterion = scoringCriterionRepository.findById(criteria_id);
-        if(scoringCriterion.isPresent()) {
-            return scoringCriterion.get();
-        }
-        throw new IllegalArgumentException("Template ScoringCriterion not found");
-    }
 
     public ScoringCriterionService(ScoringCriterionRepository scoringCriterionRepository, CompetitionScoringCriterionRepository competitionScoringCriterionRepository, CompetitionRepository competitionRepository, GlobalExceptionHandler globalExceptionHandler) {
         this.scoringCriterionRepository = scoringCriterionRepository;
@@ -44,15 +38,27 @@ public class ScoringCriterionService {
         this.globalExceptionHandler = globalExceptionHandler;
     }
 
-    public ResponseEntity<?> addScoringCriteria(ScoringCriteriaAdd scoringCriterion) {
-        if(scoringCriterion == null) {
-            throw new IllegalArgumentException("Invalid input");
+    private ScoringCriterion getScoringCriterion(Integer criteria_id) throws GlobalExceptionHandler.NotFoundException {
+        log.info("Fetching scoring criterion with ID: {}", criteria_id);
+        if(criteria_id == null || criteria_id < 0) {
+            return null;
+        }
+        Optional<ScoringCriterion> scoringCriterion = scoringCriterionRepository.findById(criteria_id);
+        if(scoringCriterion.isPresent()) {
+            return scoringCriterion.get();
+        }
+        throw new GlobalExceptionHandler.NotFoundException("Template ScoringCriterion not found");
+    }
+
+    public ResponseEntity<?> addScoringCriteria(ScoringCriteriaAdd scoringCriterion) throws GlobalExceptionHandler.NotFoundException {
+        if(ObjectUtils.isEmpty(scoringCriterion)) {
+            throw new IllegalArgumentException("Scoring criterion can not be null");
         }
         Optional<Competition> competition = Optional.empty();
         if(scoringCriterion.getCompetitionId() != null) {
             competition = competitionRepository.findById(scoringCriterion.getCompetitionId());
             if (competition.isEmpty()) {
-                throw new IllegalArgumentException(String.valueOf(Map.of("error", "Invalid competition id")));
+                throw new GlobalExceptionHandler.NotFoundException("Competition with id " + scoringCriterion.getCompetitionId() + " not found");
             }
         }
         ScoringCriterion newScoringCriterion = new ScoringCriterion(scoringCriterion);
@@ -64,15 +70,12 @@ public class ScoringCriterionService {
         return ResponseEntity.ok(newScoringCriterion);
     }
 
-    public ResponseEntity<?> getScoringCriteria(Integer scoring_id) {
-        if(scoring_id == null) {
-            throw new IllegalArgumentException("Invalid input");
-        }
+    public ResponseEntity<?> getScoringCriteria(Integer scoring_id) throws GlobalExceptionHandler.NotFoundException {
         Optional<ScoringCriterion> scoringCriterion = scoringCriterionRepository.findById(scoring_id);
         if (scoringCriterion.isPresent()) {
             return ResponseEntity.ok(scoringCriterion.get());
         }
-        return new ResponseEntity<>(Map.of("error","scoringCriterion not found"), HttpStatus.NOT_FOUND);
+        throw new GlobalExceptionHandler.NotFoundException("scoringCriterion not found");
     }
 
     public ResponseEntity<?> getAllScoringCriteria() {
@@ -99,7 +102,7 @@ public class ScoringCriterionService {
         }
     }
 
-    public ResponseEntity<?> updateScoringCriteria(ScoringCriterion scoringCriterion) {
+    public ResponseEntity<?> updateScoringCriteria(ScoringCriterion scoringCriterion) throws GlobalExceptionHandler.NotFoundException {
         if(scoringCriterion == null) {
             throw new IllegalArgumentException("Invalid input");
         }

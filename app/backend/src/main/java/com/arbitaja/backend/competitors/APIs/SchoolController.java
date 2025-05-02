@@ -1,8 +1,8 @@
 package com.arbitaja.backend.competitors.APIs;
 
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.SchoolRepository;
-import com.arbitaja.backend.users.APIs.UserController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springdoc.core.service.GenericResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,8 +37,6 @@ public class SchoolController {
 
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private GenericResponseService responseBuilder;
 
 
     @GetMapping("/all/get")
@@ -76,17 +73,12 @@ public class SchoolController {
             content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(value = "{\"error\": \"School not found\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
             })
-    public ResponseEntity<?> getSchool(@RequestParam Integer id){
-        try{
-            ResponseEntity<?> resp = schoolService.getSchoolResp(id);
-            log.info("Sending school response: " + "{}", objectMapper.writeValueAsString(resp));
-            return resp;
-        } catch (Exception e) {
-            log.error("Failed to register school", e);
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage() != null ? e.getMessage() :"An error occurred"));
-        }
+    public ResponseEntity<?> getSchool(@RequestParam Integer id) throws JsonProcessingException {
+        ResponseEntity<?> resp = schoolService.getSchoolResp(id);
+        log.info("Sending school response: " + "{}", objectMapper.writeValueAsString(resp));
+        return resp;
     }
 
     @PostMapping("/register")
@@ -100,17 +92,12 @@ public class SchoolController {
             @Content(mediaType = "application/json", examples = {
                     @ExampleObject(value = "{\"message\": \"School registered successfully\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
     })
     public ResponseEntity<?> registerSchool(@RequestBody School school) {
-        try {
-            ResponseEntity<?> resp = schoolService.addSchool(school);
-            log.info("Registering school: {}", resp.getBody());
-            return resp;
-        } catch (Exception e) {
-            log.error("Failed to register school", e);
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage() != null ? e.getMessage() :"An error occurred"));
-        }
+        ResponseEntity<?> resp = schoolService.addSchool(school);
+        log.info("Registering school: {}", resp.getBody());
+        return resp;
     }
 
 
@@ -128,17 +115,12 @@ public class SchoolController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"error\": \"School not found\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
     })
     public ResponseEntity<?> deleteSchool(@RequestParam Integer id) {
-        try {
-            ResponseEntity<?> resp = schoolService.deleteSchool(id);
-            log.info("Deleting school: {}", resp.getBody());
-            return resp;
-        } catch (Exception e) {
-            log.error("Failed to register school", e);
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage() != null ? e.getMessage() :"An error occurred"));
-        }
+        ResponseEntity<?> resp = schoolService.deleteSchool(id);
+        log.info("Deleting school: {}", resp.getBody());
+        return resp;
     }
 
     @PutMapping("/edit")
@@ -155,17 +137,12 @@ public class SchoolController {
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(value = "{\"error\": \"School not found\"}")})),
             @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserController.ErrorResponse.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
     })
     public ResponseEntity<?> editSchool(@RequestBody School school) {
-        try{
-            ResponseEntity<?> resp = schoolService.updateSchool(school);
-            log.info("Updating school: {}", resp.getBody());
-            return resp;
-        } catch (Exception e) {
-            log.error("Failed to register school", e);
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage() != null ? e.getMessage() :"An error occurred"));
-        }
+        ResponseEntity<?> resp = schoolService.updateSchool(school);
+        log.info("Updating school: {}", resp.getBody());
+        return resp;
     }
 
 

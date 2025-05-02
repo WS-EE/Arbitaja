@@ -1,5 +1,6 @@
 package com.arbitaja.backend.competitions.APIs;
 
+import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
 import com.arbitaja.backend.competitions.scorings.dataobjects.Scoring_groups_structure;
@@ -31,6 +32,8 @@ public class CompetitionService {
     private ScoringGroupsStructureRepository scoringGroupsStructureRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private GlobalExceptionHandler globalExceptionHandler;
 
     public ResponseEntity<Set<CompetitionResponse>> getAllCompetitions() {
         List<Competition> competitions = competitionRepository.findAll();
@@ -74,7 +77,7 @@ public class CompetitionService {
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("success", "Competition added"));
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+            return globalExceptionHandler.handleGeneralException(e);
         }
     }
     public ResponseEntity<?> updateCompetitionData(CompetitionResponse competition) {
