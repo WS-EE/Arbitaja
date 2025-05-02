@@ -3,10 +3,61 @@
 ## Setting up the environment
 Enviromental values all come from `.env` file.
 Required enviromental values are in `.env-example`.
-Make sure you changes the `POSTGRES_PASSWORD` variable.
+
+### Explantaion to all the .env variables
+---
+
+This is the name of the database
+```
+POSTGRES_DB=arbitaja
+```
+---
+
+This is the username and password used in postgres setup
+```
+POSTGRES_USERNAME=postgres
+POSTGRES_PASSWORD=VeryTrickyPassword
+```
+---
+
+This is the url used when backend connects to database
+```
+POSTGRES_URL=jdbc:postgresql://db:5432/arbitaja
+```
+> Note that `/arbitaja` needs to be the same as `POSTGRES_DB` variable
+---
+
+These variables are used for axios.
+Axios is used for the backend to call the frontend
+
+They are also used for CORS.
+```
+VITE_APP_BASE_URL=http://localhost/
+VITE_APP_API_ENDPOINT=api/v1/
+```
+> Unless you change this variable, the website will only be available from `http://localhost`.
+> This is fine when developing.
+
+> When in prodtuction change this to `https://yourdomain.ee`.
+> The domain name should be the same that you will configure at `Setup nginx reverse proxy for SSL`
+---
+
+The default username password to login in with.
+```
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=arbitaja
+```
+---
+
+The api key used to insert history or points to the competition/competitor.
+```
+API_KEY=arbitaja
+```
 
 ## Development
 This will consume more resourceses then the Production build.
+
+This starts the web server on port 80
 
 ### Start docker compose in dev profile
 #### Linux
@@ -23,6 +74,9 @@ This will consume more resourceses then the Production build.
 ```
 
 ## Production
+This starts the server on port 8080.
+
+This will make adding an SSL reverse proxy in front easier.
 ### Start docker compose in prod profile
 #### Linux
 ```
@@ -70,8 +124,8 @@ Here is the BASIC configuratsion for nginx `server{}` block in getting you up an
 # HTTP Server block
 server {
         listen 80;
-        return 302 https://arbitaja.ee$uri;
-        server_name arbitaja.ee;
+        return 302 https://yourdomain.ee$uri;
+        server_name yourdomain.ee;
 }
 
 server {
@@ -79,7 +133,7 @@ server {
         listen [::]:443 ssl default_server;
 
         # Server name to respond on
-        server_name arbitaja.ee;
+        server_name yourdomain.ee;
 
         # SSL Certificates
         ssl_certificate /etc/nginx/certs/web.crt;
@@ -91,4 +145,4 @@ server {
         }
 }
 ```
-> Make sure you change the domain name `arbitaja.ee` under `server_name` and `return`
+> Make sure you change the domain name `yourdomain.ee` under `server_name` and `return`
