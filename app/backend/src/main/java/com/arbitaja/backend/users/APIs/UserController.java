@@ -1,5 +1,6 @@
 package com.arbitaja.backend.users.APIs;
 import com.arbitaja.backend.GlobalExceptionHandler;
+import com.arbitaja.backend.users.APIs.requests.PasswordChangeRequest;
 import com.arbitaja.backend.users.APIs.responses.UserProfileResponse;
 import com.arbitaja.backend.users.dataobjects.SignupUser;
 import com.arbitaja.backend.users.dataobjects.User;
@@ -233,9 +234,9 @@ public class UserController {
     @Transactional
     @PutMapping("/profile/update_password")
     @PreAuthorize("hasAuthority('basic')")
-    public ResponseEntity<?> updatePassword(@RequestBody User user) throws JsonProcessingException {
+    public ResponseEntity<?> updatePassword(@RequestBody PasswordChangeRequest passwordChangeRequest) throws JsonProcessingException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        ResponseEntity<?> resp = userService.changePassword(user, auth);
+        ResponseEntity<?> resp = userService.changePassword(passwordChangeRequest, auth);
         log.debug("Sending Response for successful password change: " + "{}", objectMapper.writeValueAsString(resp));
         return resp;
     }

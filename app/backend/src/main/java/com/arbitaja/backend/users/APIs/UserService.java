@@ -5,6 +5,7 @@ import com.arbitaja.backend.competitors.dataobjects.Personal_data;
 import com.arbitaja.backend.competitors.dataobjects.School;
 import com.arbitaja.backend.competitors.repositories.PersonalDataRepository;
 import com.arbitaja.backend.competitors.repositories.SchoolRepository;
+import com.arbitaja.backend.users.APIs.requests.PasswordChangeRequest;
 import com.arbitaja.backend.users.APIs.responses.UserProfileResponse;
 import com.arbitaja.backend.users.dataobjects.*;
 import com.arbitaja.backend.users.repositories.*;
@@ -309,24 +310,31 @@ public class UserService {
     /**
      * Used to change a users password
      *
-     * @param sentUser user with new password
+     * @param passwordChangeRequest object of userId, old and new password
      * @param auth authentication of the user
      *
      * @return ResponseEntity of if the password change was successful
      */
     @Transactional
-    public ResponseEntity<?> changePassword(User sentUser, Authentication auth) {
-        log.info("Changing password for user: {}", sentUser);
+    public ResponseEntity<?> changePassword(PasswordChangeRequest passwordChangeRequest, Authentication auth) {
+        log.info("Changing password for user: {}", passwordChangeRequest.getId());
         // Check if the user exists
-        Optional<User> userOpt = userRepository.findById(sentUser.getId());
+        Optional<User> userOpt = userRepository.findById(passwordChangeRequest.getId());
         if(userOpt.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
         User user = userOpt.get();
-        // check if the user is the same as the authenticated user or if the authenticated user is an admin
-        // if the authenticated user is not an admin and the authenticated user is not the same as the user being changed
-        // then throw an exception
-        if(!auth.getName().equals(user.getUsername()) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")))
-            throw new GlobalExceptionHandler.UnauthorizedException("Non admin accounts are not allowed to change other users passwords");
-        user.setSalted_password(passwordEncoder.encode(sentUser.getSalted_password()));
+        if(!auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) {
+            // Check if the authenticated user is the same as the user being changed
+            if(!auth.getName().equals(user.getUsername()))
+                throw new GlobalExceptionHandler.UnauthorizedException("User not authorized to change password");
+            // Check if the old password is correct
+            if(!passwordEncoder.matches(passwordChangeRequest.getOld_password(), user.getSalted_password()))
+                throw new GlobalExceptionHandler.UnauthorizedException("Old password is incorrect");
+        }
+        // Check if the new password is null or empty
+        if(passwordChangeRequest.getNew_password() == null || passwordChangeRequest.getNew_password().isEmpty())
+            throw new IllegalArgumentException("Invalid new password");
+        // Change the password
+        user.setSalted_password(passwordEncoder.encode(passwordChangeRequest.getNew_password()));
         updateUser(user);
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
