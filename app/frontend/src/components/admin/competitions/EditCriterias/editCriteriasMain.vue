@@ -8,7 +8,7 @@ import router from '@/router';
 
 // Import components
 import addEditCriteria from '@/components/admin/competitions/EditCriterias/addEditCriteria.vue'
-import removeCriteria from '@/components/admin/competitions/EditCriterias/removeCriteria.vue';
+import addExistingCriteria from './addExistingCriteria.vue';
 import CriteriaTabel from './CriteriaTabel.vue';
 
 // Import displayalert
@@ -78,9 +78,6 @@ const getCriteriasByCompetition = async(competitionId) => {
 
         // Set criterias based on the response
         criterias.value = response.data
-
-        //TEMP REMOVE
-        console.log(response)
         
     } catch (error) {
         showAlert('Something went wrong while loading criterias.', 'danger')
@@ -119,12 +116,18 @@ const onTableChanged = () => {
             <!-- Buttons for action of adding -->
             <div class="row">
                 <addEditCriteria
-                    buttonName="Add Criteria"propCriteria
+                    buttonName="Add Criteria"
                     modalId="addCriteria"
                     :isAdd="true"
                     :competitionId="competition_id"
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 mt-1" 
                     @addEditCriteria="onAddCriteria()"
+                />
+                <addExistingCriteria
+                    :existingCriterias="criterias"
+                    :competitionId="competition_id"
+                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 mt-1" 
+                    @CriteriaAdd="onAddCriteria()"
                 />
             </div>
             <div v-if="isLoadingCriterias" class="position-absolute top-50 start-50">
