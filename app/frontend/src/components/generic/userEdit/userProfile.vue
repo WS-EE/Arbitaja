@@ -153,6 +153,9 @@ function showAlert(message, type, timeout){
     alertTimeout.value = timeout
 }
 
+// Import password reset
+import changePassword from './changePassword.vue';
+
 </script>
 
 <template>
@@ -224,6 +227,15 @@ function showAlert(message, type, timeout){
                             </li>
                         </ul>
                     </div>
+                </div>
+            </div>
+            <!-- Password Reset -->
+            <div class="row pt-3">
+                <div class="col">
+                    <p>Password</p>
+                </div>
+                <div class="col">
+                    <changePassword :isAdmin="props.isAdmin" :userId="userid"/>
                 </div>
             </div>
 
