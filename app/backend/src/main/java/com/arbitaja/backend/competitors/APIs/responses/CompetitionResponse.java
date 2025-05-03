@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class CompetitionResponse {
     @Schema(description = "Unique ID of the competition", example = "69")
-    private int id;
+    private Integer id;
     @Schema(description = "Name of the competition", example = "Noor meister")
     private String name;
     @Schema(description = "Start time of the competition")
@@ -27,12 +27,22 @@ public class CompetitionResponse {
 
     public CompetitionResponse() {
     }
+    public CompetitionResponse(Integer id, String name, Timestamp start_time, Timestamp end_time, Organizer_idResp organizer_id, Set<CompetitorResp> competitors, Timestamp score_showtime, Set<Scoring_groups_structure_resp> scoring_groups) {
+        this.id = id;
+        this.name = name;
+        this.start_time = start_time;
+        this.end_time = end_time;
+        this.organizer_id = organizer_id;
+        this.competitors = competitors;
+        this.score_showtime = score_showtime;
+        this.scoring_groups = scoring_groups;
+    }
 
     public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -93,18 +103,23 @@ public class CompetitionResponse {
     }
 
     public static class Organizer_idResp{
-        private int user_id;
+        private Integer user_id;
         private String full_name;
         private String username;
 
         public Organizer_idResp() {
         }
+        public Organizer_idResp(Integer user_id, String full_name, String username) {
+            this.user_id = user_id;
+            this.full_name = full_name;
+            this.username = username;
+        }
 
-        public int getUser_id() {
+        public Integer getUser_id() {
             return user_id;
         }
 
-        public void setUser_id(int user_id) {
+        public void setUser_id(Integer user_id) {
             this.user_id = user_id;
         }
 
@@ -126,18 +141,24 @@ public class CompetitionResponse {
     }
 
     public static class CompetitorResp{
-        private int id;
+        private Integer id;
         private String name;
         private String alias;
 
         public CompetitorResp() {
         }
 
-        public int getId() {
+        public CompetitorResp(Integer id, String name, String alias) {
+            this.id = id;
+            this.name = name;
+            this.alias = alias;
+        }
+
+        public Integer getId() {
             return id;
         }
 
-        public void setId(int id) {
+        public void setId(Integer id) {
             this.id = id;
         }
 
@@ -158,14 +179,24 @@ public class CompetitionResponse {
         }
     }
     public static class Scoring_groups_structure_resp{
-        private int id;
+        private Integer id;
         private String name;
         private String description;
         private Integer competitor_id;
-        private int scoring_parent_group_id;
-        private int structure_group_type;
+        private Integer scoring_parent_group_id;
+        private Integer structure_group_type;
         private Map<String, ?> dynamic_variables;
         public Scoring_groups_structure_resp() {}
+
+        public Scoring_groups_structure_resp(int id, String name, String description, Integer competitor_id, Integer scoring_parent_group_id, Integer structure_group_type, Map<String, ?> dynamic_variables) {
+            this.id = id;
+            this.name = name;
+            this.description = description;
+            this.competitor_id = competitor_id;
+            this.scoring_parent_group_id = scoring_parent_group_id;
+            this.structure_group_type = structure_group_type;
+            this.dynamic_variables = dynamic_variables;
+        }
 
         public Integer getId() {
             return id;
@@ -199,7 +230,7 @@ public class CompetitionResponse {
             this.competitor_id = competitor_id;
         }
 
-        public int getScoring_parent_group_id() {
+        public Integer getScoring_parent_group_id() {
             return scoring_parent_group_id;
         }
 
@@ -207,11 +238,11 @@ public class CompetitionResponse {
             this.scoring_parent_group_id = scoring_parent_group_id;
         }
 
-        public int getStructure_group_type() {
+        public Integer getStructure_group_type() {
             return structure_group_type;
         }
 
-        public void setStructure_group_type(int structure_group_type) {
+        public void setStructure_group_type(Integer structure_group_type) {
             this.structure_group_type = structure_group_type;
         }
 
