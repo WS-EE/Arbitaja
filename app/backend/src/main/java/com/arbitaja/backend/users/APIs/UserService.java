@@ -115,21 +115,25 @@ public class UserService {
      * @return ResponseEntity of the users data
      */
     public UserProfileResponse mapPersonalData(Personal_data personalData, User user) {
+        // Get the roles and permissions for the user
         List<Role> roles = roleRepository.findRolesByUserId(user.getId());
         List<Permission> permissions = permissionRepository.findPermissionsByUserId(user.getId());
         Set<SimpleGrantedAuthority> authorities = permissions.stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.getName()))
                 .collect(Collectors.toSet());
 
+        // Add the roles to the authorities
         UserProfileResponse response = new UserProfileResponse(user.getId(), user.getUsername(), roles, authorities);
 
+        // Map the personal data to the response
         UserProfileResponse.PersonalDataResponse personalDataResponse = new UserProfileResponse.PersonalDataResponse();
+        // If the personal data is not null then set the values
         if (personalData != null) {
             personalDataResponse.setId(personalData.getId());
             personalDataResponse.setFullName(personalData.getFull_name());
             personalDataResponse.setEmail(personalData.getEmail());
         }
-
+        // If the personal data is not null and the school is not null then set the values
         UserProfileResponse.SchoolResponse schoolResponse = new UserProfileResponse.SchoolResponse();
         if (personalData != null && personalData.getSchool() != null) {
             schoolResponse.setId(personalData.getSchool().getId());
@@ -142,9 +146,16 @@ public class UserService {
         return response;
     }
 
+    /**
+     * Returns a list of all users in the database
+     *
+     * @return ResponseEntity of all users
+     */
     public ResponseEntity<?> getAllUsers() {
+        // Get all users from the database
         List<User> users = userRepository.findAll();
         Set<UserProfileResponse> userResponses = new HashSet<>();
+        // Map the users to the response
         for (User user : users) {
             userResponses.add(mapPersonalData(user.getPersonal_data(), user));
         }
@@ -152,9 +163,16 @@ public class UserService {
     }
 
 
+    /**
+     * Deletes the user with the given id
+     *
+     * @param id The ID of the User being deleted.
+     * @return ResponseEntity of if the deletion was successful
+     */
     @Transactional
     public ResponseEntity<?> deleteUser(int id) {
         Optional<User> user = userRepository.findById(id);
+        // If the user does not exist throw an exception
         if (user.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
         userRepository.delete(user.get());
         return ResponseEntity.ok(Map.of("message", "User was deleted successfully"));
@@ -170,42 +188,43 @@ public class UserService {
      */
     public ResponseEntity<?> updatePersonalData(Authentication auth, User sentUser) {
         log.info("Updating user profile: {}", sentUser);
+        // Check if the user exists
         User user = getUserById(sentUser.getId());
+        // If the user does not exist throw an exception
         if (user == null) throw new GlobalExceptionHandler.NotFoundException("User not found");
+        // Check if the user is the same as the authenticated user or if the authenticated user is an admin
+        // if the authenticated user is not an admin and the authenticated user is not the same as the user being changed
+        // then throw an exception
         if(!auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")) && !auth.getName().equals(user.getUsername())) {
             throw new GlobalExceptionHandler.UnauthorizedException("User not authorized to change other user");
         }
-        String newUsername = sentUser.getUsername();
 
+        // if the username is null or empty throw an exception
+        if (sentUser.getUsername() == null) throw new IllegalArgumentException("Invalid username");
+        user.setUsername(sentUser.getUsername());
 
-        if (newUsername == null) throw new IllegalArgumentException("Invalid username");
-        user.setUsername(newUsername);
-
-
+        // Check if the personal data is null and create a new one if it is
         Personal_data personalData = user.getPersonal_data();
-        if (personalData == null) personalData = new Personal_data();
+        if (user.getPersonal_data() == null) personalData = new Personal_data();
 
-
+        // Check if the personal data is not null and set the new values
         Personal_data personalDataMap = sentUser.getPersonal_data();
         if (personalDataMap == null) throw new IllegalArgumentException("Invalid personal data");
 
-
-        School schoolMap = personalDataMap.getSchool();
-        if (schoolMap == null) throw new IllegalArgumentException("Invalid school");
-
-
+        // If email or full name is null or empty then throw an exception
         if (personalDataMap.getEmail().isEmpty() || personalDataMap.getFull_name().isEmpty()) throw new IllegalArgumentException("Invalid full name or email");
         personalData.setFull_name(personalDataMap.getFull_name());
         personalData.setEmail(personalDataMap.getEmail());
 
-
-        School school = getSchoolById(schoolMap.getId());
+        // Check if the school is null and set it to null if it is
+        School school = personalDataMap.getSchool() == null ? null : getSchoolById(personalDataMap.getSchool().getId());
         if (school == null) throw new GlobalExceptionHandler.NotFoundException("School not found");
         personalData.setSchool(school);
 
-
+        // Set the created at timestamp to now if it is null
         if(personalData.getCreated_at() == null) personalData.setCreated_at(Timestamp.from(Instant.now()));
 
+        // Save the personal data
         updatePersonalData(personalData);
         user.setPersonal_data(personalData);
         updateUser(user);
@@ -223,13 +242,17 @@ public class UserService {
      */
     public ResponseEntity<Map<String, ?>> signupUser(SignupUser sentUser) {
         log.info("Signing up user: {}", sentUser);
+        // Check if the user with this username already exists in signup users and regular users
+        // If the user with this username already exists throw an exception
         if(signupUserRepository.findByUsername(sentUser.getUsername()).isPresent()
                 || userRepository.findUserByUsername(sentUser.getUsername()) != null) throw new GlobalExceptionHandler.DuplicateException("User with username already exists");
+        // Encode the password
         String salted_password = passwordEncoder.encode(sentUser.getSalted_password());
+        // Set the password and created at
         sentUser.setSalted_password(salted_password);
         sentUser.setCreatedAt(Instant.now());
         sentUser.setIsApproved(false);
-        log.info("Creating new user: {}", sentUser);
+        log.info("Creating new signup user: {}", sentUser);
         signupUserRepository.save(sentUser);
         return ResponseEntity.ok(Map.of("message", "User created successfully"));
     }
@@ -243,8 +266,12 @@ public class UserService {
      * @return ResponseEntity of if the deletion was successful
      */
     public ResponseEntity<Map<String, ?>> declineUser(Integer id) {
+        log.info("Declining user with id: {}", id);
+        // Check if the user exists
         Optional<SignupUser> deletableUser = signupUserRepository.findById(id);
+        // If the user does not exist throw an exception
         if(deletableUser.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
+        // If the user exists delete it
         signupUserRepository.delete(deletableUser.get());
         return ResponseEntity.ok(Map.of("message", "User declined successfully"));
     }
@@ -279,12 +306,26 @@ public class UserService {
         return ResponseEntity.ok(Map.of("message", "User approved successfully"));
     }
 
+    /**
+     * Used to change a users password
+     *
+     * @param sentUser user with new password
+     * @param auth authentication of the user
+     *
+     * @return ResponseEntity of if the password change was successful
+     */
     @Transactional
     public ResponseEntity<?> changePassword(User sentUser, Authentication auth) {
+        log.info("Changing password for user: {}", sentUser);
+        // Check if the user exists
         Optional<User> userOpt = userRepository.findById(sentUser.getId());
         if(userOpt.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
         User user = userOpt.get();
-        if(!auth.getName().equals(user.getUsername()) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) throw new GlobalExceptionHandler.UnauthorizedException("Non admin accounts are not allowed to change other users passwords");
+        // check if the user is the same as the authenticated user or if the authenticated user is an admin
+        // if the authenticated user is not an admin and the authenticated user is not the same as the user being changed
+        // then throw an exception
+        if(!auth.getName().equals(user.getUsername()) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")))
+            throw new GlobalExceptionHandler.UnauthorizedException("Non admin accounts are not allowed to change other users passwords");
         user.setSalted_password(passwordEncoder.encode(sentUser.getSalted_password()));
         updateUser(user);
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
@@ -301,14 +342,28 @@ public class UserService {
     }
 
 
+    /**
+     * Used to create a new user
+     *
+     * @param sentUser new user data
+     * @param isAdmin if the user being created should be an admin
+     *
+     * @return ResponseEntity of if the creation was successful
+     */
     public ResponseEntity<?> createUser(User sentUser, Boolean isAdmin) {
         log.info("Creating new user: {}", sentUser);
-        if (userRepository.findByUsername(sentUser.getUsername()).isPresent()) throw new GlobalExceptionHandler.DuplicateException("User with username already exists");
+        // Check if the user with this username already exists
+        if (userRepository.findByUsername(sentUser.getUsername()).isPresent())
+            throw new GlobalExceptionHandler.DuplicateException("User with username already exists");
+        // Encode the password
         String salted_password = passwordEncoder.encode(sentUser.getSalted_password());
         sentUser.setSalted_password(salted_password);
+        // Set the personal data
         savePersonalData(sentUser.getPersonal_data());
         userRepository.save(sentUser);
+        // give the user the basic role
         giveUserBasicRole(sentUser);
+        // if the user is an admin, make him an admin
         if(isAdmin) makeUserAdmin(sentUser);
         return ResponseEntity.ok(Map.of("message", "User created successfully"));
     }
@@ -322,38 +377,72 @@ public class UserService {
      * @return updated signupUser
      */
     private SignupUser setSignupUserChanges(SignupUser sentUser){
+        // Find the signup user by id
         Optional<SignupUser> signupUser = signupUserRepository.findById(sentUser.getId());
+        // If the signup user is not found throw an exception
         if(signupUser.isEmpty()) throw new GlobalExceptionHandler.NotFoundException("User not found");
         SignupUser newUser = signupUser.get();
+        // Set the new values
         newUser.setUsername(sentUser.getUsername());
         newUser.setPersonal_data(sentUser.getPersonal_data());
-        if(newUser.getPersonal_data().getSchool() == null || newUser.getPersonal_data().getSchool().getId() == 0) newUser.getPersonal_data().setSchool(null);
+        // Set the school to null if the id is 0 or school is null
+        if(newUser.getPersonal_data().getSchool() == null || newUser.getPersonal_data().getSchool().getId() == 0)
+            newUser.getPersonal_data().setSchool(null);
+        // approve the signup user
         newUser.setIsApproved(true);
+        // save the changes to signup user
         signupUserRepository.save(newUser);
         return newUser;
     }
 
+    /**
+     * Used to save the personal data of a user
+     * @param personalData personal data that is to be saved
+     */
     private void savePersonalData(Personal_data personalData) {
+        // If personal data is null return
         if (personalData == null) return;
-        if (personalData.getSchool() != null) saveSchool(personalData.getSchool());
+        // If personal data is not null and school is not null save the school
+        if (personalData.getSchool() != null) saveSchool(personalData);
+        personalData.setCreated_at(Timestamp.from(Instant.now()));
         personalDataRepository.save(personalData);
     }
 
-    private void saveSchool(School school) {
-        if (school != null) {
-            schoolRepository.save(school);
+    /**
+     * Used to save the school of a user
+     * @param personalData personal data where the school is
+     */
+    private void saveSchool(Personal_data personalData) {
+        // If given school has an id then find the school and set it to the personal data
+        if(personalData.getSchool().getId() != null) {
+            Optional<School> existingSchool = schoolRepository.findById(personalData.getSchool().getId());
+            if(existingSchool.isPresent()) {
+                School existing = existingSchool.get();
+                personalData.setSchool(existing);
+            }
+            // If the school is not in the database then save it
+            else{
+                personalData.getSchool().setCreated_at(Timestamp.from(Instant.now()));
+                personalData.getSchool().setId(null);
+                schoolRepository.save(personalData.getSchool());
+            }
         }
     }
 
+    /**
+     * Used to give the user the basic role
+     * @param user user that is to be given the basic role
+     */
     private void giveUserBasicRole(User user) {
-        Optional<Role> role = roleRepository.findByName("user");
-        if (role.isEmpty()) {
-            throw new GlobalExceptionHandler.NotFoundException("User role not found");
-        }
-        User_role basic = new User_role(user, role.get());
+        Role role = roleRepository.findByName("user").orElseThrow(() -> new GlobalExceptionHandler.NotFoundException("User role not found"));
+        User_role basic = new User_role(user, role);
         userRoleRepository.save(basic);
     }
 
+    /**
+     * Used to make a user an admin
+     * @param user user that is to be made an admin
+     */
     private void makeUserAdmin(User user) {
         Role role = roleRepository.findByName("admin").orElseThrow(() -> new GlobalExceptionHandler.NotFoundException("Admin role not found"));
         User_role userRole = new User_role(user, role);
