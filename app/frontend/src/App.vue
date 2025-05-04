@@ -25,7 +25,6 @@ onMounted(async () => {
   }
   try {
     const response = await axios.get('user/profile/get')
-    console.log(response)
     if(response.status === 200 && response.data.username !== 'anonymousUser'){
       // Set user to be logged in
       await $cookies.set('isLoggedIn', true, 0);

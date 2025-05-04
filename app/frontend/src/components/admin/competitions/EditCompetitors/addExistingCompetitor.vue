@@ -90,7 +90,6 @@ const addCompetitorToCompetition = async (competitionId, competitorId) => {
             competition: { id: competitionId },
             competitor: { id: competitorId }
         }
-        console.log(apiBody)
 
         // Add exstiting competitor to competition
         await axios.post('competitor/add/to/competition', apiBody)

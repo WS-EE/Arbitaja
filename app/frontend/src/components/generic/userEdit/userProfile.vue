@@ -112,7 +112,6 @@ const saveProfile = (async () =>{
         }
     } catch (error) {
         showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to save changes!</strong></h4><hr><p class=mb-0>Error: ' + error + '</p><p class=mb-0>For more information check console log.</p>', 'danger', 6000)
-        console.log(error)
     }
 });
 function discardChanges(){

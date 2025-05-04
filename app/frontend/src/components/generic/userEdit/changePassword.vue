@@ -69,7 +69,6 @@ const resetPassword = async(userId, oldPassword, setPassword, confirmSetPassword
             showAlert('Passwords don\'t match!', 'danger', 2000)
         }
     } catch(error) {
-        console.log(error)
         showAlert('Setting new password failed. Error: ' + error.response.data.message, 'danger', 9000)
     }
 }

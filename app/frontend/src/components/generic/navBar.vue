@@ -33,9 +33,7 @@ onMounted(async () => {
         displayUsername.value = userParameters.value.username
         userRoles.value = userParameters.value.roles
         isUserAdmin.value = await checkUserAdmin();
-    } catch(err) {
-        console.log('User is unauthenticated')
-    }
+    } catch(err) {}
 })
 
 // User logout function
@@ -67,7 +65,6 @@ const checkUserAdmin = async () => {
         // else return false
         return isTrue
     } catch(error) {
-        console.log('Error:' + error);
         return false
     }
 }

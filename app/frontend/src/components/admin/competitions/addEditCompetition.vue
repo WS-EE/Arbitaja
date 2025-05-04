@@ -187,7 +187,6 @@ const saveComp = async() => {
             .toUTC()
             .toISO()
 
-        console.log(competition.value)
         // Try to edit or add competition
         if (props.isEdit === true){
             await axios.put('competition/edit', competition.value)
@@ -198,7 +197,6 @@ const saveComp = async() => {
         // Show success when everything is done
         await showAlert('Succesfully saved', 'success')
     } catch(error) {
-        console.log(error)
         // Throw console log error if fail
         showAlert('Something went wrong while saveing.', 'danger')
     }
