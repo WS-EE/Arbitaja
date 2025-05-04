@@ -84,12 +84,9 @@ const addCriteriaToCompetition = async (competitionId, CriteriaId) => {
             competition_id: competitionId,
             scoring_id: CriteriaId
         }
-        console.log(apiParams)
 
         // Add exstiting Criteria to competition
         const response = await axios.post('scoring/criteria/add/to/competition', null, { params: apiParams })
-
-        console.log(response)
 
         // alert success
         showAlert('Success on adding Criteria to competition.', 'success')
@@ -100,7 +97,6 @@ const addCriteriaToCompetition = async (competitionId, CriteriaId) => {
     } catch (error) {
         // Show error alert on fail
         showAlert('Error adding Criteria to competiton. Error' + error, 'danger')
-        console.log(error)
     } finally {
         setCriteriaToAddEmpty()
     }

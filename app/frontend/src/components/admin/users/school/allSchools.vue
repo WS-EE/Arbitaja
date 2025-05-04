@@ -133,7 +133,6 @@ watch(
   (newSchools) => {
     // New list of schools
     schools.value = newSchools
-    console.log(schools.value)
   }
 );
 

@@ -93,7 +93,6 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
         
     } catch(e) {
         showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e.response.data.error, 'danger', 9000)
-        console.log(e)
     }
 }
 

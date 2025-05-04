@@ -58,7 +58,6 @@ const userSignup = async () => {
       'danger',
       6000
     )
-    console.log(error)
   }
 }
 

@@ -30,7 +30,6 @@ onMounted(async () => {
     }
 
   } catch(error) {
-    console.log('Error:', error)
     await router.replace('/login');
   };
 });
@@ -51,7 +50,6 @@ const checkUserAdmin = async () => {
         // else return false
         return isTrue
     } catch(error) {
-        console.log('Error:' + error);
         return false
     }
 }
