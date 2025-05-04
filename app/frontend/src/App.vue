@@ -7,6 +7,10 @@ const backendLoading = ref(true)
 
 import PulseSpinner from 'vue-spinner/src/PulseLoader.vue';
 
+// import cookie handler
+import { useCookies } from '@/assets/js/useCookies';
+const $cookies = useCookies(); 
+
 onMounted(async () => {
   while (backendLoading.value){
     try {
@@ -19,6 +23,19 @@ onMounted(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
+  try {
+    const response = await axios.get('user/profile/get')
+    console.log(response)
+    if(response.status === 200 && response.data.username !== 'anonymousUser'){
+      // Set user to be logged in
+      await $cookies.set('isLoggedIn', true, 0);
+      await $cookies.set('userParameters', response.data, 0);
+    }
+  } catch(error) {
+    // If User is not logged in clear the cookies
+    await $cookies.remove('isLoggedIn');
+    await $cookies.remove('userParameters');
+  };
 })
 </script>
 
