@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,7 @@ public class CompetitionScoringController {
         return response;
     }
 
+    @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/dashboard/competition/criteria")
     public ResponseEntity<?> getCompetitionScoringCriteria(@RequestParam Integer competition_id) {
         ResponseEntity<?> response = ResponseEntity.ok(competitionScoringService.getScoringCriteriaResultForCompetitors(competition_id));

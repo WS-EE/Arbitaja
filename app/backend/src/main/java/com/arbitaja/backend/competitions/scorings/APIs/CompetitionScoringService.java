@@ -90,20 +90,46 @@ public class CompetitionScoringService {
         throw new GlobalExceptionHandler.NotFoundException("Competitor not found");
     }
 
+    /**
+     * Finds the last result of every scoring criterion for a competitor in a competition.
+     *
+     * @param competition_id Id of the competition scoring history is being searched for
+     * @return ScoringCriteriaResultForCompetitors object containing the scoring history
+     */
     public ScoringCriteriaResultForCompetitors getScoringCriteriaResultForCompetitors(Integer competition_id) {
+        log.info("Fetching scoring criteria result for competitors in competition ID: " + competition_id);
+        // Get the competition and competitors
         Competition competition = getCompetition(competition_id);
+        // Set the competitors with the correct alias based on the public display name type
         Set<Competitor> competitors = setCompetitorAlias(competitorRepository.findByCompetitionId(competition_id));
-        Set<ScoringCriterion> scoringCriteria = scoringCriterionRepository.findByCompetitionId(competition_id);
         Set<ScoringCriteriaResultForCompetitors.Competitor> competitorsWithCriteria = new HashSet<>();
+        // Iterate over the competitors and get the scoring criteria result for each
         for (Competitor competitor : competitors) {
-            Set<ScoringCriteriaResultForCompetitors.Criteria> criteriaSet = new HashSet<>();
-            for (ScoringCriterion scoringCriterion : scoringCriteria) {
-                ScoringHistory scoringHistory = scoringHistoryRepository.findByCompetitionIdAndCompetitorIdAndCriteriaId(competition.getId(), competitor.getId(), scoringCriterion.getId());
-                criteriaSet.add(new ScoringCriteriaResultForCompetitors.Criteria(scoringHistory.getScoringCriteria().getId(), scoringHistory.getScoringCriteria().getName(), scoringHistory.getPointsGiven()));
-            }
-            competitorsWithCriteria.add(new ScoringCriteriaResultForCompetitors.Competitor(competitor.getId(), competitor.getAlias(), criteriaSet));
+            competitorsWithCriteria.add(getScoringCriteriaResultForCompetitor(competition_id, competitor.getId()));
         }
         return new ScoringCriteriaResultForCompetitors(competition.getId(), competition.getName(), competitorsWithCriteria);
+    }
+
+    /**
+     * Finds the last result of every scoring criterion for a competitor in a competition.
+     *
+     * @param competition_id Id of the competition scoring history is being searched for
+     * @param competitor_id Id of the competitor being searched for
+     * @return ScoringCriteriaResultForCompetitors.Competitor object containing the scoring history
+     */
+    public ScoringCriteriaResultForCompetitors.Competitor getScoringCriteriaResultForCompetitor(Integer competition_id, Integer competitor_id) {
+        log.info("Fetching scoring criteria result for competitor ID: " + competitor_id + " in competition ID: " + competition_id);
+        // Get the competitor
+        Competitor competitor = getCompetitor(competitor_id);
+        // Find the Scoring criteria for the competition
+        Set<ScoringCriterion> scoringCriteria = scoringCriterionRepository.findByCompetitionId(competition_id);
+        Set<ScoringCriteriaResultForCompetitors.Criteria> criteriaSet = new HashSet<>();
+        // Iterate over the scoring criteria and get the scoring history for each
+        for (ScoringCriterion scoringCriterion : scoringCriteria) {
+            ScoringHistory scoringHistory = scoringHistoryRepository.findByCompetitionIdAndCompetitorIdAndCriteriaId(competition_id, competitor.getId(), scoringCriterion.getId());
+            criteriaSet.add(new ScoringCriteriaResultForCompetitors.Criteria(scoringHistory.getScoringCriteria().getId(), scoringHistory.getScoringCriteria().getName(), scoringHistory.getPointsGiven()));
+        }
+        return new ScoringCriteriaResultForCompetitors.Competitor(competitor.getId(), competitor.getAlias(), criteriaSet);
     }
 
     /**
