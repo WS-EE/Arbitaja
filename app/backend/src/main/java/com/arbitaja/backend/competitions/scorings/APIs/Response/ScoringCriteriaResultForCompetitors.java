@@ -74,9 +74,9 @@ public class ScoringCriteriaResultForCompetitors {
     }
 
     public static class Criteria{
-        private static Integer id;
-        private static String name;
-        private static Double points;
+        private Integer id;
+        private String name;
+        private Double points;
 
         public Criteria(Integer id, String name, Double points) {
             this.id = id;
@@ -96,16 +96,16 @@ public class ScoringCriteriaResultForCompetitors {
             return points;
         }
 
-        public static void setId(Integer id) {
-            Criteria.id = id;
+        public void setId(Integer id) {
+            this.id = id;
         }
 
-        public static void setName(String name) {
-            Criteria.name = name;
+        public void setName(String name) {
+            this.name = name;
         }
 
-        public static void setPoints(Double points) {
-            Criteria.points = points;
+        public void setPoints(Double points) {
+            this.points = points;
         }
     }
 }

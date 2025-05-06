@@ -92,7 +92,6 @@ public class CompetitionScoringService {
 
     public ScoringCriteriaResultForCompetitors getScoringCriteriaResultForCompetitors(Integer competition_id) {
         Competition competition = getCompetition(competition_id);
-        Set<ScoringCriteriaResultForCompetitors> scoringCriteriaResultForCompetitors = new HashSet<>();
         Set<Competitor> competitors = setCompetitorAlias(competitorRepository.findByCompetitionId(competition_id));
         Set<ScoringCriterion> scoringCriteria = scoringCriterionRepository.findByCompetitionId(competition_id);
         Set<ScoringCriteriaResultForCompetitors.Competitor> competitorsWithCriteria = new HashSet<>();
