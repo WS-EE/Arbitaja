@@ -15,6 +15,9 @@ public interface ScoringHistoryRepository extends JpaRepository<ScoringHistory, 
     @Query("SELECT sh FROM ScoringHistory sh WHERE sh.competition.id = :competitionId AND sh.competitor.id = :competitorId AND sh.createdAt <= :scoreShowtime")
     Set<ScoringHistory> findByCompetitionIdAndCompetitorIdAndScoreShowtime(Integer competitionId, Integer competitorId, Timestamp scoreShowtime);
 
+    @Query("SELECT sh FROM ScoringHistory sh WHERE sh.competition.id = :competitionId AND sh.competitor.id = :competitorId AND sh.scoringCriteria.id = :criteriaId order by sh.createdAt desc limit 1")
+    ScoringHistory findByCompetitionIdAndCompetitorIdAndCriteriaId(Integer competitionId, Integer competitorId, Integer criteriaId);
+
     default Set<ScoringHistory> findByCompetitionIdAndCompetitorIdOrderedByCreatedAt(Integer competitionId, Integer competitorId, Timestamp scoreShowtime) {
         Set<ScoringHistory> scoringHistories = findByCompetitionIdAndCompetitorIdAndScoreShowtime(competitionId, competitorId, scoreShowtime);
         return new TreeSet<>(Comparator.comparing(ScoringHistory::getCreatedAt));

@@ -5,6 +5,7 @@ import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
 import com.arbitaja.backend.competitions.scorings.APIs.Response.CompetitionScoringResponse;
+import com.arbitaja.backend.competitions.scorings.APIs.Response.ScoringCriteriaResultForCompetitors;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringHistory;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringCriterionRepository;
@@ -89,6 +90,22 @@ public class CompetitionScoringService {
         throw new GlobalExceptionHandler.NotFoundException("Competitor not found");
     }
 
+    public ScoringCriteriaResultForCompetitors getScoringCriteriaResultForCompetitors(Integer competition_id) {
+        Competition competition = getCompetition(competition_id);
+        Set<ScoringCriteriaResultForCompetitors> scoringCriteriaResultForCompetitors = new HashSet<>();
+        Set<Competitor> competitors = setCompetitorAlias(competitorRepository.findByCompetitionId(competition_id));
+        Set<ScoringCriterion> scoringCriteria = scoringCriterionRepository.findByCompetitionId(competition_id);
+        Set<ScoringCriteriaResultForCompetitors.Competitor> competitorsWithCriteria = new HashSet<>();
+        for (Competitor competitor : competitors) {
+            Set<ScoringCriteriaResultForCompetitors.Criteria> criteriaSet = new HashSet<>();
+            for (ScoringCriterion scoringCriterion : scoringCriteria) {
+                ScoringHistory scoringHistory = scoringHistoryRepository.findByCompetitionIdAndCompetitorIdAndCriteriaId(competition.getId(), competitor.getId(), scoringCriterion.getId());
+                criteriaSet.add(new ScoringCriteriaResultForCompetitors.Criteria(scoringHistory.getScoringCriteria().getId(), scoringHistory.getScoringCriteria().getName(), scoringHistory.getPointsGiven()));
+            }
+            competitorsWithCriteria.add(new ScoringCriteriaResultForCompetitors.Competitor(competitor.getId(), competitor.getAlias(), criteriaSet));
+        }
+        return new ScoringCriteriaResultForCompetitors(competition.getId(), competition.getName(), competitorsWithCriteria);
+    }
 
     /**
      * Adds a new scoring history entry for a competitor in a competition.

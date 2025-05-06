@@ -33,4 +33,11 @@ public class CompetitionScoringController {
         log.info("Sending response for competition scoring history: {}", response);
         return response;
     }
+
+    @GetMapping("/dashboard/competition/criteria")
+    public ResponseEntity<?> getCompetitionScoringCriteria(@RequestParam Integer competition_id) {
+        ResponseEntity<?> response = ResponseEntity.ok(competitionScoringService.getScoringCriteriaResultForCompetitors(competition_id));
+        log.info("Sending response for competition scoring criteria: {}", response);
+        return response;
+    }
 }
