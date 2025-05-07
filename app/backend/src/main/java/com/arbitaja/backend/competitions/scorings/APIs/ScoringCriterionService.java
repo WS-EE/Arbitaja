@@ -78,7 +78,7 @@ public class ScoringCriterionService {
         // Create a new ScoringCriterion object
         ScoringCriterion newScoringCriterion = new ScoringCriterion(scoringCriterion);
         // Set the criteria template
-        newScoringCriterion.setCriteriaTemplate(getScoringCriterion(scoringCriterion.getCriteriaTemplate()));
+        newScoringCriterion.setCriteriaTemplate(scoringCriterion.getCriteriaTemplate() == null ? null : getScoringCriterion(scoringCriterion.getCriteriaTemplate()));
         scoringCriterionRepository.save(newScoringCriterion);
         // If competition ID is provided, save the CompetitionScoringCriterion
         if(scoringCriterion.getCompetitionId() != null) {
