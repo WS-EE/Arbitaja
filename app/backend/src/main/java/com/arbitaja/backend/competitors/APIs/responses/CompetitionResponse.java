@@ -149,6 +149,15 @@ public class CompetitionResponse {
         public void setUsername(String username) {
             this.username = username;
         }
+
+        @Override
+        public String toString() {
+            return "Organizer_idResp{" +
+                    "user_id=" + user_id +
+                    ", full_name='" + full_name + '\'' +
+                    ", username='" + username + '\'' +
+                    '}';
+        }
     }
 
     public static class CompetitorResp{
@@ -187,6 +196,15 @@ public class CompetitionResponse {
 
         public void setAlias(String alias) {
             this.alias = alias;
+        }
+
+        @Override
+        public String toString() {
+            return "CompetitorResp{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", alias='" + alias + '\'' +
+                    '}';
         }
     }
     public static class Scoring_groups_structure_resp{
@@ -264,5 +282,33 @@ public class CompetitionResponse {
         public void setDynamic_variables(Map<String, ?> dynamic_variables) {
             this.dynamic_variables = dynamic_variables;
         }
+
+        @Override
+        public String toString() {
+            return "Scoring_groups_structure_resp{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", description='" + description + '\'' +
+                    ", competitor_id=" + competitor_id +
+                    ", scoring_parent_group_id=" + scoring_parent_group_id +
+                    ", structure_group_type=" + structure_group_type +
+                    ", dynamic_variables=" + dynamic_variables +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "CompetitionResponse{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", start_time=" + start_time +
+                ", end_time=" + end_time +
+                ", organizer_id=" + organizer_id +
+                ", score_showtime=" + score_showtime +
+                ", competitors=" + competitors +
+                ", scoring_groups=" + scoring_groups +
+                ", publish_scores=" + publish_scores +
+                '}';
     }
 }
