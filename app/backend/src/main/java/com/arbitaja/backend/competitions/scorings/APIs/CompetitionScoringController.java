@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,11 +34,20 @@ public class CompetitionScoringController {
         return response;
     }
 
-    @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/dashboard/competition/criteria")
     public ResponseEntity<?> getCompetitionScoringCriteria(@RequestParam Integer competition_id) {
+        competitionScoringService.checkIfHasAccessToScoring(competition_id, SecurityContextHolder.getContext().getAuthentication());
         ResponseEntity<?> response = ResponseEntity.ok(competitionScoringService.getScoringCriteriaResultForCompetitors(competition_id));
         log.info("Sending response for competition scoring criteria: {}", response);
+        return response;
+    }
+
+    @GetMapping("/dashboard/competition/criteria/competitor")
+    public ResponseEntity<?> getCompetitionScoringCriteriaForCompetitor(@RequestParam Integer competition_id, @RequestParam Integer competitor_id) {
+        log.info("Fetching scoring criteria for competitor with ID: {}", competitor_id);
+        competitionScoringService.checkIfHasAccessToScoring(competition_id, SecurityContextHolder.getContext().getAuthentication());
+        ResponseEntity<?> response = ResponseEntity.ok(competitionScoringService.getScoringCriteriaResultForCompetitor(competition_id, competitor_id));
+        log.info("Sending response for competition scoring criteria for competitor: {}", response);
         return response;
     }
 }

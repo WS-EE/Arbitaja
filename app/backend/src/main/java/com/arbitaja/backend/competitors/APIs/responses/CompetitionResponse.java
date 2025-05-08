@@ -24,10 +24,12 @@ public class CompetitionResponse {
     private Set<CompetitorResp> competitors;
     @Schema(description = "Competitors of the competition")
     private Set<Scoring_groups_structure_resp> scoring_groups;
+    @Schema(description = "Are scores published")
+    private Boolean publish_scores;
 
     public CompetitionResponse() {
     }
-    public CompetitionResponse(Integer id, String name, Timestamp start_time, Timestamp end_time, Organizer_idResp organizer_id, Set<CompetitorResp> competitors, Timestamp score_showtime, Set<Scoring_groups_structure_resp> scoring_groups) {
+    public CompetitionResponse(Integer id, String name, Timestamp start_time, Timestamp end_time, Organizer_idResp organizer_id, Set<CompetitorResp> competitors, Timestamp score_showtime, Set<Scoring_groups_structure_resp> scoring_groups, Boolean publish_scores) {
         this.id = id;
         this.name = name;
         this.start_time = start_time;
@@ -36,6 +38,7 @@ public class CompetitionResponse {
         this.competitors = competitors;
         this.score_showtime = score_showtime;
         this.scoring_groups = scoring_groups;
+        this.publish_scores = publish_scores;
     }
 
     public Integer getId() {
@@ -92,6 +95,14 @@ public class CompetitionResponse {
 
     public Timestamp getScore_showtime() {
         return score_showtime;
+    }
+
+    public Boolean getPublish_scores() {
+        return publish_scores;
+    }
+
+    public void setPublish_scores(Boolean publish_scores) {
+        this.publish_scores = publish_scores;
     }
 
     public void setScore_showtime(Timestamp score_showtime) {

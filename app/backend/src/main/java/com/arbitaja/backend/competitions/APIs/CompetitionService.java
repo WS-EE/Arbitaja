@@ -137,6 +137,7 @@ public class CompetitionService {
         updatedCompetition.setStart_time(competition.getStart_time());
         updatedCompetition.setEnd_time(competition.getEnd_time());
         updatedCompetition.setScore_showtime(competition.getScore_showtime());
+        updatedCompetition.setPublish_scores(competition.getPublish_scores());
         competitionRepository.save(updatedCompetition);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("success", "Competition updated"));
     }
@@ -245,7 +246,8 @@ public class CompetitionService {
                         setCompetitors(competition),
                         competition.getScore_showtime(),
                         // calls out to setScoring_groups_structure_resp method and sets the scoring groups structure for all scoring groups in the competition
-                        setScoring_groups_structure_resp(competition));
+                        setScoring_groups_structure_resp(competition),
+                        competition.getPublish_scores());
     }
 
     /**

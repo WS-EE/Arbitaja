@@ -119,6 +119,8 @@ public class CompetitionScoringService {
      */
     public ScoringCriteriaResultForCompetitors.Competitor getScoringCriteriaResultForCompetitor(Integer competition_id, Integer competitor_id) {
         log.info("Fetching scoring criteria result for competitor ID: " + competitor_id + " in competition ID: " + competition_id);
+        // Get the competition
+        Competition competition = getCompetition(competition_id);
         // Get the competitor
         Competitor competitor = getCompetitor(competitor_id);
         // Find the Scoring criteria for the competition
@@ -127,6 +129,10 @@ public class CompetitionScoringService {
         // Iterate over the scoring criteria and get the scoring history for each
         for (ScoringCriterion scoringCriterion : scoringCriteria) {
             ScoringHistory scoringHistory = scoringHistoryRepository.findByCompetitionIdAndCompetitorIdAndCriteriaId(competition_id, competitor.getId(), scoringCriterion.getId());
+            // If the scoring history is not found, set the points to 0.0
+            if (scoringHistory == null) {
+                scoringHistory = new ScoringHistory(competitor, competition, scoringCriterion, 0.0, null);
+            }
             criteriaSet.add(new ScoringCriteriaResultForCompetitors.Criteria(scoringHistory.getScoringCriteria().getId(), scoringHistory.getScoringCriteria().getName(), scoringHistory.getPointsGiven()));
         }
         return new ScoringCriteriaResultForCompetitors.Competitor(competitor.getId(), competitor.getAlias(), criteriaSet);
@@ -284,5 +290,21 @@ public class CompetitionScoringService {
             competitorsWithCorrectName.add(newCompetitor);
         }
         return competitorsWithCorrectName;
+    }
+
+    /**
+     * Checks if the scoring is published for a competition or if the user is an admin.
+     *
+     * @param competition_id Id of the competition being checked
+     * @param auth Authentication object containing the user information who made the request
+     */
+    public void checkIfHasAccessToScoring(Integer competition_id, Authentication auth) {
+        log.info("Checking if scoring is published for competition ID: " + competition_id);
+        // Get the competition
+        Competition competition = getCompetition(competition_id);
+        // Check if the competition is active or if the user is an admin
+        if(!competition.getPublish_scores() && (auth == null || !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")))) {
+            throw new IllegalArgumentException("Scores are not published yet");
+        }
     }
 }
