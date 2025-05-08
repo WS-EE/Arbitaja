@@ -304,7 +304,7 @@ public class CompetitionScoringService {
         Competition competition = getCompetition(competition_id);
         // Check if the competition is active or if the user is an admin
         if(!competition.getPublish_scores() && (auth == null || !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")))) {
-            throw new IllegalArgumentException("Scores are not published yet");
+            throw new GlobalExceptionHandler.UnauthorizedException("Scores are not published yet");
         }
     }
 }
