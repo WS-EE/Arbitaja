@@ -150,7 +150,7 @@ function showAlert(message, type, timeout){
             <tr v-for="(competitor, index) in sortedComptitors">
                 <th scope="row">{{ index + 1 }}</th>
                 <td>{{ competitor.name }}</td>
-                <td>{{ competitor.total_score }}</td>
+                <td>{{ ''+competitor.total_score }}</td>
             </tr>
         </tbody>
     </table>
