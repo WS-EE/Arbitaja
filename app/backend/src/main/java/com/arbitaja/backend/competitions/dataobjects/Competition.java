@@ -42,6 +42,10 @@ public class Competition {
     @Schema(description = "End time of the competition", example = "17:00:00")
     private Timestamp score_showtime;
 
+    @Column(name = "publish_scores")
+    @Schema(description = "Flag to publish scores", example = "true")
+    private Boolean publish_scores;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organizer_id")
     @Schema(description = "Details of the competition organizer")
@@ -125,6 +129,14 @@ public class Competition {
 
     public void setOrganizer_id(User organizer_id) {
         this.organizer_id = organizer_id;
+    }
+
+    public Boolean getPublish_scores() {
+        return publish_scores;
+    }
+
+    public void setPublish_scores(Boolean publish_scores) {
+        this.publish_scores = publish_scores;
     }
 
     public List<Competitor_competition> getCompetitorCompetitions() {

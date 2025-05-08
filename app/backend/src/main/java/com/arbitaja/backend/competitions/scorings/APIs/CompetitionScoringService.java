@@ -5,8 +5,10 @@ import com.arbitaja.backend.GlobalExceptionHandler;
 import com.arbitaja.backend.competitions.dataobjects.Competition;
 import com.arbitaja.backend.competitions.repositories.CompetitionRepository;
 import com.arbitaja.backend.competitions.scorings.APIs.Response.CompetitionScoringResponse;
+import com.arbitaja.backend.competitions.scorings.APIs.Response.ScoringCriteriaResultForCompetitors;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringHistory;
+import com.arbitaja.backend.competitions.scorings.repositories.CompetitionScoringCriterionRepository;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringCriterionRepository;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringHistoryRepository;
 import com.arbitaja.backend.competitors.dataobjects.Competitor;
@@ -37,6 +39,8 @@ public class CompetitionScoringService {
     private ScoringCriterionRepository scoringCriterionRepository;
     @Autowired
     private ScoringHistoryRepository scoringHistoryRepository;
+    @Autowired
+    private CompetitionScoringCriterionRepository competitionScoringCriterionRepository;
 
     /**
      * Finds a competition by its Id.
@@ -89,6 +93,53 @@ public class CompetitionScoringService {
         throw new GlobalExceptionHandler.NotFoundException("Competitor not found");
     }
 
+    /**
+     * Finds the last result of every scoring criterion for a competitor in a competition.
+     *
+     * @param competition_id Id of the competition scoring history is being searched for
+     * @return ScoringCriteriaResultForCompetitors object containing the scoring history
+     */
+    public ScoringCriteriaResultForCompetitors getScoringCriteriaResultForCompetitors(Integer competition_id) {
+        log.info("Fetching scoring criteria result for competitors in competition ID: " + competition_id);
+        // Get the competition and competitors
+        Competition competition = getCompetition(competition_id);
+        // Set the competitors with the correct alias based on the public display name type
+        Set<Competitor> competitors = setCompetitorAlias(competitorRepository.findByCompetitionId(competition_id));
+        Set<ScoringCriteriaResultForCompetitors.Competitor> competitorsWithCriteria = new HashSet<>();
+        // Iterate over the competitors and get the scoring criteria result for each
+        for (Competitor competitor : competitors) {
+            competitorsWithCriteria.add(getScoringCriteriaResultForCompetitor(competition_id, competitor.getId()));
+        }
+        return new ScoringCriteriaResultForCompetitors(competition.getId(), competition.getName(), competitorsWithCriteria);
+    }
+
+    /**
+     * Finds the last result of every scoring criterion for a competitor in a competition.
+     *
+     * @param competition_id Id of the competition scoring history is being searched for
+     * @param competitor_id Id of the competitor being searched for
+     * @return ScoringCriteriaResultForCompetitors.Competitor object containing the scoring history
+     */
+    public ScoringCriteriaResultForCompetitors.Competitor getScoringCriteriaResultForCompetitor(Integer competition_id, Integer competitor_id) {
+        log.info("Fetching scoring criteria result for competitor ID: " + competitor_id + " in competition ID: " + competition_id);
+        // Get the competition
+        Competition competition = getCompetition(competition_id);
+        // Get the competitor
+        Competitor competitor = getCompetitor(competitor_id);
+        // Find the Scoring criteria for the competition
+        Set<ScoringCriterion> scoringCriteria = competitionScoringCriterionRepository.findAllByCompetitionId(competition_id);
+        Set<ScoringCriteriaResultForCompetitors.Criteria> criteriaSet = new HashSet<>();
+        // Iterate over the scoring criteria and get the scoring history for each
+        for (ScoringCriterion scoringCriterion : scoringCriteria) {
+            ScoringHistory scoringHistory = scoringHistoryRepository.findByCompetitionIdAndCompetitorIdAndCriteriaId(competition_id, competitor.getId(), scoringCriterion.getId());
+            // If the scoring history is not found, set the points to 0.0
+            if (scoringHistory == null) {
+                scoringHistory = new ScoringHistory(competitor, competition, scoringCriterion, 0.0, null);
+            }
+            criteriaSet.add(new ScoringCriteriaResultForCompetitors.Criteria(scoringHistory.getScoringCriteria().getId(), scoringHistory.getScoringCriteria().getName(), scoringHistory.getPointsGiven()));
+        }
+        return new ScoringCriteriaResultForCompetitors.Competitor(competitor.getId(), competitor.getAlias(), criteriaSet);
+    }
 
     /**
      * Adds a new scoring history entry for a competitor in a competition.
@@ -242,5 +293,21 @@ public class CompetitionScoringService {
             competitorsWithCorrectName.add(newCompetitor);
         }
         return competitorsWithCorrectName;
+    }
+
+    /**
+     * Checks if the scoring is published for a competition or if the user is an admin.
+     *
+     * @param competition_id Id of the competition being checked
+     * @param auth Authentication object containing the user information who made the request
+     */
+    public void checkIfHasAccessToScoring(Integer competition_id, Authentication auth) {
+        log.info("Checking if scoring is published for competition ID: " + competition_id);
+        // Get the competition
+        Competition competition = getCompetition(competition_id);
+        // Check if the competition is active or if the user is an admin
+        if(!competition.getPublish_scores() && (auth == null || !auth.getAuthorities().contains(new SimpleGrantedAuthority("admin")))) {
+            throw new GlobalExceptionHandler.UnauthorizedException("Scores are not published yet");
+        }
     }
 }
