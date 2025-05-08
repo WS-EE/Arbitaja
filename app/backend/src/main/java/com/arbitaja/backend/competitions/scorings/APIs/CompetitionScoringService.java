@@ -8,6 +8,7 @@ import com.arbitaja.backend.competitions.scorings.APIs.Response.CompetitionScori
 import com.arbitaja.backend.competitions.scorings.APIs.Response.ScoringCriteriaResultForCompetitors;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringHistory;
+import com.arbitaja.backend.competitions.scorings.repositories.CompetitionScoringCriterionRepository;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringCriterionRepository;
 import com.arbitaja.backend.competitions.scorings.repositories.ScoringHistoryRepository;
 import com.arbitaja.backend.competitors.dataobjects.Competitor;
@@ -38,6 +39,8 @@ public class CompetitionScoringService {
     private ScoringCriterionRepository scoringCriterionRepository;
     @Autowired
     private ScoringHistoryRepository scoringHistoryRepository;
+    @Autowired
+    private CompetitionScoringCriterionRepository competitionScoringCriterionRepository;
 
     /**
      * Finds a competition by its Id.
@@ -124,7 +127,7 @@ public class CompetitionScoringService {
         // Get the competitor
         Competitor competitor = getCompetitor(competitor_id);
         // Find the Scoring criteria for the competition
-        Set<ScoringCriterion> scoringCriteria = scoringCriterionRepository.findByCompetitionId(competition_id);
+        Set<ScoringCriterion> scoringCriteria = competitionScoringCriterionRepository.findAllByCompetitionId(competition_id);
         Set<ScoringCriteriaResultForCompetitors.Criteria> criteriaSet = new HashSet<>();
         // Iterate over the scoring criteria and get the scoring history for each
         for (ScoringCriterion scoringCriterion : scoringCriteria) {
