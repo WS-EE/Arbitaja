@@ -56,7 +56,6 @@ const removeCompetitor = async(competitorId, competitorName) => {
     } catch (error) {
         // On error show error
         showAlert('Competitor name ' + competitorName + ' couldn\'t be removed. Error: ' + error + '<br>' + error.response.data.error , 'danger', 9000)
-        console.log(error)
     }
 }
 

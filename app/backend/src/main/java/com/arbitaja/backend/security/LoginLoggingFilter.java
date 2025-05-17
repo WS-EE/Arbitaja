@@ -24,7 +24,7 @@ public class LoginLoggingFilter extends OncePerRequestFilter {
         if ("/login-user".equals(request.getRequestURI()) && "POST".equals(request.getMethod())) {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
-            logger.info("Login attempt with username: " + username + " and password: " + password);
+            logger.info("Login attempt with username: {} and password: {}", username, password);
         }
 
         filterChain.doFilter(request, response);

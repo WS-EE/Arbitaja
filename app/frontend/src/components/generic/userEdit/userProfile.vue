@@ -112,7 +112,6 @@ const saveProfile = (async () =>{
         }
     } catch (error) {
         showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to save changes!</strong></h4><hr><p class=mb-0>Error: ' + error + '</p><p class=mb-0>For more information check console log.</p>', 'danger', 6000)
-        console.log(error)
     }
 });
 function discardChanges(){
@@ -152,6 +151,9 @@ function showAlert(message, type, timeout){
     alertType.value = type
     alertTimeout.value = timeout
 }
+
+// Import password reset
+import changePassword from './changePassword.vue';
 
 </script>
 
@@ -224,6 +226,15 @@ function showAlert(message, type, timeout){
                             </li>
                         </ul>
                     </div>
+                </div>
+            </div>
+            <!-- Password Reset -->
+            <div class="row pt-3">
+                <div class="col">
+                    <p>Password</p>
+                </div>
+                <div class="col">
+                    <changePassword :isAdmin="props.isAdmin" :userId="userid"/>
                 </div>
             </div>
 

@@ -11,7 +11,7 @@ const isLoading = ref(true)
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Get the user we want to edit
-import userProfile from '@/components/generic/userProfile.vue';
+import userProfile from '@/components/generic/userEdit/userProfile.vue';
 import axios from 'axios';
 const user = ref([])
 

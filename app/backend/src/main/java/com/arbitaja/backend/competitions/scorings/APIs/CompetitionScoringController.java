@@ -33,4 +33,21 @@ public class CompetitionScoringController {
         log.info("Sending response for competition scoring history: {}", response);
         return response;
     }
+
+    @GetMapping("/dashboard/competition/criteria")
+    public ResponseEntity<?> getCompetitionScoringCriteria(@RequestParam Integer competition_id) {
+        competitionScoringService.checkIfHasAccessToScoring(competition_id, SecurityContextHolder.getContext().getAuthentication());
+        ResponseEntity<?> response = ResponseEntity.ok(competitionScoringService.getScoringCriteriaResultForCompetitors(competition_id));
+        log.info("Sending response for competition scoring criteria: {}", response);
+        return response;
+    }
+
+    @GetMapping("/dashboard/competition/criteria/competitor")
+    public ResponseEntity<?> getCompetitionScoringCriteriaForCompetitor(@RequestParam Integer competition_id, @RequestParam Integer competitor_id) {
+        log.info("Fetching scoring criteria for competitor with ID: {}", competitor_id);
+        competitionScoringService.checkIfHasAccessToScoring(competition_id, SecurityContextHolder.getContext().getAuthentication());
+        ResponseEntity<?> response = ResponseEntity.ok(competitionScoringService.getScoringCriteriaResultForCompetitor(competition_id, competitor_id));
+        log.info("Sending response for competition scoring criteria for competitor: {}", response);
+        return response;
+    }
 }

@@ -62,7 +62,8 @@ CREATE TABLE "competition" (
   "scoring_criteria_group_main_id" integer,
   "start_time" timestamp,
   "end_time" timestamp,
-  "score_showtime" timestamp
+  "score_showtime" timestamp,
+  "publish_scores" bool
 );
 
 CREATE TABLE "competitor" (

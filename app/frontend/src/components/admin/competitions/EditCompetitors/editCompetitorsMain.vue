@@ -9,6 +9,7 @@ import router from '@/router';
 // Import components
 import addCompetitor from '@/components/admin/competitions/EditCompetitors/addEditCompetitor.vue';
 import competitorTable from './competitorTable.vue';
+import addExistingCompetitor from './addExistingCompetitor.vue';
 
 // Import displayalert
 // Alert function
@@ -119,7 +120,12 @@ const onTableChanged = () => {
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
                     @addItem="onAddCompetitor()"
                 />
-                
+                <addExistingCompetitor
+                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
+                    :competitionId="competition_id"
+                    :existingCompetitors="competitors"
+                    @competitorAdd="onAddCompetitor()"
+                />
             </div>
             <div v-if="isLoadingcompetitors" class="position-absolute top-50 start-50">
                 <PulseLoader />

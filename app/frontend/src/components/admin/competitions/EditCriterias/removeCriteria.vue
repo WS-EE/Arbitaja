@@ -53,7 +53,6 @@ const removeCompetitor = async(criteriaId, criteriaName) => {
     } catch (error) {
         // On error show error
         showAlert('Criteria name ' + criteriaName + ' couldn\'t be removed. Error: ' + error + '<br>' + error.response.data.error , 'danger', 9000)
-        console.log(error)
     }
 }
 

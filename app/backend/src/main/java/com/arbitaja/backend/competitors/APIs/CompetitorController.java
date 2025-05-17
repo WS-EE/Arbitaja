@@ -136,11 +136,8 @@ public class CompetitorController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> getCompetitor(@RequestParam(required = false) Integer id, @RequestParam(required = false) String alias) throws JsonProcessingException {
-        ResponseEntity<?> resp;
-        if (id != null) resp = competitorService.getCompetitor(id);
-        else if (alias != null) resp = competitorService.getCompetitor(alias);
-        else throw new IllegalArgumentException("required parameters not given");
+    public ResponseEntity<?> getCompetitor(@RequestParam Integer id) throws JsonProcessingException {
+        ResponseEntity<?> resp = competitorService.getCompetitor(id);
         log.info("Sending Response for competitor: {}", objectMapper.writeValueAsString(resp));
         return resp;
     }

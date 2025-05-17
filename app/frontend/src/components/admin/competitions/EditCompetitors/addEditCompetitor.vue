@@ -139,7 +139,6 @@ const createCompetitor = async(newPersonalData, linkedPersonalDataId) => {
         }
     } catch(e) {
         showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e.response.data.error, 'danger', 9000)
-        console.log(e)
     }
 }
 

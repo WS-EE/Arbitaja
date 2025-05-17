@@ -1,5 +1,5 @@
 <script setup>
-import userProfile from '@/components/generic/userProfile.vue';
+import userProfile from '@/components/generic/userEdit/userProfile.vue';
 
 import { onMounted, ref } from 'vue';
 
