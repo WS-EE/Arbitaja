@@ -21,7 +21,7 @@ const app = createApp(App);
 app.use(VueCookies, { expires: '7d'}, PrimeVue);
 
 // Set arbitaja version
-app.config.globalProperties.$arbitajaVersion = "devel"
+app.config.globalProperties.$arbitajaVersion = "devel-build"
 
 // Set copyright Header to use
 app.config.globalProperties.$copyrightHeader = "Copyright (c) 2025 WorldSkills Estonia"
