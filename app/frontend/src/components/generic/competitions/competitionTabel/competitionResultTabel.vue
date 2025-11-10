@@ -151,7 +151,7 @@ import competitionCollapse from './competitionCollapse.vue';
         </thead>
         <tbody>
             <tr v-for="(competitor, index) in sortedComptitors">
-                <competitionCollapse :competitionId="competitionId" :competitor="competitor" :index="index"/>
+                <competitionCollapse :competitionId="competitionId" :competitor="competitor" :index="index" @showAlert="showAlert"/>
             </tr>
         </tbody>
     </table>

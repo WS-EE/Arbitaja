@@ -4,6 +4,9 @@ import { ref, defineProps } from 'vue';
 import axios from 'axios';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
+// Emit an error to parent alert
+const emit = defineEmits(['showAlert'])
+
 const isShow = ref(false);
 const isLoadingResults = ref(true);
 const results = ref([]);
@@ -23,7 +26,7 @@ const props = defineProps({
     },
 })
 
-const getCompetitorDetailedResults = async(competition_id, competitor_id) => {
+const getCompetitorDetailedResults = async(competition_id, competitor) => {
     try {
         // Set Loading value to true
         isLoadingResults.value = true
@@ -34,7 +37,7 @@ const getCompetitorDetailedResults = async(competition_id, competitor_id) => {
             { 
                 params: {
                     competition_id: ''+competition_id,
-                    competitor_id: ''+competitor_id
+                    competitor_id: ''+competitor.id
                 }
             }
         )
@@ -44,7 +47,7 @@ const getCompetitorDetailedResults = async(competition_id, competitor_id) => {
         console.log(results.value)
 
     } catch (error) {
-        showAlert('Couldn\'t get competitors for the user tabel. Error:' + error, 'warning')
+        showAlert('Couldn\'t get criteria restults for the competitor: "'+ competitor.name +'". Error:' + error, 'warning')
     } finally {
         isLoadingResults.value = false
     }
@@ -52,21 +55,13 @@ const getCompetitorDetailedResults = async(competition_id, competitor_id) => {
 
 
 // Alert function
-const alertTimeout = ref(3000)
-const alertMessage = ref('')
-const alertType = ref('')
-
-import displayAlert from '@/components/generic/displayAlert.vue';
-
 function showAlert(message, type, timeout){
-    alertMessage.value = message
-    alertType.value = type
-    alertTimeout.value = timeout
+    emit('showAlert', message, type, timeout)
 }
 
 const openCollapse = (competitor) => {
     isShow.value = !isShow.value
-    getCompetitorDetailedResults(props.competitionId, competitor.id)
+    getCompetitorDetailedResults(props.competitionId, competitor)
 }
 
 </script>
@@ -115,6 +110,5 @@ const openCollapse = (competitor) => {
         <button v-if="isShow" class="btn bi bi-caret-up-fill" @click="isShow = !isShow"></button>
         <button v-if="!isShow" class="btn bi bi-caret-down-fill" @click="openCollapse(competitor)"></button>
     </td>
-    <!-- Alert when needed -->
-    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+    
 </template>
