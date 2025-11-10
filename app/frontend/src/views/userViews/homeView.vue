@@ -21,6 +21,9 @@ onMounted(async () => {
     }
 })
 
+// Import dashboard for competitions
+import allcompetition from '@/components/generic/competitions/allCompetitions.vue';
+
 </script>
 
 <template>
@@ -32,12 +35,12 @@ onMounted(async () => {
         </div>
         <!-- When user is logged in -->
         <div v-if="isLoggedIn">
-            <h1>Welcome {{ displayUsername }}!</h1>
+            <h1>Welcome Arbitaja!</h1>
+            <p>Hello {{ displayUsername }}!</p>
             <p>You have logged in!</p>
-        </div>    
+        </div>
     </div>
-    <div class="container p-3">
-    </div>
+    <allcompetition />
 </template>
 
 <style scoped>
