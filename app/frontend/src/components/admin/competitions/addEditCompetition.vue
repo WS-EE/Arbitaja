@@ -93,6 +93,10 @@ const getCompetitionById = async(id) => {
             score_showtime.value = DateTime.fromISO(competition.value.score_showtime, { zone: "utc" })
                 .setZone(DateTime.local().zoneName)
                 .toFormat("yyyy-MM-dd'T'HH:mm");
+            
+            // Get competition criteria
+            getCriteriasByCompetition(competition_id);
+            getCompetitorsByCompetition(competition_id);
         }
         
         if (props.isEdit === false){
@@ -155,8 +159,6 @@ const getCompetitorsByCompetition = async(competitionId) => {
 // actions on mount
 onMounted(async () => {
     getCompetitionById(competition_id);
-    getCriteriasByCompetition(competition_id);
-    getCompetitorsByCompetition(competition_id)
 })
 
 // Change organizer
@@ -166,7 +168,7 @@ const setOrganizer = (user) => {
 
 // discard change and reload the competition values again
 const discardChanges = async() => {
-    getCompetition();
+    getCompetitionById(competition_id);
 }
 
 // Add/Save function
@@ -198,7 +200,7 @@ const saveComp = async() => {
         await showAlert('Succesfully saved', 'success')
     } catch(error) {
         // Throw console log error if fail
-        showAlert('Something went wrong while saveing.', 'danger')
+        showAlert('Something went wrong while saveing.<br>' + error.response.data.message, 'danger')
     }
 }
 
@@ -312,29 +314,26 @@ const saveComp = async() => {
             </div>
         </div>
         <!-- Competitors -->
-        <h5 class="pt-3">Competitors</h5>
         <div class="row pt-3" v-if="isEdit">
             <div class="col">
-                <label></label>
+                <h5 class="">Competitors</h5>
             </div>
             <div class="col">
                 <!-- Horizontal under breakpoint -->
-                <ul class="list-group list-group-horizontal">
-                    <RouterLink :to="'/admin/competition/edit/competitors/' + competition.id" class="btn btn-outline-dark me-1">Edit Competitors</RouterLink>
-                </ul>       
+                <RouterLink :to="'/admin/competition/edit/competitors/' + competition.id" class="btn btn-outline-dark">Edit Competitors</RouterLink>
             </div>
             <competitorTable :competitors="competitors" :addActions="false"/>
         </div>
         <!-- Criterias -->
-        <h5 class="pt-3">Criteria</h5>
+        
         <div class="row pt-3" v-if="isEdit">
-            <div class="col">
-                <label></label>
+            <div class="col justify-content-center">
+                <h5 >Criteria</h5>
             </div>
             <div class="col">
                 <!-- Horizontal under breakpoint -->
                 <ul class="list-group list-group-horizontal">
-                    <RouterLink :to="'/admin/competition/edit/criterias/' + competition.id" class="btn btn-outline-dark me-1">Edit Criteria</RouterLink>
+                    <RouterLink :to="'/admin/competition/edit/criterias/' + competition.id" class="btn btn-outline-dark">Edit Criteria</RouterLink>
                 </ul>       
             </div>
             <CriteriaTabel :criterias="criterias" :competitionId="competition.id"/>
@@ -344,7 +343,7 @@ const saveComp = async() => {
     <!-- Action Buttons -->
     <div class="container d-flex justify-content-end align-items-end pt-3 pb-3">
         <button @click.prevent="saveComp()" class="btn btn-success me-3">Save<i class="ms-1 bi bi-floppy"></i></button>
-        <button @click="getCompetitionById(competition_id)" class="btn btn-outline-danger me-3">Discard<i class="ms-1 bi bi-trash"></i></button>
+        <button @click="discardChanges()" class="btn btn-outline-danger me-3">Discard<i class="ms-1 bi bi-trash"></i></button>
         <button @click="router.back()" class="btn btn-outline-dark me-3">Go Back</button>
     </div>
 </template>

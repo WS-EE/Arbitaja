@@ -56,11 +56,6 @@ const router = createRouter({
                     component: userProfileView
                 },
                 {
-                    path: '/competitions',
-                    name: 'userCompetitions',
-                    component: allCompetitions
-                },
-                {
                     path: '/competition/:id',
                     name: 'userCompetitionShow',
                     component: competitionShow

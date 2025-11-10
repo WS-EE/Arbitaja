@@ -26,11 +26,11 @@ onMounted(async () => {
     isUserAdmin.value = await checkUserAdmin();
 
     if (!isUserAdmin.value) {
-        await router.replace('/login');
+        await router.replace('/404');
     }
 
   } catch(error) {
-    await router.replace('/login');
+    await router.replace('/404');
   };
 });
 
