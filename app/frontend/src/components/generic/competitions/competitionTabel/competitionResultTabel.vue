@@ -130,6 +130,8 @@ function showAlert(message, type, timeout){
     alertTimeout.value = timeout
 }
 
+import competitionCollapse from './competitionCollapse.vue';
+
 </script>
 
 <template>
@@ -145,12 +147,11 @@ function showAlert(message, type, timeout){
             <th scope="col">#</th>
             <th scope="col">Name</th>
             <th scope="col">Total Points</th>
+            <th scope="col">Show Details</th>
         </thead>
         <tbody>
             <tr v-for="(competitor, index) in sortedComptitors">
-                <th scope="row">{{ index + 1 }}</th>
-                <td>{{ competitor.name }}</td>
-                <td>{{ competitor.total_score }}</td>
+                <competitionCollapse :competitionId="competitionId" :competitor="competitor" :index="index" @showAlert="showAlert"/>
             </tr>
         </tbody>
     </table>

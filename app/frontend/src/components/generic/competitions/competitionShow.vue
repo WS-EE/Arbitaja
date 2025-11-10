@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 import competitionChartResults from './competitionChartResults.vue';
-import competitionResultTabel from './competitionResultTabel.vue';
+import competitionResultTabel from './competitionTabel/competitionResultTabel.vue';
 
 const route = useRoute();
 

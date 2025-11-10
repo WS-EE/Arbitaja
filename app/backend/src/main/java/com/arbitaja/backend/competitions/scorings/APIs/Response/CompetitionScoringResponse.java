@@ -25,14 +25,24 @@ public class CompetitionScoringResponse {
     }
 
     public static class Competitor {
+        private Integer id;
         private String name;
         private Double total_score;
         private List<Result> results;
 
-        public Competitor(String name, Double total_score, List<Result> results) {
+        public Competitor(Integer id, String name, Double total_score, List<Result> results) {
+            this.id = id;
             this.name = name;
             this.total_score = total_score;
             this.results = results;
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
         }
 
         public String getName() {
