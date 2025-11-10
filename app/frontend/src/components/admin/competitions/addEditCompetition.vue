@@ -268,6 +268,7 @@ const saveComp = async() => {
             <div class="col">
                 <label for="score_showtime" class="form-label"
                     title="
+                        INFO
                         Public accounts can only view score updates til this time. 
                         After that they turn stale and scores will stop updating for the public.
                         Scores will continue to update for admin users.
@@ -286,7 +287,30 @@ const saveComp = async() => {
                     id="score_showtime"
                 />
             </div>
-            
+        </div>
+        <div class="row justify-content-start pt-3">
+            <div class="col">
+                <label for="score_showtime" class="form-label"
+                    title="
+                        BEWARE!
+                        Publishing scores will make public all of the result after 'Public Score Update Time'. 
+                        Only IF YOU WANT TO MAKE THEM PUBLIC then publish results.
+                        You can always de-publish results, but someone might have already made a screenshot. 
+                    ">
+                    Publish Scores
+                    <i class="bi bi-info-circle"></i>
+                </label>
+                
+                
+            </div>
+            <div class="col">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    v-model="competition.publish_scores"
+                    id="publish_scores"
+                />
+            </div>
         </div>
 
         <!-- Organizer data start block -->
