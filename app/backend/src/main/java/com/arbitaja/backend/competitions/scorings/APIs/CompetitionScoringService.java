@@ -241,10 +241,10 @@ public class CompetitionScoringService {
             List<CompetitionScoringResponse.Result> results = setResults(competition, competitor, score_showtime);
             // If the results are empty, set the score to 0.0
             if (results.isEmpty())
-                competitorSet.add(new CompetitionScoringResponse.Competitor(competitor.getAlias(), 0.0, results));
+                competitorSet.add(new CompetitionScoringResponse.Competitor(competitor.getId(), competitor.getAlias(), 0.0, results));
             // If the results are not empty, set the score to the last result
             else
-                competitorSet.add(new CompetitionScoringResponse.Competitor(competitor.getAlias(), results.getLast().getPoint_amount(), results));
+                competitorSet.add(new CompetitionScoringResponse.Competitor(competitor.getId(), competitor.getAlias(), results.getLast().getPoint_amount(), results));
         }
         return competitorSet;
     }
