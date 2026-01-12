@@ -1,6 +1,6 @@
 package com.arbitaja.refactored.backend.pam.core.port.in.user;
 
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.UserProfileResponse;
+import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import lombok.*;
 
 /**
@@ -15,7 +15,7 @@ public interface UpdateUserUseCase {
      * @param isAdmin Whether the authenticated user is an admin
      * @return Updated UserProfileResponse
      */
-    UserProfileResponse updateUserProfile(@NonNull UpdateUserCommand command, @NonNull String authenticatedUsername, boolean isAdmin);
+    User updateUserProfile(@NonNull UpdateUserCommand command, @NonNull String authenticatedUsername, boolean isAdmin);
 
     /**
      * Change user password

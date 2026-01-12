@@ -1,7 +1,6 @@
 package com.arbitaja.refactored.backend.pam.core.port.in.user;
 
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.UserProfileResponse;
 import lombok.NonNull;
 
 import java.util.List;
@@ -38,6 +37,6 @@ public interface GetUserUseCase {
      * @param userId The user's ID
      * @return UserProfileResponse containing full profile data
      */
-    UserProfileResponse getUserProfile(@NonNull Integer userId);
+    User getUserProfile(@NonNull Integer userId);
 }
 

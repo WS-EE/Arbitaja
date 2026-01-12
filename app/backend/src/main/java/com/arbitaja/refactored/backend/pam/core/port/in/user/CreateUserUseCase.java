@@ -1,6 +1,5 @@
 package com.arbitaja.refactored.backend.pam.core.port.in.user;
 
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.SignupResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.model.SignupUser;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import lombok.*;
@@ -33,7 +32,7 @@ public interface CreateUserUseCase {
      */
     void declineSignupUser(@NonNull Integer signupUserId);
 
-    List<SignupResponse> getAllSignupUsers();
+    List<SignupUser> getAllSignupUsers();
 
     @Transactional
     User createUser(@NonNull SignupCommand command);

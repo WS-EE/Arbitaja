@@ -1,12 +1,9 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web.dto;
 
-import com.arbitaja.backend.users.dataobjects.Role;
+import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Schema(description = "Response for user profile data")
 public class UserProfileResponse {
 

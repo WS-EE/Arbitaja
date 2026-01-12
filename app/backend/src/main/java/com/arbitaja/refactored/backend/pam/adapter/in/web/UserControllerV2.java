@@ -2,6 +2,7 @@ package com.arbitaja.refactored.backend.pam.adapter.in.web;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.SignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.UpdateUserRequest;
+import com.arbitaja.refactored.backend.pam.adapter.util.DtoMapper;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Web adapter (REST Controller) for User operations.
@@ -64,7 +64,7 @@ public class UserControllerV2 {
 
         User user = createUserUseCase.createUser(command);
 
-        UserProfileResponse response = getUserUseCase.getUserProfile(user.getId());
+        UserProfileResponse response = DtoMapper.toUserProfileResponse(user);
 
         return ResponseEntity.ok(response);
     }
@@ -82,8 +82,7 @@ public class UserControllerV2 {
         log.info("Getting all users");
         List<User> users = getUserUseCase.getAllUsers();
         List<UserProfileResponse> responses = users.stream()
-                .map(user -> getUserUseCase.getUserProfile(user.getId()))
-                .collect(Collectors.toList());
+                .map(DtoMapper::toUserProfileResponse).toList();
         return ResponseEntity.ok(responses);
     }
 
@@ -97,8 +96,10 @@ public class UserControllerV2 {
     @GetMapping("/{id}")
     public ResponseEntity<UserProfileResponse> getUserById(@PathVariable Integer id) {
         log.info("Getting user by id: {}", id);
-        UserProfileResponse profile = getUserUseCase.getUserProfile(id);
-        return ResponseEntity.ok(profile);
+        User user = getUserUseCase.getUserProfile(id);
+
+
+        return ResponseEntity.ok(DtoMapper.toUserProfileResponse(user));
     }
 
     @Operation(summary = "Update user profile", description = "Update user profile information")
@@ -129,13 +130,13 @@ public class UserControllerV2 {
                 .schoolId(request.getSchoolId())
                 .build();
 
-        UserProfileResponse response = updateUserUseCase.updateUserProfile(
+        User user = updateUserUseCase.updateUserProfile(
                 command,
                 authentication.getName(),
                 isAdmin
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(DtoMapper.toUserProfileResponse(user));
     }
 
     @Operation(summary = "Delete user", description = "Delete a user from the system")

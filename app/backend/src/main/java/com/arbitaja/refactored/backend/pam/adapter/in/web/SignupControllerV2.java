@@ -112,8 +112,16 @@ public class SignupControllerV2 {
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<List<SignupResponse>> getAllSignupUsers() {
         log.info("Get All Signup Users");
-        List<SignupResponse> allSignupUsers = createUserUseCase.getAllSignupUsers();
+        List<SignupUser> allSignupUsers = createUserUseCase.getAllSignupUsers();
 
-        return ResponseEntity.ok(allSignupUsers);
+        List<SignupResponse> response = allSignupUsers.stream().map(su -> SignupResponse.builder()
+                .userId(su.getId())
+                .username(su.getUsername())
+                .email(su.getPersonalData().getEmail())
+                .schoolId(su.getPersonalData().getSchool() != null ? su.getPersonalData().getSchool().getId() : null)
+                .message("Signup request retrieved successfully")
+                .build()).toList();
+
+        return ResponseEntity.ok(response);
     }
 }

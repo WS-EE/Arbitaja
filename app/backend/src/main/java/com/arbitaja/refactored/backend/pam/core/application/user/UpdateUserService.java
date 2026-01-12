@@ -9,19 +9,14 @@ import com.arbitaja.refactored.backend.pam.core.port.out.personaldata.PersonalDa
 import com.arbitaja.refactored.backend.pam.core.port.out.role.RoleRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.school.SchoolRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.security.PasswordEncoderPort;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.UserProfileResponse;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Application service implementing user update use cases.
@@ -40,7 +35,7 @@ public class UpdateUserService implements UpdateUserUseCase {
 
     @Override
     @Transactional
-    public UserProfileResponse updateUserProfile(@NonNull UpdateUserCommand command,
+    public User updateUserProfile(@NonNull UpdateUserCommand command,
                                                   @NonNull String authenticatedUsername,
                                                   boolean isAdmin) {
         log.info("Updating user profile for user id: {}", command.getUserId());
@@ -83,13 +78,7 @@ public class UpdateUserService implements UpdateUserUseCase {
         user.setPersonalData(savedPersonalData);
 
         // Save user
-        User savedUser = userRepository.save(user);
-
-        // Get roles and permissions for response
-        List<Role> roles = roleRepository.findByUserId(savedUser.getId());
-        List<Permission> permissions = permissionRepository.findByUserId(savedUser.getId());
-
-        return mapToUserProfileResponse(savedUser, roles, permissions);
+        return userRepository.save(user);
     }
 
     @Override
@@ -130,49 +119,6 @@ public class UpdateUserService implements UpdateUserUseCase {
 
         userRepository.delete(user);
         log.info("User deleted successfully: {}", userId);
-    }
-
-    private UserProfileResponse mapToUserProfileResponse(User user, List<Role> roles, List<Permission> permissions) {
-        Set<SimpleGrantedAuthority> authorities = permissions.stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-                .collect(Collectors.toSet());
-
-        List<com.arbitaja.backend.users.dataobjects.Role> responseRoles = roles.stream()
-                .map(this::convertToLegacyRole)
-                .collect(Collectors.toList());
-
-        UserProfileResponse response = new UserProfileResponse();
-        response.setId(user.getId());
-        response.setUsername(user.getUsername());
-        response.setRoles(responseRoles);
-        response.setPermissions(authorities);
-
-        if (user.getPersonalData() != null) {
-            UserProfileResponse.PersonalDataResponse personalDataResponse = new UserProfileResponse.PersonalDataResponse();
-            personalDataResponse.setId(user.getPersonalData().getId());
-            personalDataResponse.setFullName(user.getPersonalData().getFullName());
-            personalDataResponse.setEmail(user.getPersonalData().getEmail());
-
-            if (user.getPersonalData().getSchool() != null) {
-                UserProfileResponse.SchoolResponse schoolResponse = new UserProfileResponse.SchoolResponse();
-                schoolResponse.setId(user.getPersonalData().getSchool().getId());
-                schoolResponse.setName(user.getPersonalData().getSchool().getName());
-                personalDataResponse.setSchool(schoolResponse);
-            }
-
-            response.setPersonalData(personalDataResponse);
-        }
-
-        return response;
-    }
-
-    private com.arbitaja.backend.users.dataobjects.Role convertToLegacyRole(Role domainRole) {
-        com.arbitaja.backend.users.dataobjects.Role legacyRole = new com.arbitaja.backend.users.dataobjects.Role();
-        legacyRole.setId(domainRole.getId());
-        legacyRole.setName(domainRole.getName());
-        legacyRole.setCreated_at(domainRole.getCreatedAt());
-        legacyRole.setChanged_at(domainRole.getChangedAt());
-        return legacyRole;
     }
 }
 

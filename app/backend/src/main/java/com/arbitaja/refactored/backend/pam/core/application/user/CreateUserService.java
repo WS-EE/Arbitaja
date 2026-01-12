@@ -1,6 +1,5 @@
 package com.arbitaja.refactored.backend.pam.core.application.user;
 
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.SignupResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.*;
@@ -156,16 +155,8 @@ public class CreateUserService implements CreateUserUseCase {
     }
 
     @Override
-    public List<SignupResponse> getAllSignupUsers() {
-        List<SignupUser> signupUsers = signupUserRepository.findAll();
-
-        return signupUsers.stream().map(su -> SignupResponse.builder()
-                .userId(su.getId())
-                .username(su.getUsername())
-                .email(su.getPersonalData().getEmail())
-                .schoolId(su.getPersonalData().getSchool() != null ? su.getPersonalData().getSchool().getId() : null)
-                .message("Signup request retrieved successfully")
-                .build()).toList();
+    public List<SignupUser> getAllSignupUsers() {
+        return signupUserRepository.findAll();
     }
 
 
