@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,8 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -30,10 +29,8 @@ public class SecurityConfig{
     private String VITE_APP_BASE_URL;
 
     @Bean
-    public HttpFirewall defaultHttpFirewall() {
-        StrictHttpFirewall firewall = new StrictHttpFirewall();
-        firewall.setAllowSemicolon(true);  // Allow semicolons in URLs
-        return firewall;
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/health");
     }
 
     @Bean
@@ -80,9 +77,11 @@ public class SecurityConfig{
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-user", "/error", "/user/signup/create", "/swagger-ui/**",
-                                "/context-path/**", "/v3/**", "/health", "/competition/criteria/**", "competition/get",
-                                "competition/all/get", "/dashboard/**").permitAll()
+                        .requestMatchers("/login", "/login-user", "/error", "/user/signup/create",
+                                "/swagger-ui.html", "/swagger-ui/**", "/swagger-resources/**",
+                                "/context-path/**", "/v3/**", "/v3/api-docs/**", "/webjars/**",
+                                "/competition/criteria/**", "competition/get",
+                                "competition/all/get", "/dashboard/**", "/api/v2/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
