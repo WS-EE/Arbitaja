@@ -75,8 +75,6 @@ public class AuthController {
             log.info("Sending response for unsuccessful login: " + "{}", objectMapper.writeValueAsString(response));
             return response;
         }
-        ResponseEntity<?> response = globalExceptionHandler.handleIllegalArgumentException(new IllegalArgumentException("Invalid username or password"));
-        log.info("Sending Response for unsuccessful login: " + "{}", objectMapper.writeValueAsString(response));
-        return response;
+        throw new IllegalArgumentException("Invalid username or password");
     }
 }

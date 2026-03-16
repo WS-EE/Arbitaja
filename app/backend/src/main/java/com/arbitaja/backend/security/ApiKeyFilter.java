@@ -10,7 +10,7 @@ import java.io.IOException;
 
 @Component
 public class ApiKeyFilter implements Filter {
-    @Value("${API_KEY}")
+    @Value("${app.API_KEY}")
     private String apiKey;
 
     @Override

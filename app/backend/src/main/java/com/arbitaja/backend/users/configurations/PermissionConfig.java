@@ -34,9 +34,9 @@ import java.util.Optional;
 public class PermissionConfig {
     private static final Logger log = LogManager.getLogger(PermissionConfig.class);
 
-    @Value("${ADMIN_USERNAME}")
+    @Value("${app.ADMIN_USERNAME}")
     private String adminUsername;
-    @Value("${ADMIN_PASSWORD}")
+    @Value("${app.ADMIN_PASSWORD}")
     private String adminPassword;
 
     @Bean

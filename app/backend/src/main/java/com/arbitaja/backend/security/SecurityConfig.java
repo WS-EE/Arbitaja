@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,13 +24,8 @@ import java.util.Arrays;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig{
-    @Value("${VITE_APP_BASE_URL}")
+    @Value("${app.VITE_APP_BASE_URL}")
     private String VITE_APP_BASE_URL;
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/health");
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -46,7 +40,7 @@ public class SecurityConfig{
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(Arrays.asList(VITE_APP_BASE_URL));
+        corsConfig.setAllowedOrigins(Arrays.asList(VITE_APP_BASE_URL, "http://localhost:3000"));
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         corsConfig.setAllowCredentials(true);
@@ -81,7 +75,8 @@ public class SecurityConfig{
                                 "/swagger-ui.html", "/swagger-ui/**", "/swagger-resources/**",
                                 "/context-path/**", "/v3/**", "/v3/api-docs/**", "/webjars/**",
                                 "/competition/criteria/**", "competition/get",
-                                "competition/all/get", "/dashboard/**", "/api/v2/**").permitAll()
+                                "competition/all/get", "/dashboard/**",
+                                "/api/v2/user/create", "/health").permitAll()
                         .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
