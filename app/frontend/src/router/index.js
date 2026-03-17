@@ -1,4 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import VueCookies from 'vue-cookies';
+import { useUserStore } from '@/stores/userStore';
+import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 import loginView from '@/views/loginView.vue';
 import notFoundView from '@/views/notFoundView.vue';
 import homeView from '@/views/userViews/homeView.vue';
@@ -67,6 +70,7 @@ const router = createRouter({
             name: 'admin',
             redirect: '/admin/competitions',
             component: adminView,
+            meta: { requiresPrivilege: 'ADMIN' },
             children: [
                 {
                     path: 'competitions/',
@@ -144,5 +148,30 @@ const router = createRouter({
         }
     ]
 });
+
+router.beforeEach(async (to) => {
+  const requiresAuth = Boolean(to.meta.requiresAuth || to.meta.requiresPrivilege)
+
+  if (requiresAuth) {
+    const hasSession = VueCookies.isKey('JSESSIONID')
+    const store = useUserStore()
+    const shouldForceRehydrate = hasSession && !store.id
+    await ensureAuthRehydrated({ force: shouldForceRehydrate })
+  }
+
+  // 1. Session check
+  const hasSession = VueCookies.isKey('JSESSIONID')
+  if (to.meta.requiresAuth && !hasSession) {
+    return { path: '/' }
+  }
+
+  // 2. Privilege check (equivalent to useRequirePrivilege)
+  if (to.meta.requiresPrivilege) {
+    const store = useUserStore()
+    if (!store.hasPrivilege(to.meta.requiresPrivilege)) {
+      return { path: '/', query: { forbidden: '' } }
+    }
+  }
+})
 
 export default router

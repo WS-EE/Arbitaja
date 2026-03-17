@@ -8,6 +8,7 @@ import axios from 'axios';
 // import cookie handler
 import { useCookies } from '@/assets/js/useCookies';
 const $cookies = useCookies(); 
+import { useAuthRehydrate } from '@/composables/useAuthRehydrate'
 
 const router = useRouter();
 const username = ref("");
@@ -15,22 +16,28 @@ const password = ref("");
 const getLogonError = ref('');
 const rememberMe = ref(false);
 
+const { loadAuth } = useAuthRehydrate()
+
 const userLogin = () => {
   getLogonError.value = false
-  axios.post('login-user', {
-      username: username.value,
-      rememberMe: rememberMe.value,
-      password: password.value
-    }, {
+
+  const formData = new URLSearchParams();
+  formData.append('username', username.value);
+  formData.append('password', password.value);
+  formData.append('rememberMe', rememberMe.value ? 'true' : 'false');
+
+  axios.post('login-user', formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
-      }
+      },
+      withCredentials: true
     })
-    .then(function (response) {
+    .then(async function (response) {
       if(response.status === 200){
         // Set user to be logged in
         $cookies.set('isLoggedIn', true, 0);
         $cookies.set('userParameters', response.data, 0);
+        await loadAuth({ force: true })
         router.back()
       }
     })

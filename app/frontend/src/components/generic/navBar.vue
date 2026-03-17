@@ -1,76 +1,35 @@
 <script setup>
+import { computed, getCurrentInstance } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
-import logo from '@/assets/media/logo.svg'
+import logo from '@/assets/media/logo.svg';
 import axios from 'axios';
+import router from '@/router';
+import { useUserStore } from '@/stores/userStore';
 
-// import cookie handler
-import { useCookies } from '@/assets/js/useCookies';
-const $cookies = useCookies(); 
+const userStore = useUserStore();
 
-// check the active link
+// Check the active link
 const isLinkActive = (routePath) => {
     const route = useRoute();
     return route.path === routePath;
 }
 
-// Get if user is logged in.
-import { ref, onMounted } from 'vue';
-import router from '@/router';
-const isLoggedIn = ref(false)
-const userParameters = ref('')
-const username = ref('')
-const displayUsername = ref('')
-const userRoles = ref([])
-const isUserAdmin = ref();
-
-// Get cookies for user logged in status
-onMounted(async () => {
-    try {
-        // get cookies
-        isLoggedIn.value = await $cookies.get('isLoggedIn');
-        userParameters.value = await $cookies.get('userParameters');
-        username.value = userParameters.value.username
-        displayUsername.value = userParameters.value.username
-        userRoles.value = userParameters.value.roles
-        isUserAdmin.value = await checkUserAdmin();
-    } catch(err) {}
-})
+// Reactive auth state derived from the store
+const isLoggedIn = computed(() => !!userStore.username && userStore.username !== 'anonymousUser')
+const isUserAdmin = computed(() => userStore.hasPrivilege('ADMIN'))
 
 // User logout function
 const userLogout = async () => {
     try {
         await axios.post('logout');
     } catch(error) {
-        // We are expecting 401 response when loggin out.
-        await $cookies.remove('userParameters');
-        await $cookies.remove('isLoggedIn');
+        // We are expecting 401 response when logging out.
         await router.replace('/home');
         location.reload();
     }
 }
 
-// Is the admin button on navbar disabled
-const checkUserAdmin = async () => {
-    // Get user groups
-    try {
-        let isTrue = false
-        const userGroups = userParameters.value.permissions
-        // loop over user groups
-        for (var permission of userGroups){
-            // if we find admin groups in users groups return true
-            if (permission.authority === 'admin') {
-                isTrue = true
-            }
-        }
-        // else return false
-        return isTrue
-    } catch(error) {
-        return false
-    }
-}
-
 // Get copyright header
-import { getCurrentInstance } from 'vue'
 const { appContext } = getCurrentInstance()
 const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
 
@@ -165,7 +124,7 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
                         >Home</RouterLink>
                         </li>
                         <li class="nav-item rounded m-1" v-if="isUserAdmin">
-                            <RouterLink 
+                            <RouterLink
                                 to="/admin"
                                 :class="[
                                     isLinkActive('/admin') 
