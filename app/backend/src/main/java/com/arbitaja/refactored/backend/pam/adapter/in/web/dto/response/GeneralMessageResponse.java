@@ -1,4 +1,4 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response;
 
 import lombok.*;
 

@@ -1,7 +1,8 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web;
 
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.SignupRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.UpdateUserRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.SignupRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.UpdateUserRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.GeneralMessageResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.DtoMapper;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
@@ -10,7 +11,7 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.CreateUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.GetUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.UpdateUserUseCase;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.UserProfileResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.UserProfileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,10 +25,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Web adapter (REST Controller) for User operations.
@@ -98,7 +99,6 @@ public class UserControllerV2 {
         log.info("Getting user by id: {}", id);
         User user = getUserUseCase.getUserProfile(id);
 
-
         return ResponseEntity.ok(DtoMapper.toUserProfileResponse(user));
     }
 
@@ -148,10 +148,27 @@ public class UserControllerV2 {
     @SecurityRequirement(name = "basicAuth")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Integer id) {
+    public ResponseEntity<GeneralMessageResponse> deleteUser(@PathVariable Integer id) {
         log.info("Deleting user: {}", id);
         updateUserUseCase.deleteUser(id);
-        return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
+        return ResponseEntity.ok(new GeneralMessageResponse("User deleted successfully"));
+    }
+
+    @GetMapping("/auth")
+    @Operation(summary = "Get authenticated user profile", description = "Retrieve the profile of the currently authenticated user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
+            @Schema(implementation = UnauthorizedException.class)) })
+    })
+    @SecurityRequirement(name = "basicAuth")
+    ResponseEntity<UserProfileResponse> getUserAuth() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        log.info("Getting authenticated user profile: {}", username);
+        User user = getUserUseCase.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserProfileResponse response = DtoMapper.toUserProfileResponse(user);
+        return ResponseEntity.ok(response);
     }
 }
 

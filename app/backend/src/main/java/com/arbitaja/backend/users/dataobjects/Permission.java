@@ -4,11 +4,14 @@ import jakarta.persistence.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "permission")
 public class Permission {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,38 +34,6 @@ public class Permission {
     }
 
     public Permission() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getKey_object() {
-        return key_object;
-    }
-
-    public void setKey_object(String key_object) {
-        this.key_object = key_object;
     }
 
     @Override

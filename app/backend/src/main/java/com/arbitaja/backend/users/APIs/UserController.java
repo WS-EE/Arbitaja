@@ -204,7 +204,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<?> deleteSignupUser(@RequestParam Integer id) throws JsonProcessingException {
+    public ResponseEntity<?> deleteSignupUser(@RequestParam("id") Integer id) throws JsonProcessingException {
         ResponseEntity<Map<String, ?>> resp = userService.declineUser(id);
         log.debug("Sending Response for declining user: " + "{}", objectMapper.writeValueAsString(resp));
         return resp;

@@ -1,10 +1,10 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 /**
- * DTO for signup requests.
+ * DTO for user update requests.
  */
 @Getter
 @Setter
@@ -12,14 +12,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @ToString
-public class SignupRequest {
+public class UpdateUserRequest {
 
     @NonNull
     private String username;
-
-    @NonNull
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
 
     @NonNull
     @JsonProperty("full_name")

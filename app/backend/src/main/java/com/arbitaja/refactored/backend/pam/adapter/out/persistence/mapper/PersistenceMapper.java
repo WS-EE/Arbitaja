@@ -5,6 +5,9 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.*;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -32,14 +35,12 @@ public class PersistenceMapper {
     }
 
     public UserJpaEntity toEntity(@NonNull User domain) {
-        UserJpaEntity entity = UserJpaEntity.builder()
+        return UserJpaEntity.builder()
                 .id(domain.getId())
                 .username(domain.getUsername())
                 .saltedPassword(domain.getSaltedPassword())
                 .personalData(domain.getPersonalData() != null ? toEntity(domain.getPersonalData()) : null)
                 .build();
-
-        return entity;
     }
 
     // PersonalData mappings
@@ -80,12 +81,86 @@ public class PersistenceMapper {
 
     // Role mappings
     public Role toDomain(@NonNull RoleJpaEntity entity) {
-        return Role.builder()
+        return toDomainRole(entity, new HashSet<>());
+    }
+
+    private Role toDomainRole(@NonNull RoleJpaEntity entity, Set<String> visitedRoleKeys) {
+        String roleVisitKey = getRoleVisitKey(entity);
+        if (!visitedRoleKeys.add(roleVisitKey)) {
+            return Role.builder()
+                    .id(entity.getId())
+                    .name(entity.getName())
+                    .createdAt(entity.getCreatedAt())
+                    .changedAt(entity.getChangedAt())
+                    .build();
+        }
+
+        Role role = Role.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .createdAt(entity.getCreatedAt())
                 .changedAt(entity.getChangedAt())
                 .build();
+
+        role.setRolePermissions(collectRolePermissions(entity, role, new HashSet<>()));
+        return role;
+    }
+
+    private Set<RolePermission> collectRolePermissions(
+            @NonNull RoleJpaEntity currentRole,
+            @NonNull Role mappedRole,
+            Set<String> visitedRoleKeys
+    ) {
+        String roleVisitKey = getRoleVisitKey(currentRole);
+        if (!visitedRoleKeys.add(roleVisitKey)) {
+            return new HashSet<>();
+        }
+
+        LinkedHashMap<String, RolePermission> aggregatedPermissions = new LinkedHashMap<>();
+
+        if (currentRole.getRolePermissions() != null) {
+            currentRole.getRolePermissions().forEach(rolePermissionJpa -> {
+                RolePermission mappedPermission = toDomainRolePermission(rolePermissionJpa, mappedRole);
+                String dedupeKey = getPermissionDedupeKey(mappedPermission);
+                aggregatedPermissions.putIfAbsent(dedupeKey, mappedPermission);
+            });
+        }
+
+        if (currentRole.getChildRoleRelations() != null) {
+            currentRole.getChildRoleRelations().forEach(roleRelation -> {
+                RoleJpaEntity childRole = roleRelation.getChildRole();
+                collectRolePermissions(childRole, mappedRole, visitedRoleKeys)
+                        .forEach(rolePermission -> aggregatedPermissions.putIfAbsent(
+                                getPermissionDedupeKey(rolePermission),
+                                rolePermission
+                        ));
+            });
+        }
+
+        return new HashSet<>(aggregatedPermissions.values());
+    }
+
+    private RolePermission toDomainRolePermission(@NonNull RolePermissionJpaEntity entity, @NonNull Role role) {
+        return RolePermission.builder()
+                .id(entity.getId())
+                .permission(toDomain(entity.getPermission()))
+                .role(role)
+                .keyObjectAcl(entity.getKeyObjectAcl())
+                .build();
+    }
+
+    private String getRoleVisitKey(@NonNull RoleJpaEntity role) {
+        return role.getId() != null
+                ? "id:" + role.getId()
+                : "obj:" + System.identityHashCode(role);
+    }
+
+    private String getPermissionDedupeKey(@NonNull RolePermission rolePermission) {
+        Permission permission = rolePermission.getPermission();
+        if (permission.getId() != null) {
+            return "id:" + permission.getId();
+        }
+        return "key:" + permission.getKey();
     }
 
     public RoleJpaEntity toEntity(@NonNull Role domain) {
@@ -149,4 +224,3 @@ public class PersistenceMapper {
                 .build();
     }
 }
-

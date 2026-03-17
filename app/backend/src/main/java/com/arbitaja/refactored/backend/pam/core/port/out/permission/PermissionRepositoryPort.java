@@ -1,5 +1,6 @@
 package com.arbitaja.refactored.backend.pam.core.port.out.permission;
 
+import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Permission;
 import lombok.NonNull;
 
@@ -43,5 +44,13 @@ public interface PermissionRepositoryPort {
      * @param permission Permission to delete
      */
     void delete(@NonNull Permission permission);
+
+    /**
+     * Check if a user has a specific permission
+     *
+     * @param userId         User ID
+     * @param permissionCode Permission code to check
+     */
+    void userHasPermissions(@NonNull Integer userId, @NonNull PermissionCode[] permissionCode);
 }
 

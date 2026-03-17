@@ -1,5 +1,9 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web;
 
+import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode.VIEW_PERMISSIONS;
+import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode.VIEW_USERS;
+
+import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Permission;
@@ -14,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +42,7 @@ public class PermissionControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
-    @PreAuthorize("hasAuthority('admin')")
+    @RequiresPermission(VIEW_PERMISSIONS)
     public ResponseEntity<List<Permission>> getAllPermissions() {
         log.info("Getting all permissions");
         List<Permission> permissions = getPermissionUseCase.getAllPermissions();
@@ -54,7 +57,7 @@ public class PermissionControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @RequiresPermission(VIEW_PERMISSIONS)
     public ResponseEntity<Permission> getPermissionById(@PathVariable Integer id) {
         log.info("Getting permission by id: {}", id);
         return getPermissionUseCase.getPermissionById(id)
@@ -68,6 +71,7 @@ public class PermissionControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/user/{userId}")
+    @RequiresPermission({VIEW_PERMISSIONS, VIEW_USERS})
     public ResponseEntity<List<Permission>> getPermissionsByUserId(@PathVariable Integer userId) {
         log.info("Getting permissions for user: {}", userId);
         List<Permission> permissions = getPermissionUseCase.getPermissionsByUserId(userId);

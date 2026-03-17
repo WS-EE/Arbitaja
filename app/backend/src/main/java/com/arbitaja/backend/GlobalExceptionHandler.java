@@ -1,6 +1,7 @@
 package com.arbitaja.backend;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.Getter;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -91,16 +92,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException.class)
+    public ResponseEntity<Map<String, String>> handleDomainUnauthorizedException(com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Unauthorized");
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @Getter
     public static class ApiException extends RuntimeException {
         private final HttpStatus status;
 
         public ApiException(String message, HttpStatus status) {
             super(message);
             this.status = status;
-        }
-
-        public HttpStatus getStatus() {
-            return status;
         }
     }
 

@@ -1,9 +1,13 @@
 package com.arbitaja.refactored.backend.pam.adapter.out.persistence;
 
+import com.arbitaja.refactored.backend.pam.adapter.out.persistence.entity.PermissionJpaEntity;
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.mapper.PersistenceMapper;
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.repository.PermissionJpaRepository;
+import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Permission;
 import com.arbitaja.refactored.backend.pam.core.port.out.permission.PermissionRepositoryPort;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -52,6 +56,18 @@ public class PermissionPersistenceAdapter implements PermissionRepositoryPort {
     @Override
     public void delete(@NonNull Permission permission) {
         permissionJpaRepository.deleteById(permission.getId());
+    }
+
+    @Override
+    public void userHasPermissions(@NonNull Integer userId, @NonNull PermissionCode[] requiredPermissions) {
+        List<PermissionJpaEntity> permissions = permissionJpaRepository.findByUserId(userId);
+        Arrays.stream(requiredPermissions).forEach(required -> {
+            boolean hasPermission = permissions.stream()
+                    .anyMatch(p -> p.getKey().equals(required.name()));
+            if (!hasPermission) {
+                throw new UnauthorizedException("Access denied: missing permission " + required.name());
+            }
+        });
     }
 }
 

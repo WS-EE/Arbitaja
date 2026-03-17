@@ -1,4 +1,4 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response;
 
 import lombok.*;
 
@@ -12,6 +12,6 @@ public class SignupResponse {
     long userId;
     String username;
     String email;
-    long schoolId;
+    Integer schoolId;
     String message;
 }

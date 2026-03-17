@@ -1,5 +1,10 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web;
 
+import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode.VIEW_ROLES;
+
+import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.RoleResponse;
+import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
@@ -14,10 +19,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Web adapter (REST Controller) for Role operations.
@@ -39,10 +44,12 @@ public class RoleControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
-    @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<List<Role>> getAllRoles() {
+    @RequiresPermission(VIEW_ROLES)
+    public ResponseEntity<List<RoleResponse>> getAllRoles() {
         log.info("Getting all roles");
-        List<Role> roles = getRoleUseCase.getAllRoles();
+        List<RoleResponse> roles = getRoleUseCase.getAllRoles().stream()
+                .map(this::toRoleResponse)
+                .toList();
         return ResponseEntity.ok(roles);
     }
 
@@ -54,10 +61,11 @@ public class RoleControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<Role> getRoleById(@PathVariable Integer id) {
+    @RequiresPermission(VIEW_ROLES)
+    public ResponseEntity<RoleResponse> getRoleById(@PathVariable Integer id) {
         log.info("Getting role by id: {}", id);
         return getRoleUseCase.getRoleById(id)
+                .map(this::toRoleResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -70,10 +78,11 @@ public class RoleControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/name/{name}")
-    @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<Role> getRoleByName(@PathVariable String name) {
+    @RequiresPermission(VIEW_ROLES)
+    public ResponseEntity<RoleResponse> getRoleByName(@PathVariable String name) {
         log.info("Getting role by name: {}", name);
         return getRoleUseCase.getRoleByName(name)
+                .map(this::toRoleResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -84,10 +93,38 @@ public class RoleControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Role>> getRolesByUserId(@PathVariable Integer userId) {
+    public ResponseEntity<List<RoleResponse>> getRolesByUserId(@PathVariable Integer userId) {
         log.info("Getting roles for user: {}", userId);
-        List<Role> roles = getRoleUseCase.getRolesByUserId(userId);
+        List<RoleResponse> roles = getRoleUseCase.getRolesByUserId(userId).stream()
+                .map(this::toRoleResponse)
+                .toList();
         return ResponseEntity.ok(roles);
     }
-}
 
+    private RoleResponse toRoleResponse(Role role) {
+        List<PermissionCode> permissions = role.getRolePermissions() == null
+                ? List.of()
+                : role.getRolePermissions().stream()
+                        .map(rolePermission -> rolePermission.getPermission().getKey())
+                        .map(this::toPermissionCodeOrNull)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .toList();
+
+        return new RoleResponse(
+                role.getId(),
+                role.getName(),
+                role.getCreatedAt(),
+                role.getChangedAt(),
+                permissions
+        );
+    }
+
+    private PermissionCode toPermissionCodeOrNull(String permissionKey) {
+        try {
+            return PermissionCode.valueOf(permissionKey);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+}

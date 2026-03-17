@@ -1,10 +1,9 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response;
 
-import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
+import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 import java.util.Set;
@@ -24,10 +23,10 @@ public class UserProfileResponse {
     private String username;
 
     @Schema(description = "List of user roles")
-    private List<Role> roles;
+    private List<RoleResponse> roles;
 
     @Schema(description = "Set of user permissions")
-    private Set<SimpleGrantedAuthority> permissions;
+    private Set<PermissionCode> permissions;
 
     @Schema(description = "Personal data of the user")
     @JsonProperty("personal_data")

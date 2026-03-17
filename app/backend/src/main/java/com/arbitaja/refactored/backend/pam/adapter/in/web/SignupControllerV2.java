@@ -1,8 +1,8 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web;
 
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.GeneralMessageResponse;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.SignupRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.SignupResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.GeneralMessageResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.SignupRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.SignupResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
@@ -56,7 +56,7 @@ public class SignupControllerV2 {
                 .userId(signupUser.getId())
                 .username(signupUser.getUsername())
                 .email(signupUser.getPersonalData().getEmail())
-                .schoolId(signupUser.getId())
+                .schoolId(signupUser.getPersonalData().getId())
                 .message("Signup request created successfully")
                 .build();
 
