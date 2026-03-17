@@ -5,9 +5,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_URL:localhost:5432}/${DB_SCHEMA:arbitaja}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:admin}
+    url: jdbc:postgresql://${POSTGRES_URL:localhost:5432}/${POSTGRES_DB:arbitaja}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:admin}
   jpa:
     hibernate:
       ddl-auto: update
