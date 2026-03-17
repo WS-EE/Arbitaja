@@ -16,6 +16,13 @@ spring:
     hibernate:
       format_sql: true
       show_sql: true
+  liquibase:
+    change-log: classpath:/db.changelog/db.changelog-master.xml
+    parameters:
+      adminUsername: ${ADMIN_USERNAME:admin}
+      adminPasswordPlain: ${ADMIN_PASSWORD:admin}
+      competitorUsername: ${COMPETITOR_USERNAME:competitor}
+      competitorPasswordPlain: ${COMPETITOR_PASSWORD:123}
 
 logging:
   level:
@@ -30,5 +37,8 @@ logging:
 app:
   API_KEY: ${API_KEY:default_api_key}
   VITE_APP_BASE_URL: ${VITE_APP_BASE_URL:http://localhost:3000}
+  BASE_URL: ${SWAGGER_BASE_URL:http://localhost:8080}
   ADMIN_USERNAME: ${ADMIN_USERNAME:admin}
   ADMIN_PASSWORD: ${ADMIN_PASSWORD:admin}
+  COMPETITOR_USERNAME: ${COMPETITOR_USERNAME:competitor}
+  COMPETITOR_PASSWORD: ${COMPETITOR_PASSWORD:123}
