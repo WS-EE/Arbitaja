@@ -13,7 +13,7 @@ public class OpenApiConfig {
 
     @Value("${app.BASE_URL}")
     private String BASE_URL;
-    @Value("${server.servlet.context-path}")
+    @Value("${app.BASE_PATH}")
     private String SERVER_ENDPOINT;
     @Bean
     public OpenAPI customOpenAPI() {

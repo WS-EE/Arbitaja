@@ -27,6 +27,9 @@ public class SecurityConfig{
     @Value("${app.VITE_APP_BASE_URL}")
     private String VITE_APP_BASE_URL;
 
+    @Value("${app.public-apis}")
+    private String[] publicApis;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
@@ -71,12 +74,7 @@ public class SecurityConfig{
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-user", "/error", "/user/signup/create",
-                                "/swagger-ui.html", "/swagger-ui/**", "/swagger-resources/**",
-                                "/context-path/**", "/v3/**", "/v3/api-docs/**", "/webjars/**",
-                                "/competition/criteria/**", "competition/get",
-                                "competition/all/get", "/dashboard/**",
-                                "/api/v2/user/create", "/health").permitAll()
+                        .requestMatchers(publicApis).permitAll()
                         .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)

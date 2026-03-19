@@ -8,6 +8,13 @@ spring:
     url: jdbc:postgresql://${POSTGRES_URL:localhost:5432}/${POSTGRES_DB:arbitaja}
     username: ${POSTGRES_USERNAME:postgres}
     password: ${POSTGRES_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      auto-commit: true
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,6 +31,13 @@ spring:
       competitorUsername: ${COMPETITOR_USERNAME:competitor}
       competitorPasswordPlain: ${COMPETITOR_PASSWORD:123}
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger
+    disable-swagger-default-url: true
+
 logging:
   level:
     root: INFO
@@ -37,8 +51,22 @@ logging:
 app:
   API_KEY: ${API_KEY:default_api_key}
   VITE_APP_BASE_URL: ${VITE_APP_BASE_URL:http://localhost:3000}
-  BASE_URL: ${SWAGGER_BASE_URL:http://localhost:8080}
+  BASE_URL: ${VITE_APP_BASE_URL:http://localhost:8080}
+  BASE_PATH: ${VITE_APP_API_ENDPOINT:/}
   ADMIN_USERNAME: ${ADMIN_USERNAME:admin}
   ADMIN_PASSWORD: ${ADMIN_PASSWORD:admin}
   COMPETITOR_USERNAME: ${COMPETITOR_USERNAME:competitor}
   COMPETITOR_PASSWORD: ${COMPETITOR_PASSWORD:123}
+  public-apis:
+    "/login,
+    /login-user,
+    /error,
+    /user/signup/create,
+    /swagger-ui/**,
+    /swagger/**,
+    /api-docs/**,
+    /competition/criteria/**,
+    /competition/get,
+    /competition/all/get,
+    /dashboard/**,
+    /health"
