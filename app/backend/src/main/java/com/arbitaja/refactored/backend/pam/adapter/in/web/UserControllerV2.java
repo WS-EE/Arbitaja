@@ -1,15 +1,22 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web;
 
+import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.SignupRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.OverwriteUserRolesRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.UpdateUserRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.GeneralMessageResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.DtoMapper;
+import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
+import com.arbitaja.refactored.backend.pam.adapter.util.UserMapper;
+import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
+import com.arbitaja.refactored.backend.pam.core.port.in.permission.CheckPermissionUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.CreateUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.GetUserUseCase;
+import com.arbitaja.refactored.backend.pam.core.port.in.user.ManageUserRolesUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.UpdateUserUseCase;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.UserProfileResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,23 +26,24 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode.*;
 
 /**
  * Web adapter (REST Controller) for User operations.
  * This is the inbound adapter in Hexagonal Architecture.
  */
 @RestController
-@RequestMapping("/api/v2/user")
+@RequestMapping("/v2/user")
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "User Management v2", description = "User management operations (Hexagonal Architecture)")
@@ -44,6 +52,10 @@ public class UserControllerV2 {
     private final GetUserUseCase getUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
     private final CreateUserUseCase createUserUseCase;
+    private final ManageUserRolesUseCase manageUserRolesUseCase;
+    private final SignupUserMapper signupUserMapper;
+    private final UserMapper userMapper;
+    private final CheckPermissionUseCase checkPermissionUseCase;
 
     @Operation(summary = "Create user", description = "Create a new user")
     @ApiResponses(value = {
@@ -52,22 +64,17 @@ public class UserControllerV2 {
             @Schema(implementation = DuplicateEntityException.class)) })
     })
     @PostMapping("/create")
-    public ResponseEntity<UserProfileResponse> createUser(@RequestBody SignupRequest request) {
+    @SecurityRequirement(name = "basicAuth")
+    @RequiresPermission(ACCEPT_SIGNUPS)
+    public ResponseEntity<UserProfileResponse> createUser(@RequestBody @Valid SignupRequest request) {
         log.info("Creating user: {}", request);
 
-        CreateUserUseCase.SignupCommand command = CreateUserUseCase.SignupCommand.builder()
-                .username(request.getUsername())
-                .password(request.getPassword())
-                .fullName(request.getFullName())
-                .email(request.getEmail())
-                .schoolId(request.getSchoolId())
-                .build();
-
-        User user = createUserUseCase.createUser(command);
-
-        UserProfileResponse response = DtoMapper.toUserProfileResponse(user);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                DtoMapper.toUserProfileResponse(
+                    createUserUseCase.createUser(
+                            signupUserMapper.toSignupCommand(request)
+                        )
+                ));
     }
 
     @Operation(summary = "Get all users", description = "Retrieve all users in the system")
@@ -78,7 +85,7 @@ public class UserControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
-    @PreAuthorize("hasAuthority('admin')")
+    @RequiresPermission(VIEW_USERS)
     public ResponseEntity<List<UserProfileResponse>> getAllUsers() {
         log.info("Getting all users");
         List<User> users = getUserUseCase.getAllUsers();
@@ -95,6 +102,7 @@ public class UserControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/{id}")
+    @RequiresPermission(VIEW_USERS)
     public ResponseEntity<UserProfileResponse> getUserById(@PathVariable Integer id) {
         log.info("Getting user by id: {}", id);
         User user = getUserUseCase.getUserProfile(id);
@@ -114,28 +122,41 @@ public class UserControllerV2 {
     @PutMapping("/{id}")
     public ResponseEntity<UserProfileResponse> updateUser(
             @PathVariable Integer id,
-            @RequestBody UpdateUserRequest request,
+            @RequestBody @Valid UpdateUserRequest request,
             Authentication authentication) {
 
         log.info("Updating user: {}", id);
 
-        boolean isAdmin = authentication.getAuthorities()
-                .contains(new SimpleGrantedAuthority("admin"));
 
-        UpdateUserUseCase.UpdateUserCommand command = UpdateUserUseCase.UpdateUserCommand.builder()
-                .userId(id)
-                .username(request.getUsername())
-                .fullName(request.getFullName())
-                .email(request.getEmail())
-                .schoolId(request.getSchoolId())
-                .build();
-
-        User user = updateUserUseCase.updateUserProfile(
-                command,
+        boolean canEditOthers = checkPermissionUseCase.assertUserHasPermissions(
                 authentication.getName(),
-                isAdmin
+                new PermissionCode[]{EDIT_USERS}
         );
 
+        User user = updateUserUseCase.updateUserProfile(
+                userMapper.toUpdateUserCommand(id, request),
+                authentication.getName(),
+                canEditOthers
+        );
+
+        return ResponseEntity.ok(DtoMapper.toUserProfileResponse(user));
+    }
+
+    @Operation(summary = "Overwrite user roles", description = "Overwrite all roles for a specific user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated user roles"),
+            @ApiResponse(responseCode = "404", description = "User or role not found", content = {@Content(mediaType = "application/json", schema =
+            @Schema(implementation = EntityNotFoundException.class)) })
+    })
+    @SecurityRequirement(name = "basicAuth")
+    @PutMapping("/{id}/roles")
+    @RequiresPermission(EDIT_USERS)
+    public ResponseEntity<UserProfileResponse> overwriteUserRoles(
+            @PathVariable Integer id,
+            @RequestBody @Valid OverwriteUserRolesRequest request) {
+        log.info("Overwriting roles {} for user {}", request.roleIds(), id);
+
+        User user = manageUserRolesUseCase.overwriteUserRoles(id, request.roleIds());
         return ResponseEntity.ok(DtoMapper.toUserProfileResponse(user));
     }
 
@@ -147,7 +168,7 @@ public class UserControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @RequiresPermission(EDIT_USERS)
     public ResponseEntity<GeneralMessageResponse> deleteUser(@PathVariable Integer id) {
         log.info("Deleting user: {}", id);
         updateUserUseCase.deleteUser(id);
@@ -166,7 +187,8 @@ public class UserControllerV2 {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         log.info("Getting authenticated user profile: {}", username);
-        User user = getUserUseCase.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        User user = getUserUseCase.getUserByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         UserProfileResponse response = DtoMapper.toUserProfileResponse(user);
         return ResponseEntity.ok(response);
     }

@@ -50,13 +50,4 @@ public class Role {
                 .changedAt(now)
                 .build();
     }
-
-    /**
-     * Check if this role has a specific permission
-     */
-    public boolean hasPermission(String permissionName) {
-        if (rolePermissions == null) return false;
-        return rolePermissions.stream()
-                .anyMatch(rp -> rp.getPermission() != null && permissionName.equals(rp.getPermission().getName()));
-    }
 }

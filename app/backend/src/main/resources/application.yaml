@@ -53,20 +53,15 @@ app:
   VITE_APP_BASE_URL: ${VITE_APP_BASE_URL:http://localhost:3000}
   BASE_URL: ${VITE_APP_BASE_URL:http://localhost:8080}
   BASE_PATH: ${VITE_APP_API_ENDPOINT:/}
-  ADMIN_USERNAME: ${ADMIN_USERNAME:admin}
-  ADMIN_PASSWORD: ${ADMIN_PASSWORD:admin}
-  COMPETITOR_USERNAME: ${COMPETITOR_USERNAME:competitor}
-  COMPETITOR_PASSWORD: ${COMPETITOR_PASSWORD:123}
   public-apis:
     "/login,
     /login-user,
-    /error,
-    /user/signup/create,
+    */user/signup/create,
     /swagger-ui/**,
     /swagger/**,
     /api-docs/**,
-    /competition/criteria/**,
-    /competition/get,
-    /competition/all/get,
-    /dashboard/**,
+    */competition/criteria/**,
+    */competition/get,
+    */competition/all/get,
+    */dashboard/**,
     /health"

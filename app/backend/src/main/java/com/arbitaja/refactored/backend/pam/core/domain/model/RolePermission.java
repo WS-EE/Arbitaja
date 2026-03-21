@@ -2,7 +2,6 @@ package com.arbitaja.refactored.backend.pam.core.domain.model;
 
 import lombok.*;
 
-import java.util.Map;
 
 /**
  * Domain entity representing the association between a Role and a Permission.
@@ -24,16 +23,13 @@ public class RolePermission {
     @NonNull
     private Role role;
 
-    private Map<String, String> keyObjectAcl;
-
     /**
      * Factory method to create new RolePermission
      */
-    public static RolePermission createNew(@NonNull Permission permission, @NonNull Role role, Map<String, String> keyObjectAcl) {
+    public static RolePermission createNew(@NonNull Permission permission, @NonNull Role role) {
         return RolePermission.builder()
                 .permission(permission)
                 .role(role)
-                .keyObjectAcl(keyObjectAcl)
                 .build();
     }
 }

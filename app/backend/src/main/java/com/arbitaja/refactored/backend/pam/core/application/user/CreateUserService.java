@@ -45,7 +45,9 @@ public class CreateUserService implements CreateUserUseCase {
         checkUsernameTaken(command.getUsername());
 
         // Get school if provided
-        School school = getSchoolIfExists(command.getSchoolId());
+        School school = command.getSchoolId() != null
+                ? schoolRepository.findById(command.getSchoolId())
+                .orElseThrow(() -> EntityNotFoundException.school(command.getSchoolId())) : null;
 
         // Create personal data
         PersonalData personalData = PersonalData.builder()
@@ -166,13 +168,6 @@ public class CreateUserService implements CreateUserUseCase {
         }
     }
 
-    private School getSchoolIfExists(Integer schoolId) {
-        if (schoolId == null) {
-            return null;
-        }
-        return schoolRepository.findById(schoolId)
-                .orElseThrow(() -> EntityNotFoundException.school(schoolId));
-    }
 
     private ApproveSignupCommand convertSignupToApproveCommand(SignupCommand command, Integer signupUserId) {
         return ApproveSignupCommand.builder()

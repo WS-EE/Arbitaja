@@ -1,6 +1,9 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 /**
@@ -14,14 +17,14 @@ import lombok.*;
 @ToString
 public class UpdateUserRequest {
 
-    @NonNull
+    @Pattern(regexp = "^[a-zA-Z0-9._-]+$")
     private String username;
 
-    @NonNull
     @JsonProperty("full_name")
     private String fullName;
 
-    @NonNull
+    @NotBlank
+    @Email
     private String email;
 
     @JsonProperty("school_id")

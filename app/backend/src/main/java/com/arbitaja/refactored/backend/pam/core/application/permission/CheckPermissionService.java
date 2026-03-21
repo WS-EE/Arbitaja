@@ -17,11 +17,11 @@ public class CheckPermissionService implements CheckPermissionUseCase {
   private final PermissionRepositoryPort permissionRepositoryPort;
 
   @Override
-  public void assertUserHasPermissions(String username, PermissionCode[] permissions) {
+  public boolean assertUserHasPermissions(String username, PermissionCode[] permissions) {
     User user = userRepositoryPort.findByUsername(username)
         .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-    permissionRepositoryPort.userHasPermissions(user.getId(), permissions);
+    return permissionRepositoryPort.userHasPermissions(user.getId(), permissions);
   }
 }
 

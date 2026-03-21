@@ -13,13 +13,6 @@ import java.util.Optional;
 public interface GetUserUseCase {
 
     /**
-     * Get a user by their ID
-     * @param id The user's ID
-     * @return Optional containing the user if found
-     */
-    Optional<User> getUserById(@NonNull Integer id);
-
-    /**
      * Get a user by their username
      * @param username The user's username
      * @return Optional containing the user if found

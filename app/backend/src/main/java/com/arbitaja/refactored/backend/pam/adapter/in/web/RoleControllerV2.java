@@ -5,7 +5,6 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.AddPermissionToRoleRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.CreateRoleRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.RemovePermissionFromRoleRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.RoleResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
@@ -33,7 +32,7 @@ import java.util.Objects;
  * Web adapter (REST Controller) for Role operations.
  */
 @RestController
-@RequestMapping("/api/v2/roles")
+@RequestMapping("/v2/roles")
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "Role Management v2", description = "Role management operations (Hexagonal Architecture)")
@@ -122,7 +121,7 @@ public class RoleControllerV2 {
         return ResponseEntity.status(201).body(
                 toRoleResponse(
                     createRoleUseCase.createRole(
-                        new CreateRoleUseCase.RoleCommand(request.name())
+                        new CreateRoleUseCase.RoleCommand(request.name(), request.permissionIds())
                     )
                 )
         );
@@ -140,43 +139,25 @@ public class RoleControllerV2 {
     public ResponseEntity<RoleResponse> updateRole(@PathVariable Integer id, @RequestBody CreateRoleRequest request) {
         log.info("Updating role: {}", id);
         return ResponseEntity.ok(toRoleResponse(
-                createRoleUseCase.updateRole(id, new CreateRoleUseCase.RoleCommand(request.name()))
+                createRoleUseCase.updateRole(id, new CreateRoleUseCase.RoleCommand(request.name(), request.permissionIds()))
         ));
     }
 
-    @Operation(summary = "Add permission to role", description = "Assign a permission to a specific role")
+    @Operation(summary = "Overwrite role permissions", description = "Overwrite all permissions for a specific role")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully added permission to role"),
+            @ApiResponse(responseCode = "200", description = "Successfully updated role permissions"),
             @ApiResponse(responseCode = "404", description = "Role or permission not found", content = {@Content(mediaType = "application/json", schema =
             @Schema(implementation = EntityNotFoundException.class)) })
     })
     @SecurityRequirement(name = "basicAuth")
-    @PostMapping("/{roleId}/permissions/add")
-    @RequiresPermission(CREATE_UPDATE_ROLES)
-    public ResponseEntity<RoleResponse> addPermissionToRole(
+    @PutMapping("/{roleId}/permissions")
+    @RequiresPermission({CREATE_UPDATE_ROLES})
+    public ResponseEntity<RoleResponse> overwriteRolePermissions(
             @PathVariable Integer roleId,
             @RequestBody AddPermissionToRoleRequest request) {
-        log.info("Adding permission {} to role {}", request.permissionId(), roleId);
+        log.info("Overwriting permissions {} for role {}", request.permissionIds(), roleId);
         return ResponseEntity.ok(toRoleResponse(
-                manageRolePermissionsUseCase.addPermissionToRole(roleId, request.permissionId(), request.keyObjectAcl())
-        ));
-    }
-
-    @Operation(summary = "Remove permission from role", description = "Unassign a permission from a specific role")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully removed permission from role"),
-            @ApiResponse(responseCode = "404", description = "Role or permission not found", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = EntityNotFoundException.class)) })
-    })
-    @SecurityRequirement(name = "basicAuth")
-    @PostMapping("/{roleId}/permissions/remove")
-    @RequiresPermission(CREATE_UPDATE_ROLES)
-    public ResponseEntity<RoleResponse> removePermissionFromRole(
-            @PathVariable Integer roleId,
-            @RequestBody RemovePermissionFromRoleRequest request) {
-        log.info("Removing permission {} from role {}", request.permissionId(), roleId);
-        return ResponseEntity.ok(toRoleResponse(
-                manageRolePermissionsUseCase.removePermissionFromRole(roleId, request.permissionId())
+                manageRolePermissionsUseCase.overwriteRolePermissions(roleId, request.permissionIds())
         ));
     }
 
@@ -194,8 +175,6 @@ public class RoleControllerV2 {
         return new RoleResponse(
                 role.getId(),
                 role.getName(),
-                role.getCreatedAt(),
-                role.getChangedAt(),
                 permissions
         );
     }

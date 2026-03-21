@@ -59,7 +59,7 @@ public class UserProfileResponse {
     @AllArgsConstructor
     public static class SchoolResponse {
         @Schema(description = "School ID", example = "101")
-        private Object id;
+        private Integer id;
 
         @Schema(description = "School name", example = "Springfield High School")
         private String name;

@@ -61,8 +61,6 @@ public class DtoMapper {
         return new RoleResponse(
                 role.getId(),
                 role.getName(),
-                role.getCreatedAt(),
-                role.getChangedAt(),
                 permissions
         );
     }

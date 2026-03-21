@@ -25,7 +25,6 @@ public class CreatePermissionService implements CreatePermissionUseCase {
         Permission permission = Permission.builder()
                 .name(command.name())
                 .key(command.key())
-                .keyObject(command.keyObject())
                 .build();
 
         return permissionRepositoryPort.save(permission);
@@ -42,7 +41,6 @@ public class CreatePermissionService implements CreatePermissionUseCase {
 
         existingPermission.setName(command.name());
         existingPermission.setKey(command.key());
-        existingPermission.setKeyObject(command.keyObject());
 
         return permissionRepositoryPort.save(existingPermission);
     }

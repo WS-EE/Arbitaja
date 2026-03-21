@@ -14,7 +14,6 @@ public interface CreatePermissionUseCase {
 
     record PermissionCommand(
             String name,
-            String key,
-            String keyObject
+            String key
     ){ }
 }

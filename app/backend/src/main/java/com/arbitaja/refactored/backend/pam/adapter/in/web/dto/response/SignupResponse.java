@@ -13,5 +13,4 @@ public class SignupResponse {
     String username;
     String email;
     Integer schoolId;
-    String message;
 }

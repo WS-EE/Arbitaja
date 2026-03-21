@@ -25,19 +25,16 @@ public class Permission {
     @NonNull
     private String key;
 
-    private String keyObject;
-
     @Builder.Default
     private Set<RolePermission> rolePermissions = new HashSet<>();
 
     /**
      * Factory method to create new Permission
      */
-    public static Permission createNew(@NonNull String name, @NonNull String key, String keyObject) {
+    public static Permission createNew(@NonNull String name, @NonNull String key) {
         return Permission.builder()
                 .name(name)
                 .key(key)
-                .keyObject(keyObject)
                 .build();
     }
 }

@@ -51,6 +51,6 @@ public interface PermissionRepositoryPort {
      * @param userId         User ID
      * @param permissionCode Permission code to check
      */
-    void userHasPermissions(@NonNull Integer userId, @NonNull PermissionCode[] permissionCode);
+    boolean userHasPermissions(@NonNull Integer userId, @NonNull PermissionCode[] permissionCode);
 }
 

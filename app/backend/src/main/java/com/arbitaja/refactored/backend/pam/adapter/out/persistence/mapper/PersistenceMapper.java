@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,12 +36,20 @@ public class PersistenceMapper {
     }
 
     public UserJpaEntity toEntity(@NonNull User domain) {
-        return UserJpaEntity.builder()
+        UserJpaEntity userEntity = UserJpaEntity.builder()
                 .id(domain.getId())
                 .username(domain.getUsername())
                 .saltedPassword(domain.getSaltedPassword())
                 .personalData(domain.getPersonalData() != null ? toEntity(domain.getPersonalData()) : null)
                 .build();
+
+        if (domain.getUserRoles() != null) {
+            userEntity.setUserRoles(domain.getUserRoles().stream()
+                    .map(userRole -> toEntityUserRole(userRole, userEntity))
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+        }
+
+        return userEntity;
     }
 
     // PersonalData mappings
@@ -145,7 +154,22 @@ public class PersistenceMapper {
                 .id(entity.getId())
                 .permission(toDomain(entity.getPermission()))
                 .role(role)
-                .keyObjectAcl(entity.getKeyObjectAcl())
+                .build();
+    }
+
+    public RolePermission toDomain(@NonNull RolePermissionJpaEntity entity) {
+        return RolePermission.builder()
+                .id(entity.getId())
+                .permission(toDomain(entity.getPermission()))
+                .role(toDomain(entity.getRole()))
+                .build();
+    }
+
+    public RolePermissionJpaEntity toEntity(@NonNull RolePermission domain) {
+        return RolePermissionJpaEntity.builder()
+                .id(domain.getId())
+                .permission(toEntity(domain.getPermission()))
+                .role(toEntity(domain.getRole()))
                 .build();
     }
 
@@ -178,7 +202,6 @@ public class PersistenceMapper {
                 .id(entity.getId())
                 .name(entity.getName())
                 .key(entity.getKey())
-                .keyObject(entity.getKeyObject())
                 .build();
     }
 
@@ -187,7 +210,6 @@ public class PersistenceMapper {
                 .id(domain.getId())
                 .name(domain.getName())
                 .key(domain.getKey())
-                .keyObject(domain.getKeyObject())
                 .build();
     }
 
@@ -198,6 +220,15 @@ public class PersistenceMapper {
                 .user(user)
                 .role(toDomain(entity.getRole()))
                 .createdAt(entity.getCreatedAt())
+                .build();
+    }
+
+    private UserRoleJpaEntity toEntityUserRole(@NonNull UserRole domain, @NonNull UserJpaEntity user) {
+        return UserRoleJpaEntity.builder()
+                .id(domain.getId())
+                .user(user)
+                .role(toEntity(domain.getRole()))
+                .createdAt(domain.getCreatedAt())
                 .build();
     }
 

@@ -59,7 +59,7 @@ public class PermissionPersistenceAdapter implements PermissionRepositoryPort {
     }
 
     @Override
-    public void userHasPermissions(@NonNull Integer userId, @NonNull PermissionCode[] requiredPermissions) {
+    public boolean userHasPermissions(@NonNull Integer userId, @NonNull PermissionCode[] requiredPermissions) {
         List<PermissionJpaEntity> permissions = permissionJpaRepository.findByUserId(userId);
         Arrays.stream(requiredPermissions).forEach(required -> {
             boolean hasPermission = permissions.stream()
@@ -68,6 +68,7 @@ public class PermissionPersistenceAdapter implements PermissionRepositoryPort {
                 throw new UnauthorizedException("Access denied: missing permission " + required.name());
             }
         });
+        return true;
     }
 }
 
