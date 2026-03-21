@@ -53,7 +53,7 @@ const getCriteriasByCompetition = async(competitionId) => {
 
         // Get criterias based on competition id
         const response = await axios.get(
-            'scoring/criteria/by/competition',
+            'v1/scoring/criteria/by/competition',
             { 
                 params: { 
                     competition_id: competitionId 
@@ -80,7 +80,7 @@ const getCompetitionById = async(id) => {
         if (props.isEdit === true){
 
             // If prop schools is not defined try to get them ourselves
-            const response = await axios.get('competition/get?id=' + id);
+            const response = await axios.get('v1/competition/get?id=' + id);
             competition.value = response.data
 
             // Format dates
@@ -112,7 +112,7 @@ const getCompetitionById = async(id) => {
 
         // Get all users
         // Try getting the Users
-        const allUsers = await axios.get('user/profile/all')
+        const allUsers = await axios.get('v1/user/profile/all')
         
         // Get all the admin users
         allUsers.data.forEach((user) => {
@@ -141,7 +141,7 @@ const getCompetitorsByCompetition = async(competitionId) => {
 
         // Get and set competitors
         const response = await axios.get(
-            'competitor/get/all/in/competition', 
+            'v1/competitor/get/all/in/competition',
             { params: { id: competitionId } } 
         );
         competitors.value = response.data
@@ -191,9 +191,9 @@ const saveComp = async() => {
 
         // Try to edit or add competition
         if (props.isEdit === true){
-            await axios.put('competition/edit', competition.value)
+            await axios.put('v1/competition/edit', competition.value)
         } else {
-            await axios.post('competition/add', competition.value)
+            await axios.post('v1/competition/add', competition.value)
         }
 
         // Show success when everything is done

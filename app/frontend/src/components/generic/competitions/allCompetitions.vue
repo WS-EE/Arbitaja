@@ -42,7 +42,7 @@ const getAllCompetition = async() => {
     // Try getting all competitions
     try{
         // Try getting all competitions
-        const response = await axios.get('competition/all/get')
+        const response = await axios.get('v1/competition/all/get')
         competitions.value = response.data
         
         // sort competitions based on type

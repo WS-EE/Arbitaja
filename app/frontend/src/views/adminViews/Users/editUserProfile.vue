@@ -17,7 +17,7 @@ const user = ref([])
 
 onMounted(async() =>{
     try {
-        const response = await axios('/user/profile/get', { params: { id: userID }})
+        const response = await axios('/v2/user/:userId', { urlParams: { id: userID }})
         user.value = response.data
     } catch(e) {
 

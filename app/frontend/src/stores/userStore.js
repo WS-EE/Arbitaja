@@ -7,10 +7,12 @@ export const useUserStore = defineStore('user', {
     roles: [],        // flat string[] e.g. ['USER', 'ADMIN']
     permissions: [],   // flat string[] e.g. ['USER_VIEW', 'USER_CREATE']
     personal_data: {
-      first_name: null,
-      last_name: null,
+      full_name: null,
       email: null,
-      school: null,
+      school: {
+        id: null,
+        name: null
+      },
     },
   }),
 

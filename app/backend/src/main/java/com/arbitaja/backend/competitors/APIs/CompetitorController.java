@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 @EnableMethodSecurity
 @RestController("competitor")
-@RequestMapping("/competitor")
+@RequestMapping("/v1/competitor")
 public class CompetitorController {
     private static final Logger log = LogManager.getLogger(CompetitorController.class);
 

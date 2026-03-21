@@ -65,7 +65,7 @@ const getAllCompetitors = async () => {
         isLoadingCompetirors.value = true
 
         // Get competitors
-        const response = await axios.get('competitor/get/all')
+        const response = await axios.get('v1/competitor/get/all')
 
         // Set competitors
         allCompetitors.value = response.data
@@ -92,7 +92,7 @@ const addCompetitorToCompetition = async (competitionId, competitorId) => {
         }
 
         // Add exstiting competitor to competition
-        await axios.post('competitor/add/to/competition', apiBody)
+        await axios.post('v1/competitor/add/to/competition', apiBody)
 
         // alert success
         showAlert('Success on adding competitor to competition.', 'success')

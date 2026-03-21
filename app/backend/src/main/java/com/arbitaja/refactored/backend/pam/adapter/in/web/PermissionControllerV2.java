@@ -28,7 +28,7 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
  * Web adapter (REST Controller) for Permission operations.
  */
 @RestController
-@RequestMapping("/api/v2/permissions")
+@RequestMapping("/v2/permissions")
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "Permission Management v2", description = "Permission management operations (Hexagonal Architecture)")

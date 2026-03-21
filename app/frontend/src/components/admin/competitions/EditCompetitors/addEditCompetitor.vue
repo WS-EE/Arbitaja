@@ -86,7 +86,7 @@ const editCompetitor = async(id, displayTypeId, alias, personalDataId) => {
         }
 
         // Edit data of competitor
-        await axios.put('competitor/edit', editedCompetitor)
+        await axios.put('v1/competitor/edit', editedCompetitor)
 
         // Show success on edit
         showAlert('Edit competitor <strong>' + alias + '</strong> was a success.', 'success')
@@ -165,7 +165,7 @@ function showAlert(message, type, timeout){
 const getSchools = async() => {
     try {
         isLoadingSchool.value = true
-        const response = await axios.get('school/all/get')
+        const response = await axios.get('v1/school/all/get')
         allSchools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
@@ -178,7 +178,7 @@ const getSchools = async() => {
 const getAllUsers = async() => {
     try {
         isLoadingUsers.value = true
-        const response = await axios.get('user/profile/all')
+        const response = await axios.get('v1/user/profile/all')
         allUsers.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)

@@ -2,6 +2,8 @@
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
 import { RouterLink } from 'vue-router';
+import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
+import { useUserStore } from '@/stores/userStore';
 
 const allUsers = ref([]);
 const isLoadingUsers = ref(true)
@@ -26,7 +28,7 @@ const getAllUsers = async() => {
     // Try getting user data
     try{
         // Try getting the Users
-        const response = await axios.get('user/profile/all')
+        const response = await axios.get('v1/user/profile/all')
         allUsers.value = response.data
     } catch(error) {
         // Throw console log error if fail
@@ -39,9 +41,9 @@ onMounted(async () => {
         // Get Users with a function
         await getAllUsers();
 
-        // Get the current user
-        const curUser = await axios.get('user/profile/get')
-        curUserId.value = curUser.data.id
+        // Get the current authenticated user from the auth store
+        await ensureAuthRehydrated({ force: true })
+        curUserId.value = useUserStore().id
     } catch(error) {
         showAlert('Something went wrong. <br> Error:' + error, 'danger', 9000)
     } finally {
@@ -64,7 +66,7 @@ const unsetUserToDelete = () => {
 // Delete user
 const deleteUser = async(userID, userName) => {
     try {
-        await axios.delete('/user/profile/delete', { params: {id: userID} })
+        await axios.delete('v1//user/profile/delete', { params: {id: userID} })
         showAlert('User <strong>'+userName+'</strong> has been succesfully deleted.', 'success')
     } catch(error){
         // Throw error if fail

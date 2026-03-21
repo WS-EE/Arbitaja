@@ -29,7 +29,7 @@ app.use(VueCookies, { expires: '7d'}, PrimeVue);
 app.config.globalProperties.$arbitajaVersion = "devel-build"
 
 // Set copyright Header to use
-app.config.globalProperties.$copyrightHeader = "Copyright (c) 2025 WorldSkills Estonia"
+app.config.globalProperties.$copyrightHeader = "Copyright (c) 2025-2026 WorldSkills Estonia"
 
 app.use(router);
 

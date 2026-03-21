@@ -60,7 +60,7 @@ const resetPassword = async(userId, oldPassword, setPassword, confirmSetPassword
         if (setPassword === confirmSetPassword) {
 
             // try reseting password
-            await axios.put('user/profile/update_password', apiObject)
+            await axios.put('v1/user/profile/update_password', apiObject)
 
             // Show alert password changed
             showAlert('Password changed successfully!', 'success')

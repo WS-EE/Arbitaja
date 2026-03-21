@@ -34,7 +34,7 @@ import java.util.Map;
 
 @EnableMethodSecurity
 @RestController("user")
-@RequestMapping("/user")
+@RequestMapping("/v1/user")
 public class UserController {
     private static final Logger log = LogManager.getLogger(UserController.class);
 

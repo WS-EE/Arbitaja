@@ -59,7 +59,7 @@ const getAllCriterias = async () => {
         isLoadingCompetirors.value = true
 
         // Get Criterias
-        const response = await axios.get('scoring/criteria/get/all')
+        const response = await axios.get('v1/scoring/criteria/get/all')
 
         // Set Criterias
         allCriterias.value = response.data
@@ -86,7 +86,7 @@ const addCriteriaToCompetition = async (competitionId, CriteriaId) => {
         }
 
         // Add exstiting Criteria to competition
-        const response = await axios.post('scoring/criteria/add/to/competition', null, { params: apiParams })
+        const response = await axios.post('v1/scoring/criteria/add/to/competition', null, { params: apiParams })
 
         // alert success
         showAlert('Success on adding Criteria to competition.', 'success')

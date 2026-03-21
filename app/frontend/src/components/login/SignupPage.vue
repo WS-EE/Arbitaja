@@ -19,7 +19,7 @@ const userSignup = async () => {
     // check if passwords match
     if (password.value === rePassword.value){
       // Try to signup user
-      const response = await axios.post('user/signup/create', {
+      const response = await axios.post('v1/user/signup/create', {
         username: username.value,
         salted_password: password.value,
         personal_data: {

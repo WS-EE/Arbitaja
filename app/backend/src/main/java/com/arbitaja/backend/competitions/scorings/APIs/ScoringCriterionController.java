@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("ScoringCriteria")
-@RequestMapping("")
+@RequestMapping("/v1")
 public class ScoringCriterionController {
     private static final Logger log = LogManager.getLogger(ScoringCriterionController.class);
 

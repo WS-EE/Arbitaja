@@ -19,11 +19,11 @@ const onAddSchool = async() => {
 const getSchools = async() => {
     try {
         // Try getting school data
-        const response = await axios.get('school/all/get')
+        const response = await axios.get('v1/school/all/get')
         schools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. <br> Error: ' + error, 'danger', 9000)
-    };
+    }
 }
 
 onMounted(async () => {

@@ -29,7 +29,7 @@ import java.util.Map;
 
 @EnableMethodSecurity
 @RestController("competition")
-@RequestMapping("/competition")
+@RequestMapping("/v1/competition")
 public class CompetitionController {
     private static final Logger log = LogManager.getLogger(CompetitionController.class);
 

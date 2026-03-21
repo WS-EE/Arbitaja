@@ -3,27 +3,17 @@ import adminNavBar from '@/components/admin/adminNavBar.vue';
 import { RouterView } from 'vue-router';
 
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
-
-// import cookie handler
-import { useCookies } from '@/assets/js/useCookies';
 import router from '@/router';
-const $cookies = useCookies(); 
+import {useUserStore} from "@/stores/userStore.js";
+import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 
 // Set isUser admin variable
 const isUserAdmin = ref();
-const userParameters = ref();
 
 onMounted(async () => {
   try {
-    const response = await axios.get('user/profile/get')
-    if(response.status === 200 && response.data.username !== 'anonymousUser'){
-      // Set user to be logged in
-      await $cookies.set('isLoggedIn', true, 0);
-      await $cookies.set('userParameters', response.data, 0);
-    }
-    userParameters.value = await $cookies.get('userParameters') 
-    isUserAdmin.value = await checkUserAdmin();
+    await ensureAuthRehydrated({ force: true })
+    isUserAdmin.value = useUserStore().hasPrivilege('ADMIN')
 
     if (!isUserAdmin.value) {
         await router.replace('/404');
@@ -31,28 +21,8 @@ onMounted(async () => {
 
   } catch(error) {
     await router.replace('/404');
-  };
+  }
 });
-
-// is the user admin
-const checkUserAdmin = async () => {
-    // Get user groups
-    try {
-        let isTrue = false
-        const userGroups = userParameters.value.roles
-        // loop over user groups
-        for (const role of userGroups){
-            // if we find admin groups in users groups return true
-            if (role.name === 'admin') {
-                isTrue = true
-            }
-        }
-        // else return false
-        return isTrue
-    } catch(error) {
-        return false
-    }
-}
 </script>
 
 <template>

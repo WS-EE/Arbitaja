@@ -37,7 +37,7 @@ const getCompetitionResults = async(competitionId) => {
 
         // Get the results
         const response = await axios.get(
-            'dashboard/competition/history', 
+            'v1/dashboard/competition/history',
             { 
                 params: {
                     competition_id: ''+competitionId 

@@ -19,7 +19,7 @@ const emit = defineEmits(['addSchool'])
 const createSchool = async(school) => {
     try {
         // Register the school
-        await axios.post('/school/register', { "name": school })
+        await axios.post('/v1/school/register', { "name": school })
         
         // show alert of success
         await showAlert('School <strong>' + school + '</strong> has been created.', 'success')

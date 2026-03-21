@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import VueCookies from 'vue-cookies';
 import { useUserStore } from '@/stores/userStore';
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 import loginView from '@/views/loginView.vue';
@@ -150,24 +149,20 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  const requiresAuth = Boolean(to.meta.requiresAuth || to.meta.requiresPrivilege)
+  const requiresAuth = Boolean(to.meta.requiresAuth || to.meta.requiresPrivilege);
+  const store = useUserStore();
 
   if (requiresAuth) {
-    const hasSession = VueCookies.isKey('JSESSIONID')
-    const store = useUserStore()
-    const shouldForceRehydrate = hasSession && !store.id
-    await ensureAuthRehydrated({ force: shouldForceRehydrate })
+    await ensureAuthRehydrated({ force: !store.id })
   }
 
-  // 1. Session check
-  const hasSession = VueCookies.isKey('JSESSIONID')
-  if (to.meta.requiresAuth && !hasSession) {
+  // 1. Session check resolved by /v2/user/auth via auth rehydration
+  if (requiresAuth && !store.id) {
     return { path: '/' }
   }
 
   // 2. Privilege check (equivalent to useRequirePrivilege)
   if (to.meta.requiresPrivilege) {
-    const store = useUserStore()
     if (!store.hasPrivilege(to.meta.requiresPrivilege)) {
       return { path: '/', query: { forbidden: '' } }
     }

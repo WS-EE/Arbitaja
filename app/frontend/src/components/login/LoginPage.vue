@@ -9,6 +9,7 @@ import axios from 'axios';
 import { useCookies } from '@/assets/js/useCookies';
 const $cookies = useCookies(); 
 import { useAuthRehydrate } from '@/composables/useAuthRehydrate'
+import { useUserStore } from '@/stores/userStore'
 
 const router = useRouter();
 const username = ref("");
@@ -57,12 +58,10 @@ const userLogin = () => {
 
 // Redirect back to previos page when user is logged in.
 onBeforeMount(async () => {
-    try {
-      const userData = await axios.get('user/profile/get')
-      if (userData.status === 200) {
-        router.back();
-      }
-    } catch(e) {}
+    await loadAuth({ force: true })
+    if (useUserStore().id) {
+      router.back();
+    }
 })
 </script>
 
