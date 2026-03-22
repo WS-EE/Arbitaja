@@ -66,7 +66,7 @@ const unsetUserToDelete = () => {
 // Delete user
 const deleteUser = async(userID, userName) => {
     try {
-        await axios.delete('v1//user/profile/delete', { params: {id: userID} })
+        await axios.delete('v1/user/profile/delete', { params: {id: userID} })
         showAlert('User <strong>'+userName+'</strong> has been succesfully deleted.', 'success')
     } catch(error){
         // Throw error if fail

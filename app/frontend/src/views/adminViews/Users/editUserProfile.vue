@@ -13,11 +13,12 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 // Get the user we want to edit
 import userProfile from '@/components/generic/userEdit/userProfile.vue';
 import axios from 'axios';
+import {useUserStore} from "@/stores/userStore.js";
 const user = ref([])
 
 onMounted(async() =>{
     try {
-        const response = await axios('/v2/user/:userId', { urlParams: { id: userID }})
+        const response = await axios(`/v2/user/${useUserStore().id}`)
         user.value = response.data
     } catch(e) {
 

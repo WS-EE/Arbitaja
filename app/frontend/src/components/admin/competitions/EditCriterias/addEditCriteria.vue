@@ -63,7 +63,7 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
             }
         
             // add the new criteria
-            await axios.post('scoring/criteria/add', newCriteria)
+            await axios.post('v1/scoring/criteria/add', newCriteria)
 
             // show alert of success
             await showAlert(props.buttonName + ' <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
@@ -82,7 +82,7 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
                 totalPoints: addEditCriteria.totalPoints
             }
             // Register the item with personal data
-            await axios.put('scoring/criteria/update', updateCriteria)
+            await axios.put('v1/scoring/criteria/update', updateCriteria)
 
             // Edit alert success
             await showAlert('Editing criteria <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
