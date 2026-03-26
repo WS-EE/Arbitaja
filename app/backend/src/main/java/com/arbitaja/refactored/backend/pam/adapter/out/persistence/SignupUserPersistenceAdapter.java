@@ -26,20 +26,20 @@ public class SignupUserPersistenceAdapter implements SignupUserRepositoryPort {
     @Override
     public Optional<SignupUser> findById(@NonNull Integer id) {
         return signupUserJpaRepository.findById(id)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public Optional<SignupUser> findByUsername(@NonNull String username) {
         return signupUserJpaRepository.findByUsername(username)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public List<SignupUser> findAll() {
         return signupUserJpaRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+            .map(mapper::toDomain)
+            .collect(Collectors.toList());
     }
 
     @Override

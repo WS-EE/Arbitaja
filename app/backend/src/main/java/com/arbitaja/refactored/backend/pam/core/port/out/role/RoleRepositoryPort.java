@@ -13,6 +13,7 @@ public interface RoleRepositoryPort {
 
     /**
      * Find role by ID
+     *
      * @param id Role ID
      * @return Optional containing role if found
      */
@@ -20,6 +21,7 @@ public interface RoleRepositoryPort {
 
     /**
      * Find role by name
+     *
      * @param name Role name
      * @return Optional containing role if found
      */
@@ -27,12 +29,14 @@ public interface RoleRepositoryPort {
 
     /**
      * Find all roles
+     *
      * @return List of all roles
      */
     List<Role> findAll();
 
     /**
      * Find roles by user ID
+     *
      * @param userId User ID
      * @return List of roles for the user
      */
@@ -40,6 +44,7 @@ public interface RoleRepositoryPort {
 
     /**
      * Save a role
+     *
      * @param role Role to save
      * @return Saved role
      */
@@ -47,6 +52,7 @@ public interface RoleRepositoryPort {
 
     /**
      * Delete a role
+     *
      * @param role Role to delete
      */
     void delete(@NonNull Role role);

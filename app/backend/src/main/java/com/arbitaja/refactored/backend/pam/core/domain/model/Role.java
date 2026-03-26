@@ -45,9 +45,9 @@ public class Role {
     public static Role createNew(@NonNull String name) {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         return Role.builder()
-                .name(name)
-                .createdAt(now)
-                .changedAt(now)
-                .build();
+            .name(name)
+            .createdAt(now)
+            .changedAt(now)
+            .build();
     }
 }

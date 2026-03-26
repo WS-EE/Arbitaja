@@ -14,12 +14,12 @@ import java.util.List;
 public interface PermissionJpaRepository extends JpaRepository<PermissionJpaEntity, Integer> {
 
     @Query("""
-        SELECT DISTINCT p FROM PermissionJpaEntity p
-        JOIN p.rolePermissions rp
-        JOIN rp.role r
-        JOIN r.userRoles ur
-        WHERE ur.user.id = :userId
-    """)
+            SELECT DISTINCT p FROM PermissionJpaEntity p
+            JOIN p.rolePermissions rp
+            JOIN rp.role r
+            JOIN r.userRoles ur
+            WHERE ur.user.id = :userId
+        """)
     List<PermissionJpaEntity> findByUserId(Integer userId);
 }
 

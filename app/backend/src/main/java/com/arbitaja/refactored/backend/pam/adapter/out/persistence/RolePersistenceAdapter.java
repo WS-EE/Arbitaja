@@ -25,27 +25,27 @@ public class RolePersistenceAdapter implements RoleRepositoryPort {
     @Override
     public Optional<Role> findById(@NonNull Integer id) {
         return roleJpaRepository.findById(id)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public Optional<Role> findByName(@NonNull String name) {
         return roleJpaRepository.findByName(name)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public List<Role> findAll() {
         return roleJpaRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+            .map(mapper::toDomain)
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<Role> findByUserId(@NonNull Integer userId) {
         return roleJpaRepository.findByUserId(userId).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+            .map(mapper::toDomain)
+            .collect(Collectors.toList());
     }
 
     @Override

@@ -14,6 +14,7 @@ public interface PermissionRepositoryPort {
 
     /**
      * Find permission by ID
+     *
      * @param id Permission ID
      * @return Optional containing permission if found
      */
@@ -21,12 +22,14 @@ public interface PermissionRepositoryPort {
 
     /**
      * Find all permissions
+     *
      * @return List of all permissions
      */
     List<Permission> findAll();
 
     /**
      * Find permissions by user ID
+     *
      * @param userId User ID
      * @return List of permissions for the user
      */
@@ -34,6 +37,7 @@ public interface PermissionRepositoryPort {
 
     /**
      * Save a permission
+     *
      * @param permission Permission to save
      * @return Saved permission
      */
@@ -41,6 +45,7 @@ public interface PermissionRepositoryPort {
 
     /**
      * Delete a permission
+     *
      * @param permission Permission to delete
      */
     void delete(@NonNull Permission permission);

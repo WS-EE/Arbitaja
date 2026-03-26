@@ -27,20 +27,20 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
     @Override
     public Optional<User> findById(@NonNull Integer id) {
         return userJpaRepository.findById(id)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public Optional<User> findByUsername(@NonNull String username) {
         return userJpaRepository.findByUsername(username)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public List<User> findAll() {
         return userJpaRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+            .map(mapper::toDomain)
+            .collect(Collectors.toList());
     }
 
     @Override

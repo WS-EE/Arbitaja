@@ -6,7 +6,8 @@ import java.util.List;
 
 
 public record CreateRoleRequest(
-        @NotBlank
-        String name,
-        List<Integer> permissionIds
-) {}
+    @NotBlank
+    String name,
+    List<Integer> permissionIds
+) {
+}

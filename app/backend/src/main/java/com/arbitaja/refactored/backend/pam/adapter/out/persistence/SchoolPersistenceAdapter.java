@@ -26,14 +26,14 @@ public class SchoolPersistenceAdapter implements SchoolRepositoryPort {
     @Override
     public Optional<School> findById(@NonNull Integer id) {
         return schoolJpaRepository.findById(id)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public List<School> findAll() {
         return schoolJpaRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+            .map(mapper::toDomain)
+            .collect(Collectors.toList());
     }
 
     @Override

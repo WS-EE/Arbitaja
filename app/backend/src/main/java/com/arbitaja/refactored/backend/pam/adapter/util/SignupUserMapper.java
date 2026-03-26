@@ -9,6 +9,8 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SignupUserMapper {
     SignupResponse toSignupResponse(SignupUser signupUser);
+
     CreateUserUseCase.SignupCommand toSignupCommand(SignupRequest signupRequest);
+
     CreateUserUseCase.ApproveSignupCommand toApproveSignupCommand(Integer signupUserId, SignupRequest signupRequest);
 }

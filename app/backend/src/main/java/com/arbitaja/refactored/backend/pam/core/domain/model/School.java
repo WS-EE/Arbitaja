@@ -24,7 +24,7 @@ public class School {
      */
     public static School createNew(@NonNull String name) {
         return School.builder()
-                .name(name)
-                .build();
+            .name(name)
+            .build();
     }
 }

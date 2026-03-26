@@ -13,12 +13,14 @@ public interface GetPermissionUseCase {
 
     /**
      * Get all permissions
+     *
      * @return List of all permissions
      */
     List<Permission> getAllPermissions();
 
     /**
      * Get permission by ID
+     *
      * @param id Permission ID
      * @return Optional containing permission if found
      */
@@ -26,6 +28,7 @@ public interface GetPermissionUseCase {
 
     /**
      * Get permissions for a specific user
+     *
      * @param userId User ID
      * @return List of permissions assigned to the user
      */

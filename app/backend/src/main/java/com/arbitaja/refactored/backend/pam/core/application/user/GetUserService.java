@@ -1,7 +1,7 @@
 package com.arbitaja.refactored.backend.pam.core.application.user;
 
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
-import com.arbitaja.refactored.backend.pam.core.domain.model.*;
+import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.GetUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort;
 import lombok.NonNull;
@@ -35,7 +35,7 @@ public class GetUserService implements GetUserUseCase {
     @Override
     public User getUserProfile(@NonNull Integer userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> EntityNotFoundException.user(userId));
+            .orElseThrow(() -> EntityNotFoundException.user(userId));
 
     }
 }

@@ -24,21 +24,21 @@ public class RolePermissionPersistenceAdapter implements RolePermissionRepositor
     @Override
     public Optional<RolePermission> findById(@NonNull Integer id) {
         return rolePermissionJpaRepository.findById(id)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public List<RolePermission> findAll() {
         return rolePermissionJpaRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .toList();
+            .map(mapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<RolePermission> findByRoleId(@NonNull Integer roleId) {
         return rolePermissionJpaRepository.findByRoleId(roleId).stream()
-                .map(mapper::toDomain)
-                .toList();
+            .map(mapper::toDomain)
+            .toList();
     }
 
     @Override

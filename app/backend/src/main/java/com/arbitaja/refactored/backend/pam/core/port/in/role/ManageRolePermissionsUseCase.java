@@ -12,7 +12,8 @@ public interface ManageRolePermissionsUseCase {
 
     /**
      * Overwrite all permissions of a role with the provided permission IDs.
-     * @param roleId The ID of the role
+     *
+     * @param roleId        The ID of the role
      * @param permissionIds Full list of permission IDs the role should have after update
      * @return Updated role with synchronized permissions
      */

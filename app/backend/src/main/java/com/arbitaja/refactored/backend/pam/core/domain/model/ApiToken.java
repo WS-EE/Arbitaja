@@ -36,10 +36,10 @@ public class ApiToken {
      */
     public static ApiToken createNew(@NonNull User user, @NonNull String name, @NonNull String token) {
         return ApiToken.builder()
-                .user(user)
-                .name(name)
-                .token(token)
-                .build();
+            .user(user)
+            .name(name)
+            .token(token)
+            .build();
     }
 }
 

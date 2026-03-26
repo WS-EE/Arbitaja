@@ -33,11 +33,11 @@ public class PersonalData {
      */
     public static PersonalData createNew(@NonNull String fullName, @NonNull String email, School school) {
         return PersonalData.builder()
-                .fullName(fullName)
-                .email(email)
-                .school(school)
-                .createdAt(new Timestamp(System.currentTimeMillis()))
-                .build();
+            .fullName(fullName)
+            .email(email)
+            .school(school)
+            .createdAt(new Timestamp(System.currentTimeMillis()))
+            .build();
     }
 }
 

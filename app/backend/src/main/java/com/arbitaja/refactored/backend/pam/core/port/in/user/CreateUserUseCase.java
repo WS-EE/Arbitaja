@@ -14,6 +14,7 @@ public interface CreateUserUseCase {
 
     /**
      * Create a signup request for a new user
+     *
      * @param command Command containing signup data
      * @return Created SignupUser
      */
@@ -21,6 +22,7 @@ public interface CreateUserUseCase {
 
     /**
      * Approve a signup request and create a full user
+     *
      * @param command Command containing approval data
      * @return Created User
      */
@@ -28,6 +30,7 @@ public interface CreateUserUseCase {
 
     /**
      * Decline/reject a signup request
+     *
      * @param signupUserId ID of the signup request to decline
      */
     void declineSignupUser(@NonNull Integer signupUserId);

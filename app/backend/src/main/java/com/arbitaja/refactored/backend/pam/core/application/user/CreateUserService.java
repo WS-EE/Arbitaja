@@ -46,24 +46,24 @@ public class CreateUserService implements CreateUserUseCase {
 
         // Get school if provided
         School school = command.getSchoolId() != null
-                ? schoolRepository.findById(command.getSchoolId())
-                .orElseThrow(() -> EntityNotFoundException.school(command.getSchoolId())) : null;
+            ? schoolRepository.findById(command.getSchoolId())
+            .orElseThrow(() -> EntityNotFoundException.school(command.getSchoolId())) : null;
 
         // Create personal data
         PersonalData personalData = PersonalData.builder()
-                .fullName(command.getFullName())
-                .email(command.getEmail())
-                .school(school)
-                .createdAt(new Timestamp(System.currentTimeMillis()))
-                .build();
+            .fullName(command.getFullName())
+            .email(command.getEmail())
+            .school(school)
+            .createdAt(new Timestamp(System.currentTimeMillis()))
+            .build();
 
         // Create signup user with encoded password
         String encodedPassword = passwordEncoder.encode(command.getPassword());
         SignupUser signupUser = SignupUser.builder()
-                .username(command.getUsername())
-                .saltedPassword(encodedPassword)
-                .personalData(personalData)
-                .build();
+            .username(command.getUsername())
+            .saltedPassword(encodedPassword)
+            .personalData(personalData)
+            .build();
 
         log.info("Creating signup user: {}", command.getUsername());
         signupUserRepository.save(signupUser);
@@ -77,7 +77,7 @@ public class CreateUserService implements CreateUserUseCase {
 
         // Find signup user
         SignupUser signupUser = signupUserRepository.findById(command.getSignupUserId())
-                .orElseThrow(() -> EntityNotFoundException.signupUser(command.getSignupUserId()));
+            .orElseThrow(() -> EntityNotFoundException.signupUser(command.getSignupUserId()));
 
         // Apply any updates from command
         if (command.getUsername() != null) {
@@ -93,7 +93,7 @@ public class CreateUserService implements CreateUserUseCase {
         }
         if (command.getSchoolId() != null) {
             School school = schoolRepository.findById(command.getSchoolId())
-                    .orElseThrow(() -> EntityNotFoundException.school(command.getSchoolId()));
+                .orElseThrow(() -> EntityNotFoundException.school(command.getSchoolId()));
             personalData.setSchool(school);
         }
 
@@ -105,16 +105,16 @@ public class CreateUserService implements CreateUserUseCase {
 
         // Create user from signup user
         User newUser = User.createNew(
-                signupUser.getUsername(),
-                signupUser.getSaltedPassword(),
-                savedPersonalData
+            signupUser.getUsername(),
+            signupUser.getSaltedPassword(),
+            savedPersonalData
         );
 
         User savedUser = userRepository.save(newUser);
 
         // Assign default role
         Role userRole = roleRepository.findByName(DEFAULT_USER_ROLE)
-                .orElseThrow(() -> EntityNotFoundException.roleByName(DEFAULT_USER_ROLE));
+            .orElseThrow(() -> EntityNotFoundException.roleByName(DEFAULT_USER_ROLE));
 
         UserRole userRoleAssignment = UserRole.createNew(savedUser, userRole);
         savedUser.addRole(userRoleAssignment);
@@ -135,7 +135,7 @@ public class CreateUserService implements CreateUserUseCase {
         log.info("Declining signup user with id: {}", signupUserId);
 
         SignupUser signupUser = signupUserRepository.findById(signupUserId)
-                .orElseThrow(() -> EntityNotFoundException.signupUser(signupUserId));
+            .orElseThrow(() -> EntityNotFoundException.signupUser(signupUserId));
 
         signupUserRepository.delete(signupUser);
         log.info("Successfully declined signup user: {}", signupUserId);
@@ -163,7 +163,7 @@ public class CreateUserService implements CreateUserUseCase {
 
 
     private void checkUsernameTaken(String username) {
-        if(userRepository.existsByUsername(username) || signupUserRepository.existsByUsername(username)) {
+        if (userRepository.existsByUsername(username) || signupUserRepository.existsByUsername(username)) {
             throw DuplicateEntityException.userWithUsername(username);
         }
     }
@@ -171,11 +171,11 @@ public class CreateUserService implements CreateUserUseCase {
 
     private ApproveSignupCommand convertSignupToApproveCommand(SignupCommand command, Integer signupUserId) {
         return ApproveSignupCommand.builder()
-                .signupUserId(signupUserId)
-                .username(command.getUsername())
-                .fullName(command.getFullName())
-                .email(command.getEmail())
-                .schoolId(command.getSchoolId())
-                .build();
+            .signupUserId(signupUserId)
+            .username(command.getUsername())
+            .fullName(command.getFullName())
+            .email(command.getEmail())
+            .schoolId(command.getSchoolId())
+            .build();
     }
 }

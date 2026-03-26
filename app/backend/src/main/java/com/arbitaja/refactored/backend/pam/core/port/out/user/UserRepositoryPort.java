@@ -14,6 +14,7 @@ public interface UserRepositoryPort {
 
     /**
      * Find user by ID
+     *
      * @param id User ID
      * @return Optional containing user if found
      */
@@ -21,6 +22,7 @@ public interface UserRepositoryPort {
 
     /**
      * Find user by username
+     *
      * @param username Username
      * @return Optional containing user if found
      */
@@ -28,12 +30,14 @@ public interface UserRepositoryPort {
 
     /**
      * Find all users
+     *
      * @return List of all users
      */
     List<User> findAll();
 
     /**
      * Save a user
+     *
      * @param user User to save
      * @return Saved user
      */
@@ -41,12 +45,14 @@ public interface UserRepositoryPort {
 
     /**
      * Delete a user
+     *
      * @param user User to delete
      */
     void delete(@NonNull User user);
 
     /**
      * Check if user exists by username
+     *
      * @param username Username to check
      * @return true if user exists
      */

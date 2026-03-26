@@ -7,11 +7,11 @@ import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Permission;
 import com.arbitaja.refactored.backend.pam.core.port.out.permission.PermissionRepositoryPort;
-import java.util.Arrays;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,21 +29,21 @@ public class PermissionPersistenceAdapter implements PermissionRepositoryPort {
     @Override
     public Optional<Permission> findById(@NonNull Integer id) {
         return permissionJpaRepository.findById(id)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public List<Permission> findAll() {
         return permissionJpaRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+            .map(mapper::toDomain)
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<Permission> findByUserId(@NonNull Integer userId) {
         return permissionJpaRepository.findByUserId(userId).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+            .map(mapper::toDomain)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class PermissionPersistenceAdapter implements PermissionRepositoryPort {
         List<PermissionJpaEntity> permissions = permissionJpaRepository.findByUserId(userId);
         Arrays.stream(requiredPermissions).forEach(required -> {
             boolean hasPermission = permissions.stream()
-                    .anyMatch(p -> p.getKey().equals(required.name()));
+                .anyMatch(p -> p.getKey().equals(required.name()));
             if (!hasPermission) {
                 throw new UnauthorizedException("Access denied: missing permission " + required.name());
             }

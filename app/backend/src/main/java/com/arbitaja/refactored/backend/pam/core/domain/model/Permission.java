@@ -33,8 +33,8 @@ public class Permission {
      */
     public static Permission createNew(@NonNull String name, @NonNull String key) {
         return Permission.builder()
-                .name(name)
-                .key(key)
-                .build();
+            .name(name)
+            .key(key)
+            .build();
     }
 }

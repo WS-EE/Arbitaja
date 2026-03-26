@@ -4,4 +4,5 @@ public record PermissionResponse(
     Integer id,
     String name,
     String key
-) {}
+) {
+}

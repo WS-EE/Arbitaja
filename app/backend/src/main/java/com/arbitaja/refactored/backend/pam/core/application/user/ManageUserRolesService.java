@@ -34,20 +34,20 @@ public class ManageUserRolesService implements ManageUserRolesUseCase {
         log.info("Overwriting roles {} for user {}", roleIds, userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+            .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
         Set<Integer> requestedRoleIds = roleIds == null
-                ? Set.of()
-                : new LinkedHashSet<>(roleIds);
+            ? Set.of()
+            : new LinkedHashSet<>(roleIds);
 
         user.setUserRoles(
-                requestedRoleIds.stream()
-                        .map(roleId -> {
-                            Role role = roleRepository.findById(roleId)
-                                    .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
-                            return UserRole.createNew(user, role);
-                        })
-                        .collect(Collectors.toSet())
+            requestedRoleIds.stream()
+                .map(roleId -> {
+                    Role role = roleRepository.findById(roleId)
+                        .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
+                    return UserRole.createNew(user, role);
+                })
+                .collect(Collectors.toSet())
         );
 
         return userRepository.save(user);

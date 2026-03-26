@@ -13,6 +13,7 @@ public interface SchoolRepositoryPort {
 
     /**
      * Find school by ID
+     *
      * @param id School ID
      * @return Optional containing school if found
      */
@@ -20,12 +21,14 @@ public interface SchoolRepositoryPort {
 
     /**
      * Find all schools
+     *
      * @return List of all schools
      */
     List<School> findAll();
 
     /**
      * Save a school
+     *
      * @param school School to save
      * @return Saved school
      */
@@ -33,6 +36,7 @@ public interface SchoolRepositoryPort {
 
     /**
      * Delete a school
+     *
      * @param school School to delete
      */
     void delete(@NonNull School school);

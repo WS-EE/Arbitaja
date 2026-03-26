@@ -24,7 +24,7 @@ public class PersonalDataPersistenceAdapter implements PersonalDataRepositoryPor
     @Override
     public Optional<PersonalData> findById(@NonNull Integer id) {
         return personalDataJpaRepository.findById(id)
-                .map(mapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override

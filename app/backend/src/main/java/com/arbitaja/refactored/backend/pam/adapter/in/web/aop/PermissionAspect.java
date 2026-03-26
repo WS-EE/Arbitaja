@@ -15,15 +15,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PermissionAspect {
 
-  private final CheckPermissionUseCase checkPermissionUseCase;
+    private final CheckPermissionUseCase checkPermissionUseCase;
 
-  @Around("@annotation(requiresPermission)")
-  public Object checkPermission(
-      ProceedingJoinPoint joinPoint,
-      RequiresPermission requiresPermission
-  ) throws Throwable {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    checkPermissionUseCase.assertUserHasPermissions(auth.getName(), requiresPermission.value());
-    return joinPoint.proceed();
-  }
+    @Around("@annotation(requiresPermission)")
+    public Object checkPermission(
+        ProceedingJoinPoint joinPoint,
+        RequiresPermission requiresPermission
+    ) throws Throwable {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        checkPermissionUseCase.assertUserHasPermissions(auth.getName(), requiresPermission.value());
+        return joinPoint.proceed();
+    }
 }

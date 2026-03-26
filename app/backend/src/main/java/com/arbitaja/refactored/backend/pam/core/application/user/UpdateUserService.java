@@ -2,7 +2,9 @@ package com.arbitaja.refactored.backend.pam.core.application.user;
 
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
-import com.arbitaja.refactored.backend.pam.core.domain.model.*;
+import com.arbitaja.refactored.backend.pam.core.domain.model.PersonalData;
+import com.arbitaja.refactored.backend.pam.core.domain.model.School;
+import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.UpdateUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.out.permission.PermissionRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.personaldata.PersonalDataRepositoryPort;
@@ -29,20 +31,18 @@ public class UpdateUserService implements UpdateUserUseCase {
     private final UserRepositoryPort userRepository;
     private final SchoolRepositoryPort schoolRepository;
     private final PersonalDataRepositoryPort personalDataRepository;
-    private final RoleRepositoryPort roleRepository;
-    private final PermissionRepositoryPort permissionRepository;
     private final PasswordEncoderPort passwordEncoder;
 
     @Override
     @Transactional
     public User updateUserProfile(@NonNull UpdateUserCommand command,
-                                                  @NonNull String authenticatedUsername,
-                                                  boolean isAdmin) {
+                                  @NonNull String authenticatedUsername,
+                                  boolean isAdmin) {
         log.info("Updating user profile for user id: {}", command.getUserId());
 
         // Find user
         User user = userRepository.findById(command.getUserId())
-                .orElseThrow(() -> EntityNotFoundException.user(command.getUserId()));
+            .orElseThrow(() -> EntityNotFoundException.user(command.getUserId()));
 
         // Authorization check
         if (!isAdmin && !authenticatedUsername.equals(user.getUsername())) {
@@ -64,7 +64,7 @@ public class UpdateUserService implements UpdateUserUseCase {
         // Update school if provided
         if (command.getSchoolId() != null) {
             School school = schoolRepository.findById(command.getSchoolId())
-                    .orElseThrow(() -> EntityNotFoundException.school(command.getSchoolId()));
+                .orElseThrow(() -> EntityNotFoundException.school(command.getSchoolId()));
             personalData.setSchool(school);
         }
 
@@ -87,7 +87,7 @@ public class UpdateUserService implements UpdateUserUseCase {
         log.info("Changing password for user id: {}", command.getUserId());
 
         User user = userRepository.findById(command.getUserId())
-                .orElseThrow(() -> EntityNotFoundException.user(command.getUserId()));
+            .orElseThrow(() -> EntityNotFoundException.user(command.getUserId()));
 
         // Authorization check - only the user themselves can change their password
         if (!authenticatedUsername.equals(user.getUsername())) {
@@ -115,7 +115,7 @@ public class UpdateUserService implements UpdateUserUseCase {
         log.info("Deleting user with id: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> EntityNotFoundException.user(userId));
+            .orElseThrow(() -> EntityNotFoundException.user(userId));
 
         userRepository.delete(user);
         log.info("User deleted successfully: {}", userId);

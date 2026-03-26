@@ -23,9 +23,9 @@ public class CreatePermissionService implements CreatePermissionUseCase {
         log.info("Creating permission with name: {}", command.name());
 
         Permission permission = Permission.builder()
-                .name(command.name())
-                .key(command.key())
-                .build();
+            .name(command.name())
+            .key(command.key())
+            .build();
 
         return permissionRepositoryPort.save(permission);
 
@@ -37,7 +37,7 @@ public class CreatePermissionService implements CreatePermissionUseCase {
         log.info("Updating permission with id: {}", id);
 
         Permission existingPermission = permissionRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Permission not found with id: " + id));
+            .orElseThrow(() -> new EntityNotFoundException("Permission not found with id: " + id));
 
         existingPermission.setName(command.name());
         existingPermission.setKey(command.key());

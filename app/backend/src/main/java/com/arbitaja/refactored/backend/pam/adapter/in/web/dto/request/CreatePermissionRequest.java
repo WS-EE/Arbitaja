@@ -4,9 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 public record CreatePermissionRequest(
-        @NotBlank
-        String name,
+    @NotBlank
+    String name,
 
-        @NotBlank
-        @Pattern(regexp = "^[a-zA-Z_-]+$")
-        String key) {}
+    @NotBlank
+    @Pattern(regexp = "^[a-zA-Z_-]+$")
+    String key) {
+}

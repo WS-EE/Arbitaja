@@ -1,8 +1,8 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.GeneralMessageResponse;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.SignupRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.GeneralMessageResponse;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.SignupResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
@@ -41,16 +41,16 @@ public class SignupControllerV2 {
     @SuppressWarnings("JvmTaintAnalysis")
     @Operation(summary = "Signup user", description = "Create a signup request for a new user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Signup request created"),
-            @ApiResponse(responseCode = "409", description = "User with username already exists", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = DuplicateEntityException.class)) })
+        @ApiResponse(responseCode = "201", description = "Signup request created"),
+        @ApiResponse(responseCode = "409", description = "User with username already exists", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = DuplicateEntityException.class))})
     })
     @PostMapping()
     public ResponseEntity<SignupResponse> signupUser(@Valid @RequestBody SignupRequest request) {
         log.info("Processing signup request for: {}", request.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(
+            .body(
                 signupUserMapper.toSignupResponse(
                     createUserUseCase.signupUser(
                         signupUserMapper.toSignupCommand(request))
@@ -59,9 +59,9 @@ public class SignupControllerV2 {
 
     @Operation(summary = "Approve signup", description = "Approve a pending signup request")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Signup approved"),
-            @ApiResponse(responseCode = "404", description = "Signup request not found", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = EntityNotFoundException.class)) })
+        @ApiResponse(responseCode = "200", description = "Signup approved"),
+        @ApiResponse(responseCode = "404", description = "Signup request not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/signup/{id}/approve")
@@ -76,9 +76,9 @@ public class SignupControllerV2 {
 
     @Operation(summary = "Decline signup", description = "Decline/reject a pending signup request")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Signup declined"),
-            @ApiResponse(responseCode = "404", description = "Signup request not found", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = EntityNotFoundException.class)) })
+        @ApiResponse(responseCode = "200", description = "Signup declined"),
+        @ApiResponse(responseCode = "404", description = "Signup request not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @DeleteMapping("/signup/{id}")
@@ -92,9 +92,9 @@ public class SignupControllerV2 {
 
     @Operation(summary = "Get all signup users", description = "Retrieve all signup requests in the system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved signup users"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = UnauthorizedException.class)) })
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved signup users"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = UnauthorizedException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/signup")
@@ -102,9 +102,9 @@ public class SignupControllerV2 {
     public ResponseEntity<List<SignupResponse>> getAllSignupUsers() {
         log.info("Get All Signup Users");
         return ResponseEntity.ok(
-                createUserUseCase.getAllSignupUsers()
-                        .stream()
-                        .map(signupUserMapper::toSignupResponse)
-                        .toList());
+            createUserUseCase.getAllSignupUsers()
+                .stream()
+                .map(signupUserMapper::toSignupResponse)
+                .toList());
     }
 }

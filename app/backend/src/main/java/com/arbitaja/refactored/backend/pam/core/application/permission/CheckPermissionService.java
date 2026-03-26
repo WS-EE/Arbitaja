@@ -13,15 +13,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CheckPermissionService implements CheckPermissionUseCase {
 
-  private final UserRepositoryPort userRepositoryPort;
-  private final PermissionRepositoryPort permissionRepositoryPort;
+    private final UserRepositoryPort userRepositoryPort;
+    private final PermissionRepositoryPort permissionRepositoryPort;
 
-  @Override
-  public boolean assertUserHasPermissions(String username, PermissionCode[] permissions) {
-    User user = userRepositoryPort.findByUsername(username)
-        .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    @Override
+    public boolean assertUserHasPermissions(String username, PermissionCode[] permissions) {
+        User user = userRepositoryPort.findByUsername(username)
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-    return permissionRepositoryPort.userHasPermissions(user.getId(), permissions);
-  }
+        return permissionRepositoryPort.userHasPermissions(user.getId(), permissions);
+    }
 }
 

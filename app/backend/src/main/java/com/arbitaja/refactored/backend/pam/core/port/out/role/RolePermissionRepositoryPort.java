@@ -13,6 +13,7 @@ public interface RolePermissionRepositoryPort {
 
     /**
      * Find role permission by ID
+     *
      * @param id RolePermission ID
      * @return Optional containing role permission if found
      */
@@ -20,12 +21,14 @@ public interface RolePermissionRepositoryPort {
 
     /**
      * Find all role permissions
+     *
      * @return List of all role permissions
      */
     List<RolePermission> findAll();
 
     /**
      * Find role permissions by role ID
+     *
      * @param roleId Role ID
      * @return List of role permissions for the role
      */
@@ -33,6 +36,7 @@ public interface RolePermissionRepositoryPort {
 
     /**
      * Save a role permission
+     *
      * @param rolePermission RolePermission to save
      * @return Saved role permission
      */
@@ -40,12 +44,14 @@ public interface RolePermissionRepositoryPort {
 
     /**
      * Delete a role permission
+     *
      * @param rolePermission RolePermission to delete
      */
     void delete(@NonNull RolePermission rolePermission);
 
     /**
      * Delete role permission by ID
+     *
      * @param id RolePermission ID
      */
     void deleteById(@NonNull Integer id);

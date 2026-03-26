@@ -19,9 +19,9 @@ public enum PermissionCode {
     CREATE_UPDATE_COMPETITIONS("CREATE_UPDATE_COMPETITIONS");
 
 
-  private final String code;
+    private final String code;
 
-  PermissionCode(String code) {
-    this.code = code;
-  }
+    PermissionCode(String code) {
+        this.code = code;
+    }
 }

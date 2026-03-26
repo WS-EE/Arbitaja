@@ -41,10 +41,10 @@ public class User {
      */
     public static User createNew(@NonNull String username, @NonNull String saltedPassword, PersonalData personalData) {
         return User.builder()
-                .username(username)
-                .saltedPassword(saltedPassword)
-                .personalData(personalData)
-                .build();
+            .username(username)
+            .saltedPassword(saltedPassword)
+            .personalData(personalData)
+            .build();
     }
 
     /**
@@ -64,14 +64,5 @@ public class User {
         if (userRoles != null) {
             userRoles.remove(userRole);
         }
-    }
-
-    /**
-     * Checks if the user has a specific role
-     */
-    public boolean hasRole(String roleName) {
-        if (userRoles == null) return false;
-        return userRoles.stream()
-                .anyMatch(ur -> ur.getRole() != null && roleName.equals(ur.getRole().getName()));
     }
 }

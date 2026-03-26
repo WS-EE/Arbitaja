@@ -13,12 +13,14 @@ public interface GetRoleUseCase {
 
     /**
      * Get all roles
+     *
      * @return List of all roles
      */
     List<Role> getAllRoles();
 
     /**
      * Get role by ID
+     *
      * @param id Role ID
      * @return Optional containing role if found
      */
@@ -26,6 +28,7 @@ public interface GetRoleUseCase {
 
     /**
      * Get role by name
+     *
      * @param name Role name
      * @return Optional containing role if found
      */
@@ -33,6 +36,7 @@ public interface GetRoleUseCase {
 
     /**
      * Get roles for a specific user
+     *
      * @param userId User ID
      * @return List of roles assigned to the user
      */

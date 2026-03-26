@@ -13,7 +13,8 @@ public interface CreatePermissionUseCase {
 
 
     record PermissionCommand(
-            String name,
-            String key
-    ){ }
+        String name,
+        String key
+    ) {
+    }
 }

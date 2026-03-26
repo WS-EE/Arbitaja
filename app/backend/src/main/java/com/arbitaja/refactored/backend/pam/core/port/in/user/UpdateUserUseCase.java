@@ -10,16 +10,18 @@ public interface UpdateUserUseCase {
 
     /**
      * Update user profile data
-     * @param command Command containing update data
+     *
+     * @param command               Command containing update data
      * @param authenticatedUsername Username of the authenticated user performing the update
-     * @param isAdmin Whether the authenticated user is an admin
+     * @param isAdmin               Whether the authenticated user is an admin
      * @return Updated UserProfileResponse
      */
     User updateUserProfile(@NonNull UpdateUserCommand command, @NonNull String authenticatedUsername, boolean isAdmin);
 
     /**
      * Change user password
-     * @param command Command containing password change data
+     *
+     * @param command               Command containing password change data
      * @param authenticatedUsername Username of the authenticated user
      * @return true if password was changed successfully
      */
@@ -27,6 +29,7 @@ public interface UpdateUserUseCase {
 
     /**
      * Delete a user
+     *
      * @param userId ID of the user to delete
      */
     void deleteUser(@NonNull Integer userId);

@@ -44,7 +44,7 @@ public class CreateRoleService implements CreateRoleUseCase {
 
         for (Integer permissionId : new LinkedHashSet<>(permissionIds)) {
             Permission permission = permissionRepository.findById(permissionId)
-                    .orElseThrow(() -> new EntityNotFoundException("Permission not found with id: " + permissionId));
+                .orElseThrow(() -> new EntityNotFoundException("Permission not found with id: " + permissionId));
 
             RolePermission rolePermission = RolePermission.createNew(permission, savedRole);
             rolePermissionRepository.save(rolePermission);
@@ -59,7 +59,7 @@ public class CreateRoleService implements CreateRoleUseCase {
         log.info("Updating role with id: {}", id);
 
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + id));
+            .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + id));
 
         role.setName(command.name());
         role.setChangedAt(new Timestamp(System.currentTimeMillis()));

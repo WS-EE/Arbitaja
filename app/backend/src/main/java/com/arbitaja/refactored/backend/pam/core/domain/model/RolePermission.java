@@ -28,9 +28,9 @@ public class RolePermission {
      */
     public static RolePermission createNew(@NonNull Permission permission, @NonNull Role role) {
         return RolePermission.builder()
-                .permission(permission)
-                .role(role)
-                .build();
+            .permission(permission)
+            .role(role)
+            .build();
     }
 }
 

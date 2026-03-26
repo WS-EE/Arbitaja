@@ -32,9 +32,9 @@ public class UserRole {
      */
     public static UserRole createNew(@NonNull User user, @NonNull Role role) {
         return UserRole.builder()
-                .user(user)
-                .role(role)
-                .createdAt(new Timestamp(System.currentTimeMillis()))
-                .build();
+            .user(user)
+            .role(role)
+            .createdAt(new Timestamp(System.currentTimeMillis()))
+            .build();
     }
 }

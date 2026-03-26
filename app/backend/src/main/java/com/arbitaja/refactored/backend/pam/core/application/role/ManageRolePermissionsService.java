@@ -36,19 +36,19 @@ public class ManageRolePermissionsService implements ManageRolePermissionsUseCas
         log.info("Overwriting permissions {} for role {}", permissionIds, roleId);
 
         Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
+            .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
 
         Set<Integer> requestedPermissionIds = permissionIds == null
-                ? Set.of()
-                : new LinkedHashSet<>(permissionIds);
+            ? Set.of()
+            : new LinkedHashSet<>(permissionIds);
 
         Set<Integer> existingPermissionIds = role.getRolePermissions().stream()
-                .map(rp -> rp.getPermission().getId())
-                .collect(Collectors.toSet());
+            .map(rp -> rp.getPermission().getId())
+            .collect(Collectors.toSet());
 
         List<RolePermission> rolePermissionsToRemove = role.getRolePermissions().stream()
-                .filter(rp -> !requestedPermissionIds.contains(rp.getPermission().getId()))
-                .toList();
+            .filter(rp -> !requestedPermissionIds.contains(rp.getPermission().getId()))
+            .toList();
 
         rolePermissionsToRemove.forEach(rolePermission -> {
             role.getRolePermissions().remove(rolePermission);
@@ -61,7 +61,7 @@ public class ManageRolePermissionsService implements ManageRolePermissionsUseCas
             }
 
             Permission permission = permissionRepository.findById(permissionId)
-                    .orElseThrow(() -> new EntityNotFoundException("Permission not found with id: " + permissionId));
+                .orElseThrow(() -> new EntityNotFoundException("Permission not found with id: " + permissionId));
 
             RolePermission rolePermission = RolePermission.createNew(permission, role);
             rolePermissionRepository.save(rolePermission);

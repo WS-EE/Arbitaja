@@ -1,10 +1,11 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.SignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.OverwriteUserRolesRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.SignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.UpdateUserRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.GeneralMessageResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.UserProfileResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.DtoMapper;
 import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
 import com.arbitaja.refactored.backend.pam.adapter.util.UserMapper;
@@ -18,7 +19,6 @@ import com.arbitaja.refactored.backend.pam.core.port.in.user.CreateUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.GetUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.ManageUserRolesUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.UpdateUserUseCase;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.UserProfileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -59,9 +59,9 @@ public class UserControllerV2 {
 
     @Operation(summary = "Create user", description = "Create a new user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User created"),
-            @ApiResponse(responseCode = "409", description = "User with username already exists", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = DuplicateEntityException.class)) })
+        @ApiResponse(responseCode = "200", description = "User created"),
+        @ApiResponse(responseCode = "409", description = "User with username already exists", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = DuplicateEntityException.class))})
     })
     @PostMapping("/create")
     @SecurityRequirement(name = "basicAuth")
@@ -70,18 +70,18 @@ public class UserControllerV2 {
         log.info("Creating user: {}", request);
 
         return ResponseEntity.ok(
-                DtoMapper.toUserProfileResponse(
-                    createUserUseCase.createUser(
-                            signupUserMapper.toSignupCommand(request)
-                        )
-                ));
+            DtoMapper.toUserProfileResponse(
+                createUserUseCase.createUser(
+                    signupUserMapper.toSignupCommand(request)
+                )
+            ));
     }
 
     @Operation(summary = "Get all users", description = "Retrieve all users in the system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved users"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = UnauthorizedException.class)) })
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved users"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = UnauthorizedException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
@@ -90,15 +90,15 @@ public class UserControllerV2 {
         log.info("Getting all users");
         List<User> users = getUserUseCase.getAllUsers();
         List<UserProfileResponse> responses = users.stream()
-                .map(DtoMapper::toUserProfileResponse).toList();
+            .map(DtoMapper::toUserProfileResponse).toList();
         return ResponseEntity.ok(responses);
     }
 
     @Operation(summary = "Get user by ID", description = "Retrieve a specific user by their ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
-            @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = EntityNotFoundException.class)) })
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
+        @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/{id}")
@@ -112,31 +112,31 @@ public class UserControllerV2 {
 
     @Operation(summary = "Update user profile", description = "Update user profile information")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
-            @ApiResponse(responseCode = "401", description = "Not authorized to update this user", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = UnauthorizedException.class)) }),
-            @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = EntityNotFoundException.class)) })
+        @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
+        @ApiResponse(responseCode = "401", description = "Not authorized to update this user", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = UnauthorizedException.class))}),
+        @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @PutMapping("/{id}")
     public ResponseEntity<UserProfileResponse> updateUser(
-            @PathVariable Integer id,
-            @RequestBody @Valid UpdateUserRequest request,
-            Authentication authentication) {
+        @PathVariable Integer id,
+        @RequestBody @Valid UpdateUserRequest request,
+        Authentication authentication) {
 
         log.info("Updating user: {}", id);
 
 
         boolean canEditOthers = checkPermissionUseCase.assertUserHasPermissions(
-                authentication.getName(),
-                new PermissionCode[]{EDIT_USERS}
+            authentication.getName(),
+            new PermissionCode[]{EDIT_USERS}
         );
 
         User user = updateUserUseCase.updateUserProfile(
-                userMapper.toUpdateUserCommand(id, request),
-                authentication.getName(),
-                canEditOthers
+            userMapper.toUpdateUserCommand(id, request),
+            authentication.getName(),
+            canEditOthers
         );
 
         return ResponseEntity.ok(DtoMapper.toUserProfileResponse(user));
@@ -144,16 +144,16 @@ public class UserControllerV2 {
 
     @Operation(summary = "Overwrite user roles", description = "Overwrite all roles for a specific user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully updated user roles"),
-            @ApiResponse(responseCode = "404", description = "User or role not found", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = EntityNotFoundException.class)) })
+        @ApiResponse(responseCode = "200", description = "Successfully updated user roles"),
+        @ApiResponse(responseCode = "404", description = "User or role not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @PutMapping("/{id}/roles")
     @RequiresPermission(EDIT_USERS)
     public ResponseEntity<UserProfileResponse> overwriteUserRoles(
-            @PathVariable Integer id,
-            @RequestBody @Valid OverwriteUserRolesRequest request) {
+        @PathVariable Integer id,
+        @RequestBody @Valid OverwriteUserRolesRequest request) {
         log.info("Overwriting roles {} for user {}", request.roleIds(), id);
 
         User user = manageUserRolesUseCase.overwriteUserRoles(id, request.roleIds());
@@ -162,9 +162,9 @@ public class UserControllerV2 {
 
     @Operation(summary = "Delete user", description = "Delete a user from the system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = EntityNotFoundException.class)) })
+        @ApiResponse(responseCode = "200", description = "User deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @DeleteMapping("/{id}")
@@ -178,9 +178,9 @@ public class UserControllerV2 {
     @GetMapping("/auth")
     @Operation(summary = "Get authenticated user profile", description = "Retrieve the profile of the currently authenticated user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = UnauthorizedException.class)) })
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = UnauthorizedException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     ResponseEntity<UserProfileResponse> getUserAuth() {
@@ -188,7 +188,7 @@ public class UserControllerV2 {
         String username = authentication.getName();
         log.info("Getting authenticated user profile: {}", username);
         User user = getUserUseCase.getUserByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
         UserProfileResponse response = DtoMapper.toUserProfileResponse(user);
         return ResponseEntity.ok(response);
     }

@@ -12,7 +12,8 @@ public interface ManageUserRolesUseCase {
 
     /**
      * Overwrite all roles of a user with the provided role IDs.
-     * @param userId The user ID
+     *
+     * @param userId  The user ID
      * @param roleIds Full list of role IDs the user should have after update
      * @return Updated user with synchronized roles
      */

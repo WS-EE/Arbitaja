@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface RolePermissionJpaRepository extends JpaRepository<RolePermissionJpaEntity, Integer> {
 
-	List<RolePermissionJpaEntity> findByRoleId(Integer roleId);
+    List<RolePermissionJpaEntity> findByRoleId(Integer roleId);
 }
 

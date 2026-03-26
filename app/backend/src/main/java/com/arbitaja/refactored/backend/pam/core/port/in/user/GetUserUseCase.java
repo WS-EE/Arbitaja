@@ -14,6 +14,7 @@ public interface GetUserUseCase {
 
     /**
      * Get a user by their username
+     *
      * @param username The user's username
      * @return Optional containing the user if found
      */
@@ -21,12 +22,14 @@ public interface GetUserUseCase {
 
     /**
      * Get all users in the system
+     *
      * @return List of all users
      */
     List<User> getAllUsers();
 
     /**
      * Get user profile response with roles and permissions
+     *
      * @param userId The user's ID
      * @return UserProfileResponse containing full profile data
      */

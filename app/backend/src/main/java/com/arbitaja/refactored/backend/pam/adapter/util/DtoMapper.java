@@ -23,14 +23,14 @@ public class DtoMapper {
         }
 
         List<RoleResponse> roles = user.getUserRoles().stream()
-                .map(UserRole::getRole)
-                .map(DtoMapper::toRoleResponse)
-                .toList();
+            .map(UserRole::getRole)
+            .map(DtoMapper::toRoleResponse)
+            .toList();
 
         Set<PermissionCode> permissionCodes = roles.stream()
-                .flatMap(role -> role.permissions().stream())
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+            .flatMap(role -> role.permissions().stream())
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
 
         UserProfileResponse response = new UserProfileResponse();
         response.setId(user.getId());
@@ -38,30 +38,30 @@ public class DtoMapper {
         response.setRoles(roles);
         response.setPermissions(permissionCodes);
         response.setPersonalData(user.getPersonalData() != null ? new UserProfileResponse.PersonalDataResponse(
-                user.getPersonalData().getId(),
-                user.getPersonalData().getFullName(),
-                user.getPersonalData().getEmail(),
-                user.getPersonalData().getSchool() != null
-                    ? new UserProfileResponse.SchoolResponse(
-                        user.getPersonalData().getSchool().getId(),
-                        user.getPersonalData().getSchool().getName()
-                ) : null
+            user.getPersonalData().getId(),
+            user.getPersonalData().getFullName(),
+            user.getPersonalData().getEmail(),
+            user.getPersonalData().getSchool() != null
+                ? new UserProfileResponse.SchoolResponse(
+                user.getPersonalData().getSchool().getId(),
+                user.getPersonalData().getSchool().getName()
+            ) : null
         ) : null);
         return response;
     }
 
     private static RoleResponse toRoleResponse(Role role) {
         List<PermissionCode> permissions = role.getRolePermissions().stream()
-                .map(RolePermission::getPermission)
-                .map(permission -> toPermissionCodeOrNull(permission.getKey()))
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+            .map(RolePermission::getPermission)
+            .map(permission -> toPermissionCodeOrNull(permission.getKey()))
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
 
         return new RoleResponse(
-                role.getId(),
-                role.getName(),
-                permissions
+            role.getId(),
+            role.getName(),
+            permissions
         );
     }
 

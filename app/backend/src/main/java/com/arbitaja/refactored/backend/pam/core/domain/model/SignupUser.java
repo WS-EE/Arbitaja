@@ -38,12 +38,12 @@ public class SignupUser {
      */
     public static SignupUser createNew(@NonNull String username, @NonNull String saltedPassword, @NonNull PersonalData personalData) {
         return SignupUser.builder()
-                .username(username)
-                .saltedPassword(saltedPassword)
-                .personalData(personalData)
-                .isApproved(false)
-                .createdAt(Instant.now())
-                .build();
+            .username(username)
+            .saltedPassword(saltedPassword)
+            .personalData(personalData)
+            .isApproved(false)
+            .createdAt(Instant.now())
+            .build();
     }
 }
 

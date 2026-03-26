@@ -40,9 +40,9 @@ public class PermissionControllerV2 {
 
     @Operation(summary = "Get all permissions", description = "Retrieve all permissions in the system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = UnauthorizedException.class)) })
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = UnauthorizedException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
@@ -52,16 +52,16 @@ public class PermissionControllerV2 {
 
 
         return ResponseEntity.ok(getPermissionUseCase.getAllPermissions()
-                .stream()
-                .map(permissionMapper::toPermissionResponse)
-                .toList());
+            .stream()
+            .map(permissionMapper::toPermissionResponse)
+            .toList());
     }
 
     @Operation(summary = "Get permission by ID", description = "Retrieve a specific permission by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved permission"),
-            @ApiResponse(responseCode = "404", description = "Permission not found", content = {@Content(mediaType = "application/json", schema =
-            @Schema(implementation = EntityNotFoundException.class)) })
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved permission"),
+        @ApiResponse(responseCode = "404", description = "Permission not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/{id}")
@@ -70,14 +70,14 @@ public class PermissionControllerV2 {
         log.info("Getting permission by id: {}", id);
 
         return getPermissionUseCase.getPermissionById(id)
-                .map(permissionMapper::toPermissionResponse)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+            .map(permissionMapper::toPermissionResponse)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Get user permissions", description = "Retrieve permissions for a specific user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions")
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions")
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/user/{userId}")
@@ -85,9 +85,9 @@ public class PermissionControllerV2 {
     public ResponseEntity<List<PermissionResponse>> getPermissionsByUserId(@PathVariable Integer userId) {
         log.info("Getting permissions for user: {}", userId);
         return ResponseEntity.ok(getPermissionUseCase.getPermissionsByUserId(userId)
-                .stream()
-                .map(permissionMapper::toPermissionResponse)
-                .toList());
+            .stream()
+            .map(permissionMapper::toPermissionResponse)
+            .toList());
     }
 
 
@@ -96,11 +96,11 @@ public class PermissionControllerV2 {
     @RequiresPermission(CREATE_UPDATE_PERMISSIONS)
     public ResponseEntity<PermissionResponse> createPermission(@RequestBody CreatePermissionRequest request) {
         return ResponseEntity.ok(
-                permissionMapper.toPermissionResponse(
-                    createPermissionUseCase.createPermission(
-                        permissionMapper.toPermissionCommand(request)
-                    )
+            permissionMapper.toPermissionResponse(
+                createPermissionUseCase.createPermission(
+                    permissionMapper.toPermissionCommand(request)
                 )
+            )
         );
     }
 
@@ -108,7 +108,7 @@ public class PermissionControllerV2 {
     @RequiresPermission(CREATE_UPDATE_PERMISSIONS)
     public ResponseEntity<PermissionResponse> updatePermission(@PathVariable Integer id, @RequestBody CreatePermissionRequest request) {
         return ResponseEntity.ok(permissionMapper.toPermissionResponse(
-                createPermissionUseCase.updatePermission(id, permissionMapper.toPermissionCommand(request))
+            createPermissionUseCase.updatePermission(id, permissionMapper.toPermissionCommand(request))
         ));
     }
 }

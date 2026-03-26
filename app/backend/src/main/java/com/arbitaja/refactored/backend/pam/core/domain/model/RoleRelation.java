@@ -27,9 +27,9 @@ public class RoleRelation {
      */
     public static RoleRelation createNew(@NonNull Role parentRole, @NonNull Role childRole) {
         return RoleRelation.builder()
-                .parentRole(parentRole)
-                .childRole(childRole)
-                .build();
+            .parentRole(parentRole)
+            .childRole(childRole)
+            .build();
     }
 }
 

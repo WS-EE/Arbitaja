@@ -12,6 +12,7 @@ public interface CreateRoleUseCase {
 
     /**
      * Create a new role
+     *
      * @param command Role creation command
      * @return Created role
      */
@@ -20,7 +21,8 @@ public interface CreateRoleUseCase {
 
     /**
      * Update an existing role
-     * @param id Role ID
+     *
+     * @param id      Role ID
      * @param command Role update command
      * @return Updated role
      */
@@ -28,7 +30,8 @@ public interface CreateRoleUseCase {
     Role updateRole(Integer id, RoleCommand command);
 
     record RoleCommand(
-            String name,
-            List<Integer> permissionIds
-    ) { }
+        String name,
+        List<Integer> permissionIds
+    ) {
+    }
 }

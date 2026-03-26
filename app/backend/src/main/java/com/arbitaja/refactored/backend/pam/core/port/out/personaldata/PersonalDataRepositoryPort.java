@@ -12,6 +12,7 @@ public interface PersonalDataRepositoryPort {
 
     /**
      * Find personal data by ID
+     *
      * @param id PersonalData ID
      * @return Optional containing personal data if found
      */
@@ -19,6 +20,7 @@ public interface PersonalDataRepositoryPort {
 
     /**
      * Save personal data
+     *
      * @param personalData PersonalData to save
      * @return Saved personal data
      */
@@ -26,6 +28,7 @@ public interface PersonalDataRepositoryPort {
 
     /**
      * Delete personal data
+     *
      * @param personalData PersonalData to delete
      */
     void delete(@NonNull PersonalData personalData);
