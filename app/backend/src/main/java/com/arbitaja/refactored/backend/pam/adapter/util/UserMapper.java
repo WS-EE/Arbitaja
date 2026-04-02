@@ -1,6 +1,6 @@
 package com.arbitaja.refactored.backend.pam.adapter.util;
 
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.UpdateUserRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.request.UpdateUserRequest;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.UpdateUserUseCase;
 import org.mapstruct.Mapper;
 

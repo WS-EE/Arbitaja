@@ -2,6 +2,8 @@ package com.arbitaja.backend;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

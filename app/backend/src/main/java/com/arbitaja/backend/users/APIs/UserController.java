@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,6 +36,7 @@ import java.util.Map;
 @EnableMethodSecurity
 @RestController("user")
 @RequestMapping("/v1/user")
+@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "legacy", matchIfMissing = true)
 public class UserController {
     private static final Logger log = LogManager.getLogger(UserController.class);
 

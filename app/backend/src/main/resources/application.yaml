@@ -56,12 +56,18 @@ app:
   public-apis:
     "/login,
     /login-user,
-    */user/signup/create,
+    /v1/user/signup/create,
+    /v2/signup,
     /swagger-ui/**,
     /swagger/**,
     /api-docs/**,
-    */competition/criteria/**,
-    */competition/get,
-    */competition/all/get,
-    */dashboard/**,
+    /v1/competition/criteria/**,
+    /v1/competition/get,
+    /v1/competition/all/get,
+    /dashboard/**,
     /health"
+
+arbitaja:
+  pam:
+    mode: ${PAM_MODE:legacy}
+

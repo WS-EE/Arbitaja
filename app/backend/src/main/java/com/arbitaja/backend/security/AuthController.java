@@ -35,8 +35,6 @@ public class AuthController {
     private ObjectMapper objectMapper;
     @Autowired
     private UserService userService;
-    @Autowired
-    private GlobalExceptionHandler globalExceptionHandler;
 
     @GetMapping("/login")
     @Operation(

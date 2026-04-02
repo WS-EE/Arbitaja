@@ -1,5 +1,6 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.response;
 
+import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.response.RoleResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;

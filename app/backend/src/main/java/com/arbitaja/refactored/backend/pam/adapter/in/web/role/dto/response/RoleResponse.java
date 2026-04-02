@@ -1,4 +1,4 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.response;
 
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 
@@ -11,3 +11,4 @@ public record RoleResponse(
 ) {
 
 }
+

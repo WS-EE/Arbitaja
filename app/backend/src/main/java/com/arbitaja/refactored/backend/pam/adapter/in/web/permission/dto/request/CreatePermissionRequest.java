@@ -1,4 +1,4 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.permission.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,3 +11,4 @@ public record CreatePermissionRequest(
     @Pattern(regexp = "^[a-zA-Z_-]+$")
     String key) {
 }
+

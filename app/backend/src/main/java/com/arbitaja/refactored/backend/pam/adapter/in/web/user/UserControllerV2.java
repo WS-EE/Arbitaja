@@ -1,11 +1,11 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.user;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.OverwriteUserRolesRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.SignupRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.UpdateUserRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.GeneralMessageResponse;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.UserProfileResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.shared.dto.response.GeneralMessageResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.SignupRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.request.OverwriteUserRolesRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.request.UpdateUserRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.response.UserProfileResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.DtoMapper;
 import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
 import com.arbitaja.refactored.backend.pam.adapter.util.UserMapper;
@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,6 +48,7 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "User Management v2", description = "User management operations (Hexagonal Architecture)")
+@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
 public class UserControllerV2 {
 
     private final GetUserUseCase getUserUseCase;
@@ -193,4 +195,5 @@ public class UserControllerV2 {
         return ResponseEntity.ok(response);
     }
 }
+
 

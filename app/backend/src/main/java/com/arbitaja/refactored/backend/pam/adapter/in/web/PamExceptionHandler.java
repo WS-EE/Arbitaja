@@ -5,6 +5,9 @@ import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntity
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,8 +19,10 @@ import java.util.Map;
  * Exception handler for the PAM module.
  * Translates domain exceptions into HTTP responses.
  */
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice(basePackages = "com.arbitaja.refactored.backend.pam")
 @Log4j2
+@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
 public class PamExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -73,6 +78,7 @@ public class PamExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<Map<String, String>> handleNullPointerException(NullPointerException ex) {
         log.error("Null pointer exception: {}", ex.getMessage());
+        log.error(ex.getStackTrace());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of(
                 "error", "Required field is null",

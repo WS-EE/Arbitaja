@@ -1,4 +1,4 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -11,3 +11,4 @@ public record CreateRoleRequest(
     List<Integer> permissionIds
 ) {
 }
+

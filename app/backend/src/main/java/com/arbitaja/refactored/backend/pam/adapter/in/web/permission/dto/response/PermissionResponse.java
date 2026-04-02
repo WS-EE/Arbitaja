@@ -1,4 +1,4 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.permission.dto.response;
 
 public record PermissionResponse(
     Integer id,
@@ -6,3 +6,4 @@ public record PermissionResponse(
     String key
 ) {
 }
+

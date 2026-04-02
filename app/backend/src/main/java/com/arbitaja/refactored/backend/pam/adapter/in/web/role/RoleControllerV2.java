@@ -1,9 +1,9 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.role;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.AddPermissionToRoleRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.CreateRoleRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.RoleResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.request.AddPermissionToRoleRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.request.CreateRoleRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.response.RoleResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,7 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "Role Management v2", description = "Role management operations (Hexagonal Architecture)")
+@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
 public class RoleControllerV2 {
 
     private final GetRoleUseCase getRoleUseCase;
@@ -188,3 +190,4 @@ public class RoleControllerV2 {
         }
     }
 }
+

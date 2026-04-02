@@ -1,4 +1,4 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.shared.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,3 +12,4 @@ import lombok.Setter;
 public class GeneralMessageResponse {
     String message;
 }
+

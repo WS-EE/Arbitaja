@@ -1,9 +1,9 @@
-package com.arbitaja.refactored.backend.pam.adapter.in.web;
+package com.arbitaja.refactored.backend.pam.adapter.in.web.signup;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.request.SignupRequest;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.GeneralMessageResponse;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.SignupResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.shared.dto.response.GeneralMessageResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.SignupRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.response.SignupResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,13 +34,13 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "Signup Management v2", description = "Signup management operations (Hexagonal Architecture)")
+@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
 public class SignupControllerV2 {
 
     private final CreateUserUseCase createUserUseCase;
     private final SignupUserMapper signupUserMapper;
 
-    @SuppressWarnings("JvmTaintAnalysis")
-    @Operation(summary = "Signup user", description = "Create a signup request for a new user")
+        @Operation(summary = "Signup user", description = "Create a signup request for a new user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Signup request created"),
         @ApiResponse(responseCode = "409", description = "User with username already exists", content = {@Content(mediaType = "application/json", schema =
@@ -108,3 +109,4 @@ public class SignupControllerV2 {
                 .toList());
     }
 }
+

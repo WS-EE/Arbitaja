@@ -1,7 +1,7 @@
 package com.arbitaja.refactored.backend.pam.adapter.util;
 
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.RoleResponse;
-import com.arbitaja.refactored.backend.pam.adapter.in.web.dto.response.UserProfileResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.response.RoleResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.response.UserProfileResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
 import com.arbitaja.refactored.backend.pam.core.domain.model.RolePermission;
