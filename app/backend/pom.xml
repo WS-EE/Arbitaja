@@ -213,6 +213,7 @@
                             <sources>
                                 <source>src/unitTest/java</source>
                                 <source>src/integrationTest/java</source>
+                                <source>src/e2eTest/java</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -229,6 +230,9 @@
                                 </resource>
                                 <resource>
                                     <directory>src/integrationTest/resources</directory>
+                                </resource>
+                                <resource>
+                                    <directory>src/e2eTest/resources</directory>
                                 </resource>
                             </resources>
                         </configuration>

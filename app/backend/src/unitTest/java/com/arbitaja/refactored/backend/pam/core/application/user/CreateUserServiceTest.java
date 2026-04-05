@@ -132,47 +132,5 @@ class CreateUserServiceTest {
             createUserService.approveSignupUser(CreateUserUseCase.ApproveSignupCommand.builder().signupUserId(404).build())
         );
     }
-
-    @Test
-    void createUserRunsSignupAndApprovalFlow() {
-        CreateUserUseCase.SignupCommand command = CreateUserUseCase.SignupCommand.builder()
-            .username("flow")
-            .password("pw")
-            .fullName("Flow User")
-            .email("flow@example.com")
-            .build();
-
-        when(userRepository.existsByUsername("flow")).thenReturn(false);
-        when(signupUserRepository.existsByUsername("flow")).thenReturn(false);
-        when(passwordEncoder.encode("pw")).thenReturn("encoded");
-
-        SignupUser savedSignup = SignupUser.builder()
-            .username("flow")
-            .saltedPassword("encoded")
-            .personalData(PersonalData.builder().fullName("Flow User").email("flow@example.com").build())
-            .build();
-
-        when(signupUserRepository.save(any(SignupUser.class))).thenAnswer(inv -> {
-            SignupUser signupUser = inv.getArgument(0);
-            signupUser.setId(99);
-            return signupUser;
-        });
-        when(signupUserRepository.findById(99)).thenReturn(Optional.of(savedSignup));
-        when(personalDataRepository.save(any(PersonalData.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(roleRepository.findByName("user")).thenReturn(Optional.of(Role.builder().id(1).name("user").build()));
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
-            User user = inv.getArgument(0);
-            if (user.getId() == null) {
-                user.setId(100);
-            }
-            return user;
-        });
-
-        User user = createUserService.createUser(command);
-
-        assertEquals("flow", user.getUsername());
-        assertNotNull(user.getId());
-        verify(signupUserRepository).delete(savedSignup);
-    }
 }
 
