@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-class PermissionControllerV2Test {
+class PermissionControllerV2IT {
 
     @Mock
     private GetPermissionUseCase getPermissionUseCase;
@@ -79,6 +80,49 @@ class PermissionControllerV2Test {
     }
 
     @Test
+    void getAllPermissionsReturnsMappedCollection() throws Exception {
+        Permission permission1 = Permission.builder().id(1).name("View users").key("VIEW_USERS").build();
+        Permission permission2 = Permission.builder().id(2).name("Edit users").key("EDIT_USERS").build();
+
+        when(getPermissionUseCase.getAllPermissions()).thenReturn(List.of(permission1, permission2));
+        when(permissionMapper.toPermissionResponse(permission1)).thenReturn(new PermissionResponse(1, "View users", "VIEW_USERS"));
+        when(permissionMapper.toPermissionResponse(permission2)).thenReturn(new PermissionResponse(2, "Edit users", "EDIT_USERS"));
+
+        mockMvc.perform(get("/v2/permissions"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[1].id").value(2));
+    }
+
+    @Test
+    void getPermissionByIdReturnsMappedResponseWhenFound() throws Exception {
+        Permission permission = Permission.builder().id(12).name("View permissions").key("VIEW_PERMISSIONS").build();
+        when(getPermissionUseCase.getPermissionById(12)).thenReturn(Optional.of(permission));
+        when(permissionMapper.toPermissionResponse(permission)).thenReturn(
+            new PermissionResponse(12, "View permissions", "VIEW_PERMISSIONS")
+        );
+
+        mockMvc.perform(get("/v2/permissions/12"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(12))
+            .andExpect(jsonPath("$.key").value("VIEW_PERMISSIONS"));
+    }
+
+    @Test
+    void getPermissionsByUserIdReturnsMappedCollection() throws Exception {
+        Permission permission = Permission.builder().id(21).name("View roles").key("VIEW_ROLES").build();
+
+        when(getPermissionUseCase.getPermissionsByUserId(99)).thenReturn(List.of(permission));
+        when(permissionMapper.toPermissionResponse(permission)).thenReturn(
+            new PermissionResponse(21, "View roles", "VIEW_ROLES")
+        );
+
+        mockMvc.perform(get("/v2/permissions/user/99"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id").value(21));
+    }
+
+    @Test
     void getPermissionByIdReturns404WhenPermissionMissing() throws Exception {
         when(getPermissionUseCase.getPermissionById(12)).thenReturn(Optional.empty());
 
@@ -102,5 +146,29 @@ class PermissionControllerV2Test {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.error").value("Object not found"));
     }
-}
 
+    @Test
+    void updatePermissionReturnsMappedResponseWhenPermissionExists() throws Exception {
+        CreatePermissionRequest request = new CreatePermissionRequest("Edit permissions", "CREATE_UPDATE_PERMISSIONS");
+        CreatePermissionUseCase.PermissionCommand command =
+            new CreatePermissionUseCase.PermissionCommand("Edit permissions", "CREATE_UPDATE_PERMISSIONS");
+        Permission updated = Permission.builder()
+            .id(7)
+            .name("Edit permissions")
+            .key("CREATE_UPDATE_PERMISSIONS")
+            .build();
+
+        when(permissionMapper.toPermissionCommand(request)).thenReturn(command);
+        when(createPermissionUseCase.updatePermission(7, command)).thenReturn(updated);
+        when(permissionMapper.toPermissionResponse(updated)).thenReturn(
+            new PermissionResponse(7, "Edit permissions", "CREATE_UPDATE_PERMISSIONS")
+        );
+
+        mockMvc.perform(put("/v2/permissions/update/7")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(7))
+            .andExpect(jsonPath("$.key").value("CREATE_UPDATE_PERMISSIONS"));
+    }
+}

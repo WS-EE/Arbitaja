@@ -54,5 +54,25 @@ class SignupUserMapperTest {
         assertEquals("random@random.com", response.getEmail());
         assertEquals(7, response.getSchoolId());
     }
+
+    @Test
+    void toApproveSignupCommandMapsSignupIdAndRequestFields() {
+        SignupRequest request = SignupRequest.builder()
+            .username("approved")
+            .password("ignored")
+            .fullName("Approved User")
+            .email("approved@example.com")
+            .schoolId(3)
+            .build();
+
+        CreateUserUseCase.ApproveSignupCommand command = signupUserMapper.toApproveSignupCommand(99, request);
+
+        assertEquals(99, command.getSignupUserId());
+        assertEquals("approved", command.getUsername());
+        assertEquals("Approved User", command.getFullName());
+        assertEquals("approved@example.com", command.getEmail());
+        assertEquals(3, command.getSchoolId());
+    }
 }
+
 
