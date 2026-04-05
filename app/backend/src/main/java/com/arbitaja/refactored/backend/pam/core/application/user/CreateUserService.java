@@ -66,7 +66,7 @@ public class CreateUserService implements CreateUserUseCase {
             .build();
 
         log.info("Creating signup user: {}", command.getUsername());
-        signupUserRepository.save(signupUser);
+        signupUser = signupUserRepository.save(signupUser);
         return signupUser;
     }
 
@@ -146,14 +146,36 @@ public class CreateUserService implements CreateUserUseCase {
     public User createUser(@NonNull SignupCommand command) {
         log.info("Creating user with username: {}", command.getUsername());
 
-        SignupUser signupUser = signupUser(command);
-        log.info("User created with id: {}", signupUser.getId());
+        // Check if username already exists
+        if(userRepository.existsByUsername(command.getUsername())) {
+            throw DuplicateEntityException.userWithUsername(command.getUsername());
+        }
+        School school = schoolRepository.findById(command.getSchoolId()).orElse(null);
+        PersonalData personalData = personalDataRepository.save(PersonalData.builder()
+            .fullName(command.getFullName())
+            .email(command.getEmail())
+            .school(school)
+            .createdAt(new Timestamp(System.currentTimeMillis()))
+            .build());
 
-        ApproveSignupCommand approveCommand = convertSignupToApproveCommand(command, signupUser.getId());
-        User user = approveSignupUser(approveCommand);
+        User user = User.builder()
+                .username(command.getUsername())
+                .saltedPassword(passwordEncoder.encode(command.getPassword()))
+                .personalData(personalData)
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        Role userRole = roleRepository.findByName(DEFAULT_USER_ROLE)
+            .orElseThrow(() -> EntityNotFoundException.roleByName(DEFAULT_USER_ROLE));
+
+        UserRole userRoleAssignment = UserRole.createNew(savedUser, userRole);
+        savedUser.addRole(userRoleAssignment);
+
+        savedUser = userRepository.save(savedUser);
         log.info("User approved with id: {}", user.getId());
 
-        return user;
+        return savedUser;
     }
 
     @Override
@@ -166,16 +188,5 @@ public class CreateUserService implements CreateUserUseCase {
         if (userRepository.existsByUsername(username) || signupUserRepository.existsByUsername(username)) {
             throw DuplicateEntityException.userWithUsername(username);
         }
-    }
-
-
-    private ApproveSignupCommand convertSignupToApproveCommand(SignupCommand command, Integer signupUserId) {
-        return ApproveSignupCommand.builder()
-            .signupUserId(signupUserId)
-            .username(command.getUsername())
-            .fullName(command.getFullName())
-            .email(command.getEmail())
-            .schoolId(command.getSchoolId())
-            .build();
     }
 }

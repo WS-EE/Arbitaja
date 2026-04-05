@@ -2,6 +2,7 @@ package com.arbitaja.refactored.backend.pam.adapter.out.persistence;
 
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.entity.UserJpaEntity;
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.mapper.PersistenceMapper;
+import com.arbitaja.refactored.backend.pam.adapter.out.persistence.repository.PersonalDataJpaRepository;
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.repository.UserJpaRepository;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class UserPersistenceAdapter implements UserRepositoryPort {
 
     private final UserJpaRepository userJpaRepository;
+    private final PersonalDataJpaRepository personalDataJpaRepository;
     private final PersistenceMapper mapper;
 
     @Override
@@ -46,6 +48,12 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
     @Override
     public User save(@NonNull User user) {
         UserJpaEntity entity = mapper.toEntity(user);
+
+        // Reattach existing personal data via managed reference to avoid transient association errors on persist.
+        if (user.getPersonalData() != null && user.getPersonalData().getId() != null) {
+            entity.setPersonalData(personalDataJpaRepository.getReferenceById(user.getPersonalData().getId()));
+        }
+
         UserJpaEntity savedEntity = userJpaRepository.save(entity);
         return mapper.toDomain(savedEntity);
     }

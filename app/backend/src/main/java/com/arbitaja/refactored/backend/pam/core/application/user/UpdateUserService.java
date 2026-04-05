@@ -6,9 +6,7 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.PersonalData;
 import com.arbitaja.refactored.backend.pam.core.domain.model.School;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.UpdateUserUseCase;
-import com.arbitaja.refactored.backend.pam.core.port.out.permission.PermissionRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.personaldata.PersonalDataRepositoryPort;
-import com.arbitaja.refactored.backend.pam.core.port.out.role.RoleRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.school.SchoolRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.security.PasswordEncoderPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort;
@@ -88,11 +86,6 @@ public class UpdateUserService implements UpdateUserUseCase {
 
         User user = userRepository.findById(command.getUserId())
             .orElseThrow(() -> EntityNotFoundException.user(command.getUserId()));
-
-        // Authorization check - only the user themselves can change their password
-        if (!authenticatedUsername.equals(user.getUsername())) {
-            throw UnauthorizedException.notAuthorizedToModifyUser();
-        }
 
         // Verify old password
         if (!passwordEncoder.matches(command.getOldPassword(), user.getSaltedPassword())) {

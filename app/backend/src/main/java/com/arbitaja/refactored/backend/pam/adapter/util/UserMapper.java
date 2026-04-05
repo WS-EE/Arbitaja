@@ -7,6 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     UpdateUserUseCase.UpdateUserCommand toUpdateUserCommand(Integer userId, UpdateUserRequest updateUserRequest);
-
+    UpdateUserUseCase.ChangePasswordCommand toChangePasswordCommand(Integer userId, String oldPassword, String newPassword);
 
 }

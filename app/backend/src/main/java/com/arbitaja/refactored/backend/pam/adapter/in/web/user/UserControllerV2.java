@@ -3,6 +3,7 @@ package com.arbitaja.refactored.backend.pam.adapter.in.web.user;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.shared.dto.response.GeneralMessageResponse;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.SignupRequest;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.request.ChangePasswordRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.request.OverwriteUserRolesRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.request.UpdateUserRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.response.UserProfileResponse;
@@ -27,6 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -193,6 +195,40 @@ public class UserControllerV2 {
             .orElseThrow(() -> new EntityNotFoundException("User not found"));
         UserProfileResponse response = DtoMapper.toUserProfileResponse(user);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/change-password/{id}")
+    @Operation(summary = "Change user password", description = "Change the password of a user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Password changed successfully"),
+        @ApiResponse(responseCode = "401", description = "Not authorized to change this user's password", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = UnauthorizedException.class))}),
+        @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
+    })
+    @SecurityRequirement(name = "basicAuth")
+    ResponseEntity<GeneralMessageResponse> changePassword(
+        @NonNull @PathVariable Integer id,
+        @RequestBody @Valid ChangePasswordRequest request,
+        Authentication authentication) {
+
+        log.info("Changing password for user: {}", id);
+
+        boolean canEditOthers = checkPermissionUseCase.assertUserHasPermissions(
+            authentication.getName(),
+            new PermissionCode[]{EDIT_USERS}
+        );
+
+        if (!canEditOthers && !authentication.getName().equals(getUserUseCase.getUserProfile(id).getUsername())) {
+            throw new UnauthorizedException("Not authorized to change this user's password");
+        }
+
+        updateUserUseCase.changePassword(
+            userMapper.toChangePasswordCommand(id, request.oldPassword(), request.newPassword()),
+            authentication.getName()
+        );
+
+        return ResponseEntity.ok(new GeneralMessageResponse("Password changed successfully"));
     }
 }
 
