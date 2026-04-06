@@ -27,7 +27,7 @@ public class PamExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.warn("Entity not found: {}", ex.getMessage());
+        log.warn("Entity not found: {}", ex.toString());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(Map.of(
                 "error", "Object not found",
@@ -37,7 +37,7 @@ public class PamExceptionHandler {
 
     @ExceptionHandler(DuplicateEntityException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateEntityException(DuplicateEntityException ex) {
-        log.warn("Duplicate entity: {}", ex.getMessage());
+        log.warn("Duplicate entity: {}", ex.toString());
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(Map.of(
                 "error", "Duplicate entry",
@@ -47,7 +47,7 @@ public class PamExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<Map<String, String>> handleUnauthorizedException(UnauthorizedException ex) {
-        log.warn("Unauthorized: {}", ex.getMessage());
+        log.warn("Unauthorized: {}", ex.toString());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(Map.of(
                 "error", "Unauthorized",
@@ -57,7 +57,7 @@ public class PamExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<Map<String, String>> handleDomainException(DomainException ex) {
-        log.error("Domain exception: {}", ex.getMessage());
+        log.error("Domain exception: {}", ex.toString());
         return ResponseEntity.status(ex.getStatus())
             .body(Map.of(
                 "error", "Domain error",
@@ -67,7 +67,7 @@ public class PamExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.warn("Invalid input: {}", ex.getMessage());
+        log.warn("Invalid input: {}", ex.toString());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of(
                 "error", "Invalid input",
@@ -77,8 +77,7 @@ public class PamExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<Map<String, String>> handleNullPointerException(NullPointerException ex) {
-        log.error("Null pointer exception: {}", ex.getMessage());
-        log.error(ex.getStackTrace());
+        log.error("Null pointer exception: {}", ex.toString());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of(
                 "error", "Required field is null",

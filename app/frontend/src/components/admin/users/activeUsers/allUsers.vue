@@ -28,7 +28,7 @@ const getAllUsers = async() => {
     // Try getting user data
     try{
         // Try getting the Users
-        const response = await axios.get('v1/user/profile/all')
+        const response = await axios.get('/v2/user')
         allUsers.value = response.data
     } catch(error) {
         // Throw console log error if fail

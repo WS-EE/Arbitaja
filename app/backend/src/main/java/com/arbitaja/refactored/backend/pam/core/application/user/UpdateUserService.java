@@ -88,7 +88,7 @@ public class UpdateUserService implements UpdateUserUseCase {
             .orElseThrow(() -> EntityNotFoundException.user(command.getUserId()));
 
         // Verify old password
-        if (!passwordEncoder.matches(command.getOldPassword(), user.getSaltedPassword())) {
+        if (!command.isAdmin() && !passwordEncoder.matches(command.getOldPassword(), user.getSaltedPassword())) {
             throw new IllegalArgumentException("Old password is incorrect");
         }
 

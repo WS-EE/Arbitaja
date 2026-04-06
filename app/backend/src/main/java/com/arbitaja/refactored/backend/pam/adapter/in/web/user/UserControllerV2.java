@@ -197,7 +197,7 @@ public class UserControllerV2 {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/change-password/{id}")
+    @PutMapping("/change-password/{id}")
     @Operation(summary = "Change user password", description = "Change the password of a user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Password changed successfully"),
@@ -224,7 +224,7 @@ public class UserControllerV2 {
         }
 
         updateUserUseCase.changePassword(
-            userMapper.toChangePasswordCommand(id, request.oldPassword(), request.newPassword()),
+            userMapper.toChangePasswordCommand(id, canEditOthers, request.oldPassword(), request.newPassword()),
             authentication.getName()
         );
 

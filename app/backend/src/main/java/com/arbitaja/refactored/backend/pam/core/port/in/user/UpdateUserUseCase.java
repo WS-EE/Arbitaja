@@ -70,7 +70,8 @@ public interface UpdateUserUseCase {
         @NonNull
         private Integer userId;
 
-        @NonNull
+        private boolean isAdmin;
+
         private String oldPassword;
 
         @NonNull

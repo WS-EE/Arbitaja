@@ -13,12 +13,11 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 // Get the user we want to edit
 import userProfile from '@/components/generic/userEdit/userProfile.vue';
 import axios from 'axios';
-import {useUserStore} from "@/stores/userStore.js";
 const user = ref([])
 
 onMounted(async() =>{
     try {
-        const response = await axios(`/v2/user/${useUserStore().id}`)
+        const response = await axios(`/v2/user/${userID}`)
         user.value = response.data
     } catch(e) {
 
@@ -33,5 +32,5 @@ onMounted(async() =>{
     <div v-if="isLoading" class="position-absolute top-50 start-50">
         <PulseLoader />
     </div>
-    <userProfile v-else :user="user" :isAdmin=true />
+    <userProfile v-else :user="user" />
 </template>

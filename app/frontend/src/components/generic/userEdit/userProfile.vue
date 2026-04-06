@@ -22,6 +22,7 @@ import axios from 'axios';
 const allSchools = ref(''); 
 
 // Set user parameters to empty
+const isAdmin = store.hasPrivilege('EDIT_USERS')
 const userid = ref('')
 const fullName = ref('')
 const email = ref('')
@@ -47,12 +48,16 @@ onMounted(async () => {
 
     // Try getting user data
     try {
-        userid.value = store.id
-        fullName.value = store.personal_data.full_name
-        email.value = store.personal_data.email
-        username.value = store.username
-        roles.value = store.roles
-        school.value = store.personal_data.school
+        // Get user parameters from cookies
+        const userParameters = props.user;
+
+        // Map out cookie parameters
+        userid.value = userParameters.id
+        fullName.value = userParameters.personal_data.full_name
+        email.value = userParameters.personal_data.email
+        username.value = userParameters.username
+        roles.value = userParameters.roles
+        school.value = userParameters.personal_data.school
     } catch(error) {
         showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p>Couldn\'t get user data! </p class=mb-0><p>Error:' + error + '</p>', 'danger', 4500);
     } finally {
@@ -75,7 +80,7 @@ const filteredSchools = computed(() => {
 const saveProfile = (async () =>{
     try {
         // Update data with PUT request
-        const response = await axios.put(`v2/user/${useUserStore().id}`, {
+        const response = await axios.put(`v2/user/${userid.value}`, {
           username: username.value,
           full_name: fullName.value,
           email: email.value,
@@ -107,12 +112,15 @@ const saveProfile = (async () =>{
 });
 function discardChanges(){
     try {
+        // Get current values in cookies
+        const prevParameters = props.user;
+
         // Set the old values
-        fullName.value = useUserStore().personal_data.full_name
-        email.value = useUserStore().personal_data.email
-        username.value = useUserStore().username
-        roles.value = useUserStore().roles
-        school.value = useUserStore().personal_data.school
+        fullName.value = prevParameters.personal_data.full_name
+        email.value = prevParameters.personal_data.email
+        username.value = prevParameters.username
+        roles.value = prevParameters.roles
+        school.value = prevParameters.personal_data.school
 
         // Tell user that changes were discarded
         showAlert('<i class="me-2 bi bi-trash"></i><strong>Changes were discarded</strong>', 'warning', 3000)

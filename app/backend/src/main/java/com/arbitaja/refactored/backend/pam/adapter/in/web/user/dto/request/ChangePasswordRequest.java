@@ -5,7 +5,7 @@ import lombok.NonNull;
 
 public record ChangePasswordRequest(
 
-    @NonNull @NotEmpty String oldPassword,
+    String oldPassword,
     @NonNull @NotEmpty String newPassword
 ) {
 }
