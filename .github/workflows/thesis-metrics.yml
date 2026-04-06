@@ -1,0 +1,186 @@
+name: Thesis Metrics (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Which mode to run"
+        type: choice
+        required: true
+        default: both
+        options:
+          - legacy
+          - hex
+          - both
+      skip_pit:
+        description: "Skip PIT mutation testing"
+        type: boolean
+        required: true
+        default: true
+      skip_performance:
+        description: "Skip k6 performance benchmarking"
+        type: boolean
+        required: true
+        default: true
+      duration:
+        description: "k6 duration (used when performance is enabled)"
+        type: string
+        required: true
+        default: 30s
+      vus:
+        description: "k6 virtual users (used when performance is enabled)"
+        type: string
+        required: true
+        default: "10"
+      auto_commit_readme:
+        description: "Commit generated backend thesis README results back to the branch"
+        type: boolean
+        required: true
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: arbitaja
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d arbitaja"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      POSTGRES_URL: localhost:5432
+      POSTGRES_DB: arbitaja
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: admin
+      BASE_URL: http://localhost:8080
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Set up k6
+        if: ${{ inputs.skip_performance == false }}
+        uses: grafana/setup-k6-action@v1
+
+      - name: Ensure scripts are executable
+        run: |
+          chmod +x app/backend/scripts/collect-thesis-metrics.sh
+          chmod +x app/backend/scripts/summarize-thesis-metrics.py
+          chmod +x app/backend/scripts/render-thesis-readme.py
+          chmod +x app/backend/benchmark/run-k6-comparison.sh
+
+      - name: Start backend for k6 benchmark
+        if: ${{ inputs.skip_performance == false }}
+        working-directory: app/backend
+        run: |
+          nohup sh ./mvnw -Dspring-boot.run.mainClass=com.arbitaja.backend.ArbitajaBackendApplication spring-boot:run > /tmp/backend.log 2>&1 &
+
+          for i in {1..90}; do
+            if curl -fsS "$BASE_URL/api-docs" >/dev/null; then
+              echo "Backend is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Backend did not become ready in time"
+          cat /tmp/backend.log || true
+          exit 1
+
+      - name: Collect thesis metrics
+        working-directory: app/backend
+        env:
+          MODE_INPUT: ${{ inputs.mode }}
+          SKIP_PIT_INPUT: ${{ inputs.skip_pit }}
+          SKIP_PERFORMANCE_INPUT: ${{ inputs.skip_performance }}
+          DURATION_INPUT: ${{ inputs.duration }}
+          VUS_INPUT: ${{ inputs.vus }}
+        run: |
+          pit_flag=""
+          perf_flag=""
+
+          if [[ "$SKIP_PIT_INPUT" == "true" ]]; then
+            pit_flag="--skip-pit"
+          fi
+
+          if [[ "$SKIP_PERFORMANCE_INPUT" == "true" ]]; then
+            perf_flag="--skip-performance"
+          fi
+
+          run_mode() {
+            local mode="$1"
+            ./scripts/collect-thesis-metrics.sh \
+              --mode "$mode" \
+              $pit_flag \
+              $perf_flag \
+              --base-url "$BASE_URL" \
+              --duration "$DURATION_INPUT" \
+              --vus "$VUS_INPUT"
+          }
+
+          if [[ "$MODE_INPUT" == "both" ]]; then
+            run_mode legacy
+            run_mode hex
+          else
+            run_mode "$MODE_INPUT"
+          fi
+
+      - name: Render backend thesis results
+        run: |
+          python3 app/backend/scripts/render-thesis-readme.py \
+            --readme app/backend/README-thesis-comparison.md \
+            --metrics-root app/backend/target/thesis-metrics
+
+      - name: Commit backend thesis README update
+        if: ${{ inputs.auto_commit_readme == true }}
+        run: |
+          if git diff --quiet -- app/backend/README-thesis-comparison.md; then
+            echo "app/backend/README-thesis-comparison.md unchanged"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/backend/README-thesis-comparison.md
+          git commit -m "chore: update thesis results snapshot"
+          git push
+
+      - name: Upload thesis artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: thesis-metrics-${{ github.run_id }}
+          if-no-files-found: warn
+          path: |
+            app/backend/target/thesis-metrics/**
+            app/backend/target/site/jacoco-global/**
+            app/backend/target/site/jacoco-hex/**
+            app/backend/target/site/jacoco-legacy/**
+            app/backend/benchmark/results/comparison-*.csv
+            /tmp/backend.log
+

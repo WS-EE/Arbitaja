@@ -6,6 +6,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = (Resolve-Path (Join-Path $scriptDir "..")).Path
+Set-Location $projectRoot
+
 New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
 
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"

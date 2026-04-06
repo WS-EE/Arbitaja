@@ -4,3 +4,5 @@
 ---
 
 This project is a hobby project to help with marking at the Estonian's national vocational competition.
+
+Thesis metric snapshots are maintained in `app/backend/README-thesis-comparison.md`.

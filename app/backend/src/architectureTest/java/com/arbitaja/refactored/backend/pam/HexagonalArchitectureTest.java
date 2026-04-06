@@ -4,6 +4,7 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +19,7 @@ public class HexagonalArchitectureTest {
     private static final String ADAPTER_OUT = "com.arbitaja.refactored.backend.pam.adapter.out..";
 
     private final JavaClasses classes = new ClassFileImporter()
+            .withImportOption(new ImportOption.DoNotIncludeTests())
             .importPackages("com.arbitaja.refactored.backend.pam..");
 
     // Domain must not depend on anything else
