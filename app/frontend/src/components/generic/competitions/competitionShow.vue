@@ -52,7 +52,7 @@ const getCompetition = async() => {
         const competition_id = route.params.id
         
         // Try competition data
-        const response = await axios.get('competition/get?id=' + competition_id)
+        const response = await axios.get('v1/competition/get?id=' + competition_id)
         competition.value = response.data
 
         // Format dates
@@ -73,7 +73,7 @@ const getResults = async() => {
     try {
         const competition_id = route.params.id
 
-        const response = await axios.get('dashboard/competition/history?competition_id=' + competition_id)
+        const response = await axios.get('v1/dashboard/competition/history?competition_id=' + competition_id)
         results.value = response.data.competitors
     } catch(error) {
         // Throw console log error if fail

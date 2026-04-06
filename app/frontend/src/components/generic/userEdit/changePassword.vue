@@ -44,15 +44,13 @@ const resetPassword = async(userId, oldPassword, setPassword, confirmSetPassword
         // Create the object to be submited 
         if (props.isAdmin) {
             apiObject = {
-                id: userId,
-                new_password: setPassword
+                newPassword: setPassword
             }
         }
         if (!props.isAdmin) {
             apiObject = {
-                id: userId,
-                new_password: setPassword,
-                old_password: oldPassword
+                newPassword: setPassword,
+                oldPassword: oldPassword
             }
         }
 
@@ -60,7 +58,7 @@ const resetPassword = async(userId, oldPassword, setPassword, confirmSetPassword
         if (setPassword === confirmSetPassword) {
 
             // try reseting password
-            await axios.put('user/profile/update_password', apiObject)
+            await axios.put(`/v2/user/change-password/${userId}`, apiObject)
 
             // Show alert password changed
             showAlert('Password changed successfully!', 'success')

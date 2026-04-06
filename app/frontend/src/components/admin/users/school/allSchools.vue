@@ -43,7 +43,7 @@ onMounted(async () => {
     try {
         // If prop schools is not defined try to get them ourselves
         if (props.schools === undefined){  
-            const response = await axios.get('school/all/get')
+            const response = await axios.get('v1/school/all/get')
             schools.value = response.data
 
         // else get the variables from props
@@ -87,7 +87,7 @@ function unsetSchoolToDelete(){
 const deleteSchool = async() => {
     try{
         // Delete school based on ID
-        await axios.delete("/school/register", {
+        await axios.delete("/v1/school/register", {
         params: { id: setSchoolId.value }, // Send `id` as a query parameter
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

@@ -16,7 +16,7 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const getSignupUsers = async() => {
     try{
         // Try getting the Users
-        const response = await axios.get('user/signup/get')
+        const response = await axios.get('v1/user/signup/get')
         singupUsers.value = response.data.signup_users
     } catch(error) {
         // Throw console log error if fail
@@ -28,11 +28,11 @@ const getSignupUsers = async() => {
 const getSchools = async() => {
     try {
         // Try getting school data
-        const response = await axios.get('school/all/get')
+        const response = await axios.get('v1/school/all/get')
         schools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. <br> Error: ' + error, 'danger', 9000)
-    };
+    }
 }
 
 onMounted(async () => {

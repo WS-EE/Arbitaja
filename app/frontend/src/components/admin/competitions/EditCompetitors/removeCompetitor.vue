@@ -44,7 +44,7 @@ const removeCompetitor = async(competitorId, competitorName) => {
         // Delete competitor
         await axios.delete
         (
-            'competitor/delete',
+            'v1/competitor/delete',
             { params: { id: competitorId } }
         )
 

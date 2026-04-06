@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="seed-basic-000-enable-pgcrypto" author="heinrich.vannas" context="dev,test">
+        <sql>CREATE EXTENSION IF NOT EXISTS pgcrypto;</sql>
+    </changeSet>
+
+    <changeSet id="seed-basic-001-permission-basic" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="BASIC"/>
+            <column name="key_object" value="basic"/>
+            <column name="name" value="basic"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-002-permission-admin" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="ADMIN"/>
+            <column name="key_object" value="admin"/>
+            <column name="name" value="admin"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-003-role-user" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role">
+            <column name="name" value="user"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="changed_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-004-role-admin" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role">
+            <column name="name" value="admin"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="changed_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-005-role-relation-admin-user" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role_relation">
+            <column name="parent_role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+            <column name="child_role_id" valueComputed="(SELECT id FROM role WHERE name = 'user')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-006-school-randomschool" author="heinrich.vannas" context="dev,test">
+        <insert tableName="school">
+            <column name="name" value="RandomSchool"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-007-personal-data-admin" author="heinrich.vannas" context="dev,test">
+        <insert tableName="personal_data">
+            <column name="full_name" value="Arbitaja"/>
+            <column name="email" value="arbitaja@arbitaja.com"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="school_id" valueComputed="(SELECT id FROM school WHERE name = 'RandomSchool')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-008-personal-data-competitor" author="heinrich.vannas" context="dev,test">
+        <insert tableName="personal_data">
+            <column name="full_name" value="competitor"/>
+            <column name="email" value="competitor@competitor.com"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="school_id" valueComputed="(SELECT id FROM school WHERE name = 'RandomSchool')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-009-user-admin" author="heinrich.vannas" context="dev,test">
+        <insert tableName="user">
+            <column name="username" value="${adminUsername}"/>
+            <column name="salted_password" valueComputed="crypt('${adminPasswordPlain}', gen_salt('bf'))"/>
+            <column name="personal_data_id" valueComputed="(SELECT id FROM personal_data WHERE email = 'arbitaja@arbitaja.com')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-010-user-competitor" author="heinrich.vannas" context="dev,test">
+        <insert tableName="user">
+            <column name="username" value="${competitorUsername}"/>
+            <column name="salted_password" valueComputed="crypt('${competitorPasswordPlain}', gen_salt('bf'))"/>
+            <column name="personal_data_id" valueComputed="(SELECT id FROM personal_data WHERE email = 'competitor@competitor.com')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-011-role-permissions-user-basic" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'BASIC')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'user')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-012-role-permissions-admin-admin" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'ADMIN')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-013-user-role-admin" author="heinrich.vannas" context="dev,test">
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(SELECT id FROM &quot;user&quot; WHERE username = '${adminUsername}')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-014-user-role-competitor" author="heinrich.vannas" context="dev,test">
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(SELECT id FROM &quot;user&quot; WHERE username = '${competitorUsername}')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'user')"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-015-competitor-arbitaja" author="heinrich.vannas" context="dev,test">
+        <insert tableName="competitor">
+            <column name="public_display_name_type" valueNumeric="1"/>
+            <column name="personal_data_id" valueComputed="(SELECT id FROM personal_data WHERE email = 'competitor@competitor.com')"/>
+            <column name="alias" value="arbitaja"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-016-scoring-group-main" author="heinrich.vannas" context="dev,test">
+        <insert tableName="scoring_groups_structure">
+            <column name="name" value="main"/>
+            <column name="description" value="main scoring group"/>
+            <column name="structure_group_type" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-017-scoring-group-noormeister" author="heinrich.vannas" context="dev,test">
+        <insert tableName="scoring_groups_structure">
+            <column name="name" value="noormeister"/>
+            <column name="description" value="noor meistrer scoring group"/>
+            <column name="scoring_parent_group_id" valueComputed="(SELECT id FROM scoring_groups_structure WHERE name = 'main')"/>
+            <column name="structure_group_type" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-018-scoring-group-admin" author="heinrich.vannas" context="dev,test">
+        <insert tableName="scoring_groups_structure">
+            <column name="name" value="admin"/>
+            <column name="description" value="admin scoring group for testing"/>
+            <column name="competitor_id" valueComputed="(SELECT id FROM competitor WHERE alias = 'arbitaja')"/>
+            <column name="scoring_parent_group_id" valueComputed="(SELECT id FROM scoring_groups_structure WHERE name = 'noormeister')"/>
+            <column name="structure_group_type" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-019-competition-noor-meister" author="heinrich.vannas" context="dev,test">
+        <insert tableName="competition">
+            <column name="name" value="Noor meister"/>
+            <column name="scoring_criteria_group_main_id" valueComputed="(SELECT id FROM scoring_groups_structure WHERE name = 'noormeister')"/>
+            <column name="start_time" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="end_time" valueComputed="CURRENT_TIMESTAMP + INTERVAL '1 day'"/>
+            <column name="organizer_id" valueComputed="(SELECT id FROM &quot;user&quot; WHERE username = '${adminUsername}')"/>
+            <column name="score_showtime" valueComputed="CURRENT_TIMESTAMP + INTERVAL '20 hours'"/>
+            <column name="publish_scores" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-020-competitor-competition-noor-meister" author="heinrich.vannas" context="dev,test">
+        <insert tableName="competitor_competition">
+            <column name="competitor_id" valueComputed="(SELECT id FROM competitor WHERE alias = 'arbitaja')"/>
+            <column name="competition_id" valueComputed="(SELECT id FROM competition WHERE name = 'Noor meister')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-021-scoring-criteria-1" author="heinrich.vannas" context="dev,test">
+        <insert tableName="scoring_criteria">
+            <column name="name" value="test"/>
+            <column name="description" value="test"/>
+            <column name="is_manual" valueBoolean="true"/>
+            <column name="total_points" valueNumeric="50"/>
+            <column name="is_generalized" valueBoolean="true"/>
+            <column name="expected_result" value="test"/>
+            <column name="is_template" valueBoolean="false"/>
+            <column name="visibility_level" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-022-scoring-criteria-2" author="heinrich.vannas" context="dev,test">
+        <insert tableName="scoring_criteria">
+            <column name="name" value="test"/>
+            <column name="description" value="test"/>
+            <column name="is_manual" valueBoolean="true"/>
+            <column name="total_points" valueNumeric="50"/>
+            <column name="is_generalized" valueBoolean="true"/>
+            <column name="expected_result" value="test"/>
+            <column name="is_template" valueBoolean="false"/>
+            <column name="visibility_level" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-023-scoring-criteria-3" author="heinrich.vannas" context="dev,test">
+        <insert tableName="scoring_criteria">
+            <column name="name" value="test"/>
+            <column name="description" value="test"/>
+            <column name="is_manual" valueBoolean="true"/>
+            <column name="total_points" valueNumeric="50"/>
+            <column name="is_generalized" valueBoolean="true"/>
+            <column name="expected_result" value="test"/>
+            <column name="is_template" valueBoolean="false"/>
+            <column name="visibility_level" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-024-scoring-criteria-4" author="heinrich.vannas" context="dev,test">
+        <insert tableName="scoring_criteria">
+            <column name="name" value="test"/>
+            <column name="description" value="test"/>
+            <column name="is_manual" valueBoolean="true"/>
+            <column name="total_points" valueNumeric="50"/>
+            <column name="is_generalized" valueBoolean="true"/>
+            <column name="expected_result" value="test"/>
+            <column name="is_template" valueBoolean="false"/>
+            <column name="visibility_level" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-025-permission-view-dashboard" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_DASHBOARD"/>
+            <column name="key_object" value="view_dashboard"/>
+            <column name="name" value="view_dashboard"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-026-permission-view-users" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_USERS"/>
+            <column name="key_object" value="view_users"/>
+            <column name="name" value="view_users"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-027-permission-edit-users" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="EDIT_USERS"/>
+            <column name="key_object" value="edit_users"/>
+            <column name="name" value="edit_users"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-028-permission-view-signups" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_SIGNUPS"/>
+            <column name="key_object" value="view_signups"/>
+            <column name="name" value="view_signups"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-029-permission-accept-signups" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="ACCEPT_SIGNUPS"/>
+            <column name="key_object" value="accept_signups"/>
+            <column name="name" value="accept_signups"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-030-permission-view-roles" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_ROLES"/>
+            <column name="key_object" value="view_roles"/>
+            <column name="name" value="view_roles"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-031-permission-create-update-roles" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="CREATE_UPDATE_ROLES"/>
+            <column name="key_object" value="create_update_roles"/>
+            <column name="name" value="create_update_roles"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-032-permission-view-permissions" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_PERMISSIONS"/>
+            <column name="key_object" value="view_permissions"/>
+            <column name="name" value="view_permissions"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-033-permission-create-update-permissions" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="CREATE_UPDATE_PERMISSIONS"/>
+            <column name="key_object" value="create_update_permissions"/>
+            <column name="name" value="create_update_permissions"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-034-permission-view-competitions" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_COMPETITIONS"/>
+            <column name="key_object" value="view_competitions"/>
+            <column name="name" value="view_competitions"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-035-permission-create-update-competitions" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="CREATE_UPDATE_COMPETITIONS"/>
+            <column name="key_object" value="create_update_competitions"/>
+            <column name="name" value="create_update_competitions"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-036-role-permissions-admin-all-permission-codes" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_DASHBOARD')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_USERS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'EDIT_USERS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_SIGNUPS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'ACCEPT_SIGNUPS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_ROLES')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'CREATE_UPDATE_ROLES')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_PERMISSIONS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'CREATE_UPDATE_PERMISSIONS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_COMPETITIONS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'CREATE_UPDATE_COMPETITIONS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-037-role-permissions-user-dashboard-and-competitions" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_DASHBOARD')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'user')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_COMPETITIONS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'user')"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

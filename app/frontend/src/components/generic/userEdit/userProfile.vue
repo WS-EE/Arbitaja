@@ -1,14 +1,14 @@
 <script setup>
+import { useUserStore} from "@/stores/userStore.js";
+
+const store = useUserStore()
+
 // Use props to get user profile
 const props = defineProps({
     user: {
         type: Object,
         required: true
-    },
-    isAdmin: {
-        type: Boolean,
-        default: false,
-    },
+    }
 })
 
 const emit = defineEmits(['userUpdate'])
@@ -22,18 +22,19 @@ import axios from 'axios';
 const allSchools = ref(''); 
 
 // Set user parameters to empty
+const isAdmin = computed(() => store.hasPrivilege('EDIT_USERS'))
 const userid = ref('')
 const fullName = ref('')
 const email = ref('')
 const username = ref('')
-const roles = ref('')
-const school = ref('')
+const roles = ref([])
+const school = ref(null)
 const successAlert = ref('')
 const isLoading = ref(true)
 
 const getSchools = async() => {
     try {
-        const response = await axios.get('school/all/get')
+        const response = await axios.get('v1/school/all/get')
         allSchools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
@@ -79,16 +80,11 @@ const filteredSchools = computed(() => {
 const saveProfile = (async () =>{
     try {
         // Update data with PUT request
-        const response = await axios.put('user/profile/edit', {
-            id: userid.value,
-            username: username.value,
-            personal_data: {
-                full_name: fullName.value,
-                email: email.value,
-                school: {
-                  id: school.value.id
-                }
-            },
+        const response = await axios.put(`v2/user/${userid.value}`, {
+          username: username.value,
+          full_name: fullName.value,
+          email: email.value,
+          school_id: school.value.id
         })
 
         // On positive response load new data.
@@ -234,7 +230,7 @@ import changePassword from './changePassword.vue';
                     <p>Password</p>
                 </div>
                 <div class="col">
-                    <changePassword :isAdmin="props.isAdmin" :userId="userid"/>
+                    <changePassword :isAdmin="isAdmin" :userId="userid"/>
                 </div>
             </div>
 

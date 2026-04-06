@@ -17,7 +17,7 @@ const user = ref([])
 
 onMounted(async() =>{
     try {
-        const response = await axios('/user/profile/get', { params: { id: userID }})
+        const response = await axios(`/v2/user/${userID}`)
         user.value = response.data
     } catch(e) {
 
@@ -32,5 +32,5 @@ onMounted(async() =>{
     <div v-if="isLoading" class="position-absolute top-50 start-50">
         <PulseLoader />
     </div>
-    <userProfile v-else :user="user" :isAdmin=true />
+    <userProfile v-else :user="user" />
 </template>

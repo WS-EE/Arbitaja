@@ -1,0 +1,443 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-1">
+        <createTable tableName="competitor">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="competitor_pkey"/>
+            </column>
+            <column name="alias" type="VARCHAR(255)"/>
+            <column name="public_display_name_type" type="INTEGER"/>
+            <column name="personal_data_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-2">
+        <createTable tableName="signup_user">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="signup_user_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_approved" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salted_password" type="TEXT"/>
+            <column name="username" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="personal_data_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-3">
+        <createTable tableName="competition">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="competition_pkey"/>
+            </column>
+            <column name="end_time" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="publish_scores" type="BOOLEAN"/>
+            <column name="score_showtime" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="start_time" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="organizer_id" type="INTEGER"/>
+            <column name="scoring_criteria_group_main_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-4">
+        <createTable tableName="user">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_pkey"/>
+            </column>
+            <column name="salted_password" type="VARCHAR(255)"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="default_token_id" type="INTEGER"/>
+            <column name="personal_data_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-5">
+        <addUniqueConstraint columnNames="personal_data_id" constraintName="uk1fs7ux1or78dg4lfr8hrs1iar" tableName="competitor"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-6">
+        <addUniqueConstraint columnNames="username" constraintName="uk2wxebaya5memfmtdk2wcaa3ih" tableName="signup_user"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-7">
+        <addUniqueConstraint columnNames="scoring_criteria_group_main_id" constraintName="ukflfx8do8yyx7q3wca6we7olqj" tableName="competition"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-8">
+        <addUniqueConstraint columnNames="default_token_id" constraintName="ukhnqdl4l1t755q1bi1dqgrgkwy" tableName="user"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-9">
+        <addUniqueConstraint columnNames="personal_data_id" constraintName="ukr0istnxcqjopgp6mahyf6udil" tableName="user"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-10">
+        <createTable tableName="agent_proxy">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="agent_proxy_pkey"/>
+            </column>
+            <column name="authentication_type" type="INTEGER"/>
+            <column name="ip" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="competition_id" type="INTEGER"/>
+            <column name="token_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-11">
+        <createTable tableName="api_token">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="api_token_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="token" type="VARCHAR(255)"/>
+            <column name="user_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-12">
+        <createTable tableName="competition_scoring_criteria">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="competition_scoring_criteria_pkey"/>
+            </column>
+            <column name="competition_id" type="INTEGER"/>
+            <column name="criteria_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-13">
+        <createTable tableName="competitor_competition">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="competitor_competition_pkey"/>
+            </column>
+            <column name="competition_id" type="INTEGER"/>
+            <column name="competitor_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-14">
+        <createTable tableName="criteria_dependency">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="criteria_dependency_pkey"/>
+            </column>
+            <column name="criteria_id" type="INTEGER"/>
+            <column name="dependent_on_criteria_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-15">
+        <createTable tableName="logical_group_link">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="logical_group_link_pkey"/>
+            </column>
+            <column name="logical_group_id" type="INTEGER"/>
+            <column name="scoring_criteria_id" type="INTEGER"/>
+            <column name="scoring_host_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-16">
+        <createTable tableName="permission">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="permission_pkey"/>
+            </column>
+            <column name="key" type="VARCHAR(255)"/>
+            <column name="key_object" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-17">
+        <createTable tableName="personal_data">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="personal_data_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="full_name" type="VARCHAR(255)"/>
+            <column name="school_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-18">
+        <createTable tableName="role">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="role_pkey"/>
+            </column>
+            <column name="changed_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-19">
+        <createTable tableName="role_permissions">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="role_permissions_pkey"/>
+            </column>
+            <column name="key_object_acl" type="JSONB"/>
+            <column name="permission_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-20">
+        <createTable tableName="role_relation">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="role_relation_pkey"/>
+            </column>
+            <column name="child_role_id" type="INTEGER"/>
+            <column name="parent_role_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-21">
+        <createTable tableName="school">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="school_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-22">
+        <createTable tableName="scoring_agent">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="scoring_agent_pkey"/>
+            </column>
+            <column name="agent_type" type="INTEGER"/>
+            <column name="authentication_type" type="INTEGER"/>
+            <column name="custom_api_endpoint" type="VARCHAR(255)"/>
+            <column name="agent_proxy_id" type="INTEGER"/>
+            <column name="scoring_agent_transport_id" type="INTEGER"/>
+            <column name="scoring_criteria_id" type="INTEGER"/>
+            <column name="scoring_host_id" type="INTEGER"/>
+            <column name="script_id" type="INTEGER"/>
+            <column name="token_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-23">
+        <createTable tableName="scoring_agent_transport">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="scoring_agent_transport_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="ssh_key" type="VARCHAR(255)"/>
+            <column name="tcp_port" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-24">
+        <createTable tableName="scoring_criteria">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="scoring_criteria_pkey"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="expected_result" type="VARCHAR(255)"/>
+            <column name="is_generalized" type="BOOLEAN"/>
+            <column name="is_manual" type="BOOLEAN"/>
+            <column name="is_template" type="BOOLEAN"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="total_points" type="FLOAT8"/>
+            <column name="visibility_level" type="INTEGER"/>
+            <column name="criteria_template_id" type="INTEGER"/>
+            <column name="scoring_host_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-25">
+        <createTable tableName="scoring_groups_structure">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="scoring_groups_structure_pkey"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="dynamic_variables" type="JSONB"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="structure_group_type" type="INTEGER"/>
+            <column name="competitor_id" type="INTEGER"/>
+            <column name="scoring_parent_group_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-26">
+        <createTable tableName="scoring_history">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="scoring_history_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="points_given" type="FLOAT8"/>
+            <column name="result" type="VARCHAR(255)"/>
+            <column name="added_by_user_id" type="INTEGER"/>
+            <column name="competition_id" type="INTEGER"/>
+            <column name="competitor_id" type="INTEGER"/>
+            <column name="scoring_criteria_id" type="INTEGER"/>
+            <column name="scoring_host_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-27">
+        <createTable tableName="scoring_host">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="scoring_host_pkey"/>
+            </column>
+            <column name="hostname" type="VARCHAR(255)"/>
+            <column name="ip" type="VARCHAR(255)"/>
+            <column name="is_generalized" type="BOOLEAN"/>
+            <column name="is_template" type="BOOLEAN"/>
+            <column name="host_template_id" type="INTEGER"/>
+            <column name="scoring_group_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-28">
+        <createTable tableName="scoring_logical_groups">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="scoring_logical_groups_pkey"/>
+            </column>
+            <column name="is_generalized" type="BOOLEAN"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-29">
+        <createTable tableName="script">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="script_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="script" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-30">
+        <createTable tableName="user_role">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_role_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="role_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-31">
+        <addForeignKeyConstraint baseColumnNames="parent_role_id" baseTableName="role_relation" constraintName="fk2qfwycm1q5d3ccdwmf7mkbvav" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="role" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-32">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="api_token" constraintName="fk4gjgkxdt5xhym8tmsbvotdabn" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-33">
+        <addForeignKeyConstraint baseColumnNames="scoring_host_id" baseTableName="scoring_history" constraintName="fk6dx9mr2ok8m7ed6noraj3pjea" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_host" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-34">
+        <addForeignKeyConstraint baseColumnNames="scoring_criteria_id" baseTableName="scoring_agent" constraintName="fk6jqp4b4wq77bl1vcyne4ayyxe" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_criteria" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-35">
+        <addForeignKeyConstraint baseColumnNames="scoring_criteria_id" baseTableName="scoring_history" constraintName="fk6sbwjck19lv7xy1bxihch1nvw" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_criteria" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-36">
+        <addForeignKeyConstraint baseColumnNames="host_template_id" baseTableName="scoring_host" constraintName="fk6wlbpc2m9adr3mvcxphyvajrm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_host" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-37">
+        <addForeignKeyConstraint baseColumnNames="logical_group_id" baseTableName="logical_group_link" constraintName="fk739igesw2cjv10816wk981j9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_logical_groups" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-38">
+        <addForeignKeyConstraint baseColumnNames="default_token_id" baseTableName="user" constraintName="fk7mxvfclhm5je5umaqjvgln0o2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="api_token" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-39">
+        <addForeignKeyConstraint baseColumnNames="competition_id" baseTableName="scoring_history" constraintName="fk8iu5hgygjp1d0gc8hsa4jxb5h" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="competition" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-40">
+        <addForeignKeyConstraint baseColumnNames="school_id" baseTableName="personal_data" constraintName="fk95aym8xxynok595cwcbmln2d9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="school" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-41">
+        <addForeignKeyConstraint baseColumnNames="personal_data_id" baseTableName="user" constraintName="fk9l9lpjtjcvj7r9st5jxk1729c" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="personal_data" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-42">
+        <addForeignKeyConstraint baseColumnNames="child_role_id" baseTableName="role_relation" constraintName="fk9tsjucjgcf1nok2orbul198g5" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="role" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-43">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="user_role" constraintName="fka68196081fvovjhkek5m97n3y" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="role" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-44">
+        <addForeignKeyConstraint baseColumnNames="scoring_agent_transport_id" baseTableName="scoring_agent" constraintName="fkbrw5qcqw6xv7hfua02nmx36h2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_agent_transport" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-45">
+        <addForeignKeyConstraint baseColumnNames="script_id" baseTableName="scoring_agent" constraintName="fkc9jmtr46lv6jxou3mfbmtas7b" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="script" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-46">
+        <addForeignKeyConstraint baseColumnNames="scoring_parent_group_id" baseTableName="scoring_groups_structure" constraintName="fkcg8i7ddilakh26l1w4mn9ro6u" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_groups_structure" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-47">
+        <addForeignKeyConstraint baseColumnNames="criteria_id" baseTableName="criteria_dependency" constraintName="fkcsrd1r8g8r9vmdjnqajshlvte" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_criteria" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-48">
+        <addForeignKeyConstraint baseColumnNames="dependent_on_criteria_id" baseTableName="criteria_dependency" constraintName="fkegt79d2rc3xwtgngt9tda46xo" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_criteria" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-49">
+        <addForeignKeyConstraint baseColumnNames="token_id" baseTableName="scoring_agent" constraintName="fkeqdigjfiu2353hfq1ywcijhvg" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="api_token" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-50">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_role" constraintName="fkfgsgxvihks805qcq8sq26ab7c" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-51">
+        <addForeignKeyConstraint baseColumnNames="competitor_id" baseTableName="competitor_competition" constraintName="fkfn8w9qypwwe9f1wc6016f837g" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="competitor" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-52">
+        <addForeignKeyConstraint baseColumnNames="criteria_id" baseTableName="competition_scoring_criteria" constraintName="fkghue0g6flqtfn0gqyihvhlva7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_criteria" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-53">
+        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="role_permissions" constraintName="fkh0v7u4w7mttcu81o8wegayr8e" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="permission" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-54">
+        <addForeignKeyConstraint baseColumnNames="scoring_host_id" baseTableName="logical_group_link" constraintName="fkid6s43im6h7t047bb3gyi4p2n" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_host" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-55">
+        <addForeignKeyConstraint baseColumnNames="scoring_group_id" baseTableName="scoring_host" constraintName="fkidc04gguik2yus41yhs3s97p5" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_groups_structure" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-56">
+        <addForeignKeyConstraint baseColumnNames="competition_id" baseTableName="agent_proxy" constraintName="fkiuek5gtlu0mnoy3naipg9m517" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="competition" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-57">
+        <addForeignKeyConstraint baseColumnNames="agent_proxy_id" baseTableName="scoring_agent" constraintName="fkj1t4o1ygqw5hjggcnxp7jidl4" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="agent_proxy" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-58">
+        <addForeignKeyConstraint baseColumnNames="competition_id" baseTableName="competition_scoring_criteria" constraintName="fkjn3ruov2jqy0kp67d21pqtu2f" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="competition" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-59">
+        <addForeignKeyConstraint baseColumnNames="personal_data_id" baseTableName="competitor" constraintName="fkkefuoy5pnh1kukkh6cmvy1r10" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="personal_data" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-60">
+        <addForeignKeyConstraint baseColumnNames="scoring_host_id" baseTableName="scoring_criteria" constraintName="fkkoalab804ebu8comdjxm2xq1f" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_host" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-61">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="role_permissions" constraintName="fklodb7xh4a2xjv39gc3lsop95n" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="role" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-62">
+        <addForeignKeyConstraint baseColumnNames="organizer_id" baseTableName="competition" constraintName="fklojtxef5y20emdhw3il2j9p2b" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-63">
+        <addForeignKeyConstraint baseColumnNames="competitor_id" baseTableName="scoring_history" constraintName="fkmms4kybh2b6msdp1k7fwa12c7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="competitor" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-64">
+        <addForeignKeyConstraint baseColumnNames="scoring_criteria_group_main_id" baseTableName="competition" constraintName="fkmvbvk0vg401sknjncoexgyblj" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_groups_structure" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-65">
+        <addForeignKeyConstraint baseColumnNames="competitor_id" baseTableName="scoring_groups_structure" constraintName="fknhllthfx2m0eih0ipod3uk0t8" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="competitor" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-66">
+        <addForeignKeyConstraint baseColumnNames="token_id" baseTableName="agent_proxy" constraintName="fkohelybcm1rhc904atew1muyr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="api_token" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-67">
+        <addForeignKeyConstraint baseColumnNames="competition_id" baseTableName="competitor_competition" constraintName="fkpgnx0cndv90ys4ubseuiso5yu" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="competition" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-68">
+        <addForeignKeyConstraint baseColumnNames="scoring_criteria_id" baseTableName="logical_group_link" constraintName="fkpxxyn0bl7a431gt1tau66o0d1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_criteria" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-69">
+        <addForeignKeyConstraint baseColumnNames="scoring_host_id" baseTableName="scoring_agent" constraintName="fkqknskfnoxh3wi7hqf2fw2f4vn" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_host" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-70">
+        <addForeignKeyConstraint baseColumnNames="criteria_template_id" baseTableName="scoring_criteria" constraintName="fktnrqp69hk8qjaxj3ognwrer8m" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scoring_criteria" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-71">
+        <addForeignKeyConstraint baseColumnNames="personal_data_id" baseTableName="signup_user" constraintName="fktosq3m0eg95ekto9any6u329d" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="personal_data" validate="true"/>
+    </changeSet>
+    <changeSet author="heinrich.vannas (generated)" id="1773649464411-72">
+        <addForeignKeyConstraint baseColumnNames="added_by_user_id" baseTableName="scoring_history" constraintName="fkxx7wipkk2vg5fy3s9lor88ft" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

@@ -15,8 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -26,15 +24,11 @@ import java.util.Arrays;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig{
-    @Value("${VITE_APP_BASE_URL}")
+    @Value("${app.VITE_APP_BASE_URL}")
     private String VITE_APP_BASE_URL;
 
-    @Bean
-    public HttpFirewall defaultHttpFirewall() {
-        StrictHttpFirewall firewall = new StrictHttpFirewall();
-        firewall.setAllowSemicolon(true);  // Allow semicolons in URLs
-        return firewall;
-    }
+    @Value("${app.public-apis}")
+    private String[] publicApis;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -49,7 +43,7 @@ public class SecurityConfig{
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(Arrays.asList(VITE_APP_BASE_URL));
+        corsConfig.setAllowedOrigins(Arrays.asList(VITE_APP_BASE_URL, "http://localhost:3000"));
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         corsConfig.setAllowCredentials(true);
@@ -80,9 +74,7 @@ public class SecurityConfig{
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-user", "/error", "/user/signup/create", "/swagger-ui/**",
-                                "/context-path/**", "/v3/**", "/health", "/competition/criteria/**", "competition/get",
-                                "competition/all/get", "/dashboard/**").permitAll()
+                        .requestMatchers(publicApis).permitAll()
                         .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)

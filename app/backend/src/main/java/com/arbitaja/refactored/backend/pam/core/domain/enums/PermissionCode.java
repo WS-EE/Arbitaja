@@ -1,0 +1,27 @@
+package com.arbitaja.refactored.backend.pam.core.domain.enums;
+
+import lombok.Getter;
+
+@Getter
+public enum PermissionCode {
+    ADMIN("ADMIN"),
+    BASIC("BASIC"),
+    VIEW_DASHBOARD("VIEW_DASHBOARD"),
+    VIEW_USERS("VIEW_USERS"),
+    EDIT_USERS("EDIT_USERS"),
+    VIEW_SIGNUPS("VIEW_SIGNUPS"),
+    ACCEPT_SIGNUPS("ACCEPT_SIGNUPS"),
+    VIEW_ROLES("VIEW_ROLES"),
+    CREATE_UPDATE_ROLES("CREATE_UPDATE_ROLES"),
+    VIEW_PERMISSIONS("VIEW_PERMISSIONS"),
+    CREATE_UPDATE_PERMISSIONS("CREATE_UPDATE_PERMISSIONS"),
+    VIEW_COMPETITIONS("VIEW_COMPETITIONS"),
+    CREATE_UPDATE_COMPETITIONS("CREATE_UPDATE_COMPETITIONS");
+
+
+    private final String code;
+
+    PermissionCode(String code) {
+        this.code = code;
+    }
+}

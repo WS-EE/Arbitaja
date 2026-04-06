@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController("school")
-@RequestMapping("/school")
+@RequestMapping("/v1/school")
 public class SchoolController {
 
     private static final Logger log = LogManager.getLogger(SchoolController.class);

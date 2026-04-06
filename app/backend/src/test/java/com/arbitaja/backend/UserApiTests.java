@@ -54,7 +54,7 @@ class UserApiTests {
 
         assertEquals(username, foundSignupUser.getUsername(), "User with username '" + username + "' should be present in the list");
 
-        Map<String, String> deleteResult = deleteResult("/user/signup/approve", foundSignupUser);
+        Map<String, String> deleteResult = deleteResult("/user/signup/approve?id=" + foundSignupUser.getId());
         assertEquals("User declined successfully", deleteResult.get("message"));
     }
 
@@ -111,9 +111,8 @@ class UserApiTests {
         return objectMapper.readValue(responseContent, new TypeReference<>() {});
     }
 
-    private Map<String, String> deleteResult(String uri, Object object) throws Exception {
+    private Map<String, String> deleteResult(String uri) throws Exception {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.delete(uri)
-                .content(objectMapper.writeValueAsString(object))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

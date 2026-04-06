@@ -43,7 +43,7 @@ const emit = defineEmits(['approveSignupUser'])
 // approve user
 const approveUser = async() => {
     try {
-        await axios.post('user/signup/approve', commitedUserData.value)
+        await axios.post('v1/user/signup/approve', commitedUserData.value)
         showAlert('User ' + commitedUserData.value.username + ' has been approved.', 'success')
         await emit('approveSignupUser')
     } catch(error){
@@ -54,7 +54,7 @@ const approveUser = async() => {
 // approve user
 const deleteUser = async() => {
     try {
-        await axios.delete('user/signup/approve', 
+        await axios.delete('v1/user/signup/approve',
             { 
                 params: { 
                     id: commitedUserData.value.id 

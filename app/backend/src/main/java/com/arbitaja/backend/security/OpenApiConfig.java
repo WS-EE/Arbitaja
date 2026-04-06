@@ -11,15 +11,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Value("${VITE_APP_BASE_URL}")
-    private String VITE_APP_BASE_URL;
-    @Value("${VITE_APP_API_ENDPOINT}")
-    private String VITE_APP_API_ENDPOINT;
+    @Value("${app.BASE_URL}")
+    private String BASE_URL;
+    @Value("${app.BASE_PATH}")
+    private String SERVER_ENDPOINT;
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("My API").version("1.0"))
-                .addServersItem(new Server().url(VITE_APP_BASE_URL+VITE_APP_API_ENDPOINT))
+                .addServersItem(new Server().url(BASE_URL + SERVER_ENDPOINT))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("basicAuth", new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)

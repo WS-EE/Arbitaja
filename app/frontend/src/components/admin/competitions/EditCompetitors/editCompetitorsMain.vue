@@ -42,7 +42,7 @@ const getCompetition = async() => {
         isLoading.value = true;
 
         // If prop schools is not defined try to get them ourselves
-        const response = await axios.get('competition/get?id=' + competition_id);
+        const response = await axios.get('v1/competition/get?id=' + competition_id);
         competition.value = response.data
         
     } catch(error) {
@@ -63,7 +63,7 @@ const getCompetitors = async() => {
         const competition_id = route.params.id
 
         // Get and set competitors
-        const response = await axios.get('competitor/get/all/in/competition?id=' + competition_id);
+        const response = await axios.get('v1/competitor/get/all/in/competition?id=' + competition_id);
         competitors.value = response.data
 
     } catch(error) {

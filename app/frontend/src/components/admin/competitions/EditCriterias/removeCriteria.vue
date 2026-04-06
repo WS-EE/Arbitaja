@@ -41,7 +41,7 @@ const removeCompetitor = async(criteriaId, criteriaName) => {
         // Delete competitor
         await axios.delete
         (
-            'scoring/criteria/delete',
+            'v1/scoring/criteria/delete',
             { params: { scoring_id: criteriaId } }
         )
 

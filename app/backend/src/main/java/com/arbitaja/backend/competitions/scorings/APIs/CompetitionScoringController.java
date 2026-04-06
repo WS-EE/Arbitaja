@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("competitionScoring")
-@RequestMapping("")
+@RequestMapping("/v1")
 public class CompetitionScoringController {
     private static final Logger log = LogManager.getLogger(CompetitionScoringController.class);
 

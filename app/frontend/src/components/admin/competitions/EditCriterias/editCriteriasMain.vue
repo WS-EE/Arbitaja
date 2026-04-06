@@ -47,7 +47,7 @@ const getCompetitionById = async(id) => {
         isLoading.value = true;
 
         // If prop schools is not defined try to get them ourselves
-        const response = await axios.get('competition/get?id=' + id);
+        const response = await axios.get('v1/competition/get?id=' + id);
         competition.value = response.data
         
     } catch(error) {
@@ -68,7 +68,7 @@ const getCriteriasByCompetition = async(competitionId) => {
 
         // Get criterias based on competition id
         const response = await axios.get(
-            'scoring/criteria/by/competition',
+            'v1/scoring/criteria/by/competition',
             { 
                 params: { 
                     competition_id: competitionId 
