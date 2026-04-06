@@ -63,7 +63,7 @@ const getCompetitors = async() => {
         const competition_id = route.params.id
 
         // Get and set competitors
-        const response = await axios.get('/v1/competitor/get/all/in/competition?id=' + competition_id);
+        const response = await axios.get('v1/competitor/get/all/in/competition?id=' + competition_id);
         competitors.value = response.data
 
     } catch(error) {

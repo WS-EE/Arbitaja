@@ -22,7 +22,7 @@ import axios from 'axios';
 const allSchools = ref(''); 
 
 // Set user parameters to empty
-const isAdmin = store.hasPrivilege('EDIT_USERS')
+const isAdmin = computed(() => store.hasPrivilege('EDIT_USERS'))
 const userid = ref('')
 const fullName = ref('')
 const email = ref('')
@@ -230,7 +230,7 @@ import changePassword from './changePassword.vue';
                     <p>Password</p>
                 </div>
                 <div class="col">
-                    <changePassword :isAdmin="props.isAdmin" :userId="userid"/>
+                    <changePassword :isAdmin="isAdmin" :userId="userid"/>
                 </div>
             </div>
 

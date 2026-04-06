@@ -34,6 +34,7 @@ async function loadAuth(options = {}) {
           username: null,
           roles: [],
           permissions: [],
+          personal_data: null,
         })
         error.value = result?.message ?? 'Failed to load authorization'
         return
@@ -47,6 +48,7 @@ async function loadAuth(options = {}) {
         username: null,
         roles: [],
         permissions: [],
+        personal_data: null,
       })
       error.value = e
     } finally {
