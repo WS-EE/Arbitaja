@@ -64,7 +64,7 @@ app:
     /v1/competition/criteria/**,
     /v1/competition/get,
     /v1/competition/all/get,
-    /dashboard/**,
+    /v1/dashboard/**,
     /health"
 
 arbitaja:
