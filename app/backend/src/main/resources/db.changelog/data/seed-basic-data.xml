@@ -313,7 +313,23 @@
         </insert>
     </changeSet>
 
-    <changeSet id="seed-basic-036-role-permissions-admin-all-permission-codes" author="heinrich.vannas" context="dev,test">
+    <changeSet id="seed-basic-036-permission-view_competitors" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_COMPETITORS"/>
+            <column name="key_object" value="view_competitors"/>
+            <column name="name" value="view_competitors"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-037-permission-create-update-competitions" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="CREATE_UPDATE_COMPETITORS"/>
+            <column name="key_object" value="create_update_competitors"/>
+            <column name="name" value="create_update_competitors"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-038-role-permissions-admin-all-permission-codes" author="heinrich.vannas" context="dev,test">
         <insert tableName="role_permissions">
             <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_DASHBOARD')"/>
             <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
@@ -358,9 +374,17 @@
             <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'CREATE_UPDATE_COMPETITIONS')"/>
             <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
         </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_COMPETITORS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'CREATE_UPDATE_COMPETITORS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
     </changeSet>
 
-    <changeSet id="seed-basic-037-role-permissions-user-dashboard-and-competitions" author="heinrich.vannas" context="dev,test">
+    <changeSet id="seed-basic-039-role-permissions-user-dashboard-and-competitions" author="heinrich.vannas" context="dev,test">
         <insert tableName="role_permissions">
             <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_DASHBOARD')"/>
             <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'user')"/>
@@ -368,6 +392,33 @@
         <insert tableName="role_permissions">
             <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_COMPETITIONS')"/>
             <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'user')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-040-permission-view-schools" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_SCHOOLS"/>
+            <column name="key_object" value="view_schools"/>
+            <column name="name" value="view_schools"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-041-permission-create-update-schools" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="CREATE_UPDATE_SCHOOLS"/>
+            <column name="key_object" value="create_update_schools"/>
+            <column name="name" value="create_update_schools"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-042-role-permissions-admin-school-permissions" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_SCHOOLS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'CREATE_UPDATE_SCHOOLS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
         </insert>
     </changeSet>
 

@@ -70,4 +70,6 @@ app:
 arbitaja:
   pam:
     mode: ${PAM_MODE:legacy}
+  competition:
+    mode: ${COMPETITION_MODE:legacy}
 

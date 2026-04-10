@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 @RestController("school")
 @RequestMapping("/v1/school")
+@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "legacy", matchIfMissing = true)
 public class SchoolController {
 
     private static final Logger log = LogManager.getLogger(SchoolController.class);

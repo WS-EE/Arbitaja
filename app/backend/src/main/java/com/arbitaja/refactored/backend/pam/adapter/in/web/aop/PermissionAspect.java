@@ -1,6 +1,7 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web.aop;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
 import com.arbitaja.refactored.backend.pam.core.port.in.permission.CheckPermissionUseCase;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -25,7 +26,10 @@ public class PermissionAspect {
         RequiresPermission requiresPermission
     ) throws Throwable {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        checkPermissionUseCase.assertUserHasPermissions(auth.getName(), requiresPermission.value());
+        boolean hasPermissions = checkPermissionUseCase.assertUserHasPermissions(auth.getName(), requiresPermission.value());
+        if (!hasPermissions) {
+            throw new UnauthorizedException("Missing required permissions");
+        }
         return joinPoint.proceed();
     }
 }
