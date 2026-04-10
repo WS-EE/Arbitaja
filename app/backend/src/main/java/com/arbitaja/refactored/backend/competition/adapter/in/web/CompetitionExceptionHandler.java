@@ -1,4 +1,4 @@
-package com.arbitaja.refactored.backend.competition.adapter.in.web.competition;
+package com.arbitaja.refactored.backend.competition.adapter.in.web;
 
 import com.arbitaja.refactored.backend.competition.core.domain.exception.DomainException;
 import com.arbitaja.refactored.backend.competition.core.domain.exception.DuplicateEntityException;

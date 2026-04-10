@@ -1,5 +1,6 @@
 package com.arbitaja.refactored.backend.competition.core.application.competitor;
 
+import com.arbitaja.refactored.backend.competition.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.port.in.competitor.GetCompetitorUseCase;
 import com.arbitaja.refactored.backend.competition.core.port.out.competition.CompetitionCompetitorQueryPort;
@@ -19,7 +20,7 @@ public class GetCompetitorService implements GetCompetitorUseCase {
 
     @Override
     public Competitor getCompetitorById(Integer id) {
-        return competitorRepositoryPort.findById(id).orElse(null);
+        return competitorRepositoryPort.findById(id).orElseThrow(() -> new EntityNotFoundException("Competitor not found with id: " + id));
     }
 
     @Override

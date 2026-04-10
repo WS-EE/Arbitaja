@@ -2,7 +2,7 @@ package com.arbitaja.refactored.backend.competition.adapter.in.web.aop;
 
 import com.arbitaja.refactored.backend.competition.adapter.in.web.annotations.RequiresCompetitionPermission;
 import com.arbitaja.refactored.backend.competition.core.domain.enums.CompetitionPermissionCode;
-import com.arbitaja.refactored.backend.competition.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.competition.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.competition.core.port.in.security.CheckCompetitionPermissionUseCase;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.jupiter.api.AfterEach;
@@ -67,7 +67,7 @@ class CompetitionPermissionAspectTest {
         when(requiresCompetitionPermission.value()).thenReturn(required);
         when(checkPermissionUseCase.assertUserHasPermissions("bob", required)).thenReturn(false);
 
-        assertThrows(UnauthorizedException.class, () -> aspect.checkPermission(joinPoint, requiresCompetitionPermission));
+        assertThrows(ForbiddenException.class, () -> aspect.checkPermission(joinPoint, requiresCompetitionPermission));
 
         verify(joinPoint, never()).proceed();
     }

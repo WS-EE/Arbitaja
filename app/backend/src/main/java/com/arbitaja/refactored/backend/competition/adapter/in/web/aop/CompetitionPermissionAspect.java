@@ -1,7 +1,7 @@
 package com.arbitaja.refactored.backend.competition.adapter.in.web.aop;
 
 import com.arbitaja.refactored.backend.competition.adapter.in.web.annotations.RequiresCompetitionPermission;
-import com.arbitaja.refactored.backend.competition.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.competition.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.competition.core.port.in.security.CheckCompetitionPermissionUseCase;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -31,7 +31,7 @@ public class CompetitionPermissionAspect {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		boolean hasPermissions = checkPermissionUseCase.assertUserHasPermissions(auth.getName(), requiresCompetitionPermission.value());
 		if (!hasPermissions) {
-			throw new UnauthorizedException("Missing required competition permissions");
+			throw new ForbiddenException("Missing required competition permissions");
 		}
 
 		return joinPoint.proceed();

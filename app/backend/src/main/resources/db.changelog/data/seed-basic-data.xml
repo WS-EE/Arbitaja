@@ -89,6 +89,8 @@
         </insert>
     </changeSet>
 
+
+
     <changeSet id="seed-basic-011-role-permissions-user-basic" author="heinrich.vannas" context="dev,test">
         <insert tableName="role_permissions">
             <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'BASIC')"/>
@@ -422,4 +424,10 @@
         </insert>
     </changeSet>
 
+    <changeSet id="seed-basic-043-user-no-roles" author="heinrich.vannas" context="dev,test">
+        <insert tableName="user">
+            <column name="username" value="noRolesTestUser"/>
+            <column name="salted_password" valueComputed="crypt('123', gen_salt('bf'))"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

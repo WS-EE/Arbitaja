@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 /**
  * Exception thrown when the caller does not have required permissions.
  */
-public class UnauthorizedException extends DomainException {
+public class ForbiddenException extends DomainException {
 
-    public UnauthorizedException(String message) {
-        super(message, HttpStatus.UNAUTHORIZED);
+    public ForbiddenException(String message) {
+        super(message, HttpStatus.FORBIDDEN);
     }
 }
 

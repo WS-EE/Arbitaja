@@ -139,7 +139,7 @@ class UserControllerV2E2ETests extends PamWebE2EBase {
         CreatedUser created = createUserThroughApi("pwd");
         ChangePasswordRequest request = new ChangePasswordRequest(created.password(), "newPassword456");
 
-        mockMvc.perform(post("/v2/user/change-password/{id}", created.id())
+        mockMvc.perform(put("/v2/user/change-password/{id}", created.id())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())

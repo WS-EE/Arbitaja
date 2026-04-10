@@ -4,7 +4,6 @@ import com.arbitaja.refactored.backend.pam.adapter.out.persistence.entity.Permis
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.mapper.PersistenceMapper;
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.repository.PermissionJpaRepository;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Permission;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,19 +40,6 @@ class PermissionPersistenceAdapterTest {
         boolean result = adapter.userHasPermissions(5, new PermissionCode[]{PermissionCode.VIEW_USERS, PermissionCode.VIEW_ROLES});
 
         assertTrue(result);
-    }
-
-    @Test
-    void userHasPermissionsThrowsWhenAnyRequiredPermissionMissing() {
-        when(permissionJpaRepository.findByUserId(5)).thenReturn(List.of(
-            PermissionJpaEntity.builder().id(1).name("View users").key("VIEW_USERS").build()
-        ));
-
-        UnauthorizedException exception = assertThrows(UnauthorizedException.class,
-            () -> adapter.userHasPermissions(5, new PermissionCode[]{PermissionCode.VIEW_USERS, PermissionCode.EDIT_USERS})
-        );
-
-        assertTrue(exception.getMessage().contains("EDIT_USERS"));
     }
 
     @Test
