@@ -60,7 +60,7 @@ public class CompetitionControllerV2 {
     @RequiresCompetitionPermission(CompetitionPermissionCode.CREATE_UPDATE_COMPETITIONS)
     public ResponseEntity<CompetitionResponse> createCompetition(@RequestBody @Valid CompetitionUpsertRequest request) {
         log.info("Creating competition: {}", request.name());
-        return ResponseEntity.ok(
+        return ResponseEntity.status(201).body(
             mapper.toResponse(manageCompetitionUseCase.createCompetition(mapper.toCommand(request)))
         );
     }

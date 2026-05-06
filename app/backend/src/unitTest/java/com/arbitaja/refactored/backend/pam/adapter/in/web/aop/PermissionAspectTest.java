@@ -2,7 +2,7 @@ package com.arbitaja.refactored.backend.pam.adapter.in.web.aop;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.port.in.permission.CheckPermissionUseCase;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.jupiter.api.AfterEach;
@@ -67,7 +67,7 @@ class PermissionAspectTest {
         when(requiresPermission.value()).thenReturn(required);
         when(checkPermissionUseCase.assertUserHasPermissions("bob", required)).thenReturn(false);
 
-        assertThrows(UnauthorizedException.class, () -> permissionAspect.checkPermission(joinPoint, requiresPermission));
+        assertThrows(ForbiddenException.class, () -> permissionAspect.checkPermission(joinPoint, requiresPermission));
 
         verify(joinPoint, never()).proceed();
     }

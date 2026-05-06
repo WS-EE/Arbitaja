@@ -5,7 +5,7 @@ import com.arbitaja.refactored.backend.pam.adapter.in.web.permission.dto.request
 import com.arbitaja.refactored.backend.pam.adapter.in.web.permission.dto.response.PermissionResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.PermissionMapper;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.port.in.permission.CreatePermissionUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.permission.GetPermissionUseCase;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,8 +43,8 @@ public class PermissionControllerV2 {
     @Operation(summary = "Get all permissions", description = "Retrieve all permissions in the system")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-        @Schema(implementation = UnauthorizedException.class))})
+        @ApiResponse(responseCode = "403", description = "Forbidden", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = ForbiddenException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping

@@ -6,7 +6,7 @@ import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.request.Creat
 import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.response.RoleResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
 import com.arbitaja.refactored.backend.pam.core.port.in.role.CreateRoleUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.role.GetRoleUseCase;
@@ -48,8 +48,8 @@ public class RoleControllerV2 {
     @Operation(summary = "Get all roles", description = "Retrieve all roles in the system")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved roles"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-        @Schema(implementation = UnauthorizedException.class))})
+        @ApiResponse(responseCode = "403", description = "Forbidden", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = ForbiddenException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
@@ -113,8 +113,8 @@ public class RoleControllerV2 {
     @Operation(summary = "Create new role")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Successfully created role"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-        @Schema(implementation = UnauthorizedException.class))})
+        @ApiResponse(responseCode = "403", description = "Forbidden", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = ForbiddenException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/create")

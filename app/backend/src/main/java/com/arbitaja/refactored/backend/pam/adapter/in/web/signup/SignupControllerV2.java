@@ -8,7 +8,7 @@ import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.CreateUserUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -94,8 +94,8 @@ public class SignupControllerV2 {
     @Operation(summary = "Get all signup users", description = "Retrieve all signup requests in the system")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved signup users"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-        @Schema(implementation = UnauthorizedException.class))})
+        @ApiResponse(responseCode = "403", description = "Forbidden", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = ForbiddenException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/signup")

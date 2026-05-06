@@ -13,7 +13,7 @@ import com.arbitaja.refactored.backend.pam.adapter.util.UserMapper;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import com.arbitaja.refactored.backend.pam.core.port.in.permission.CheckPermissionUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.CreateUserUseCase;
@@ -84,8 +84,8 @@ public class UserControllerV2 {
     @Operation(summary = "Get all users", description = "Retrieve all users in the system")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved users"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-        @Schema(implementation = UnauthorizedException.class))})
+        @ApiResponse(responseCode = "403", description = "Forbidden", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = ForbiddenException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
@@ -118,7 +118,7 @@ public class UserControllerV2 {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
         @ApiResponse(responseCode = "401", description = "Not authorized to update this user", content = {@Content(mediaType = "application/json", schema =
-        @Schema(implementation = UnauthorizedException.class))}),
+        @Schema(implementation = ForbiddenException.class))}),
         @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
         @Schema(implementation = EntityNotFoundException.class))})
     })
@@ -183,8 +183,8 @@ public class UserControllerV2 {
     @Operation(summary = "Get authenticated user profile", description = "Retrieve the profile of the currently authenticated user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema =
-        @Schema(implementation = UnauthorizedException.class))})
+        @ApiResponse(responseCode = "403", description = "Forbidden", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = ForbiddenException.class))})
     })
     @SecurityRequirement(name = "basicAuth")
     ResponseEntity<UserProfileResponse> getUserAuth() {
@@ -201,8 +201,8 @@ public class UserControllerV2 {
     @Operation(summary = "Change user password", description = "Change the password of a user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Password changed successfully"),
-        @ApiResponse(responseCode = "401", description = "Not authorized to change this user's password", content = {@Content(mediaType = "application/json", schema =
-        @Schema(implementation = UnauthorizedException.class))}),
+        @ApiResponse(responseCode = "403", description = "Not authorized to change this user's password", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = ForbiddenException.class))}),
         @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
         @Schema(implementation = EntityNotFoundException.class))})
     })
@@ -220,7 +220,7 @@ public class UserControllerV2 {
         );
 
         if (!canEditOthers && !authentication.getName().equals(getUserUseCase.getUserProfile(id).getUsername())) {
-            throw new UnauthorizedException("Not authorized to change this user's password");
+            throw new ForbiddenException("Not authorized to change this user's password");
         }
 
         updateUserUseCase.changePassword(

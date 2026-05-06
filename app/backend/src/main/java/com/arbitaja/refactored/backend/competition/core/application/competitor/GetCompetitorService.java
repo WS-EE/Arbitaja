@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,12 +20,12 @@ public class GetCompetitorService implements GetCompetitorUseCase {
   private final CompetitionCompetitorQueryPort competitionCompetitorQueryPort;
 
     @Override
-    public Competitor getCompetitorById(Integer id) {
-        return competitorRepositoryPort.findById(id).orElseThrow(() -> new EntityNotFoundException("Competitor not found with id: " + id));
+    public Competitor getCompetitorById(@NonNull Integer id) {
+        return competitorRepositoryPort.findById(id).orElseThrow(() -> EntityNotFoundException.competitor(id));
     }
 
     @Override
-    public Set<Competitor> getCompetitorsByCompetitionId(Integer id) {
+    public Set<Competitor> getCompetitorsByCompetitionId(@NonNull Integer id) {
         return competitionCompetitorQueryPort.findByCompetitionId(id).stream()
             .map(competitionCompetitor -> Competitor.builder()
                 .id(competitionCompetitor.getId())

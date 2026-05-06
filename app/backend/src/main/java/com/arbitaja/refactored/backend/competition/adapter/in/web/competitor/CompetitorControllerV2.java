@@ -32,7 +32,7 @@ public class CompetitorControllerV2 {
     private final CompetitorWebMapper mapper;
 
     @PostMapping
-    @RequiresCompetitionPermission(CompetitionPermissionCode.CREATE_UPDATE_COMPETITIONS)
+    @RequiresCompetitionPermission(CompetitionPermissionCode.CREATE_UPDATE_COMPETITORS)
     public ResponseEntity<CompetitorResponse> createCompetitor(@RequestBody @Valid CompetitorUpsertRequest request) {
         log.info("Creating competitor: {}", request.alias());
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -40,7 +40,7 @@ public class CompetitorControllerV2 {
     }
 
     @PutMapping("/{id}")
-    @RequiresCompetitionPermission(CompetitionPermissionCode.CREATE_UPDATE_COMPETITIONS)
+    @RequiresCompetitionPermission(CompetitionPermissionCode.CREATE_UPDATE_COMPETITORS)
     public ResponseEntity<CompetitorResponse> editCompetitor(
         @PathVariable Integer id,
         @RequestBody @Valid CompetitorUpsertRequest request

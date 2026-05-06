@@ -7,7 +7,7 @@ import com.arbitaja.refactored.backend.pam.adapter.in.web.user.dto.request.Updat
 import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
 import com.arbitaja.refactored.backend.pam.adapter.util.UserMapper;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.PersonalData;
 import com.arbitaja.refactored.backend.pam.core.domain.model.School;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
@@ -174,7 +174,7 @@ class UserControllerV2IT {
     }
 
     @Test
-    void updateUserMapsUnauthorizedTo401() throws Exception {
+    void updateUserMapsForbiddenTo403() throws Exception {
         UpdateUserRequest request = UpdateUserRequest.builder()
             .username("blocked")
             .fullName("Blocked")
@@ -192,14 +192,14 @@ class UserControllerV2IT {
             .thenReturn(false);
         when(userMapper.toUpdateUserCommand(eq(3), any(UpdateUserRequest.class))).thenReturn(command);
         when(updateUserUseCase.updateUserProfile(command, "viewer", false))
-            .thenThrow(UnauthorizedException.notAuthorizedToModifyUser());
+            .thenThrow(ForbiddenException.notAuthorizedToModifyUser());
 
         mockMvc.perform(put("/v2/user/3")
                 .principal(authentication)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("$.error").value("Unauthorized"));
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.error").value("Forbidden"));
     }
 
     @Test
