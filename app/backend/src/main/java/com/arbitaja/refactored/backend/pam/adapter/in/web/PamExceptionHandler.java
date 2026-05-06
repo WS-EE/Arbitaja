@@ -3,7 +3,7 @@ package com.arbitaja.refactored.backend.pam.adapter.in.web;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DomainException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.Ordered;
@@ -45,12 +45,12 @@ public class PamExceptionHandler {
             ));
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<Map<String, String>> handleUnauthorizedException(UnauthorizedException ex) {
-        log.warn("Unauthorized: {}", ex.toString());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Map<String, String>> handleForbiddenException(ForbiddenException ex) {
+        log.warn("Forbidden: {}", ex.toString());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(Map.of(
-                "error", "Unauthorized",
+                "error", "Forbidden",
                 "message", ex.getMessage()
             ));
     }

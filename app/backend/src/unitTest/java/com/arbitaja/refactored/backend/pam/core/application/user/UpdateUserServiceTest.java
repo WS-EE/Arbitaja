@@ -1,7 +1,7 @@
 package com.arbitaja.refactored.backend.pam.core.application.user;
 
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.PersonalData;
 import com.arbitaja.refactored.backend.pam.core.domain.model.School;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
@@ -83,7 +83,7 @@ class UpdateUserServiceTest {
             .email("owner@example.com")
             .build();
 
-        assertThrows(UnauthorizedException.class, () -> updateUserService.updateUserProfile(command, "other", false));
+        assertThrows(ForbiddenException.class, () -> updateUserService.updateUserProfile(command, "other", false));
     }
 
     @Test

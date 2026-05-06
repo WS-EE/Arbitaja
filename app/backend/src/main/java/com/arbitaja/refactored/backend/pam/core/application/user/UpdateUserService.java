@@ -1,7 +1,7 @@
 package com.arbitaja.refactored.backend.pam.core.application.user;
 
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
-import com.arbitaja.refactored.backend.pam.core.domain.exception.UnauthorizedException;
+import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.PersonalData;
 import com.arbitaja.refactored.backend.pam.core.domain.model.School;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
@@ -44,7 +44,7 @@ public class UpdateUserService implements UpdateUserUseCase {
 
         // Authorization check
         if (!isAdmin && !authenticatedUsername.equals(user.getUsername())) {
-            throw UnauthorizedException.notAuthorizedToModifyUser();
+            throw ForbiddenException.notAuthorizedToModifyUser();
         }
 
         // Update username

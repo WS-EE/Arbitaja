@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @EnableMethodSecurity
 @RestController("competitor")
 @RequestMapping("/v1/competitor")
+@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "legacy", matchIfMissing = true)
 public class CompetitorController {
     private static final Logger log = LogManager.getLogger(CompetitorController.class);
 
