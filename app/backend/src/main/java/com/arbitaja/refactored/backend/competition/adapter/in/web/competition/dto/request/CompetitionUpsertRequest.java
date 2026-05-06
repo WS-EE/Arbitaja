@@ -19,6 +19,7 @@ public record CompetitionUpsertRequest(
     Timestamp scoreShowtime,
     @JsonProperty("publish_scores")
     Boolean publishScores,
+    @NotNull(message = "OrganizerId must be provided")
     @JsonProperty("organizer_id")
     Integer organizerId
 ) {

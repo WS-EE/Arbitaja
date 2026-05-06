@@ -116,7 +116,7 @@ class CompetitionControllerV2E2ETests extends CompetitionWebE2EBase {
         String createResponse = mockMvc.perform(post("/v2/competition")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createRequest)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -175,7 +175,7 @@ class CompetitionControllerV2E2ETests extends CompetitionWebE2EBase {
         String response = mockMvc.perform(post("/v2/competition")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn()
             .getResponse()
             .getContentAsString();
