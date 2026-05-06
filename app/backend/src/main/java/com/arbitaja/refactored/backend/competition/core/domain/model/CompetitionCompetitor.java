@@ -16,6 +16,7 @@ public class CompetitionCompetitor {
     private Integer id;
     private String fullName;
     private String alias;
+    private Integer publicDisplayNameType;
     private CompetitorPersonalData personalData;
 }
 

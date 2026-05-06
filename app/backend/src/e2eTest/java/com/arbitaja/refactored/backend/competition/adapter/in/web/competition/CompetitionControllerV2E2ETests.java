@@ -72,7 +72,7 @@ class CompetitionControllerV2E2ETests extends CompetitionWebE2EBase {
         mockMvc.perform(post("/v2/competition")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id").isNumber())
             .andExpect(jsonPath("$.name").value(request.name()))
             .andExpect(jsonPath("$.organizer.id").value(firstOrganizerId()));

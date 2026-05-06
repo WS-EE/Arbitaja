@@ -117,7 +117,7 @@ public class UserControllerV2 {
     @Operation(summary = "Update user profile", description = "Update user profile information")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
-        @ApiResponse(responseCode = "401", description = "Not authorized to update this user", content = {@Content(mediaType = "application/json", schema =
+        @ApiResponse(responseCode = "403", description = "Not authorized to update this user", content = {@Content(mediaType = "application/json", schema =
         @Schema(implementation = ForbiddenException.class))}),
         @ApiResponse(responseCode = "404", description = "User not found", content = {@Content(mediaType = "application/json", schema =
         @Schema(implementation = EntityNotFoundException.class))})

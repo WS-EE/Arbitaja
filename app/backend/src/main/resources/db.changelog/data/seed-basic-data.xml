@@ -323,7 +323,7 @@
         </insert>
     </changeSet>
 
-    <changeSet id="seed-basic-037-permission-create-update-competitiors" author="heinrich.vannas" context="dev,test">
+    <changeSet id="seed-basic-037-permission-create-update-competitors" author="heinrich.vannas" context="dev,test">
         <insert tableName="permission">
             <column name="key" value="CREATE_UPDATE_COMPETITORS"/>
             <column name="key_object" value="create_update_competitors"/>

@@ -101,6 +101,7 @@ public class CompetitionPersistenceMapper {
             .id(competitor.getId())
             .fullName(fullName)
             .alias(competitor.getAlias())
+            .publicDisplayNameType(competitor.getPublicDisplayNameType())
             .personalData(competitor.getPersonalData() != null ? toDomain(competitor.getPersonalData()) : null)
             .build();
     }

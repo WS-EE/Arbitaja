@@ -8,7 +8,7 @@ public class ForbiddenException extends DomainException {
         super(message, HttpStatus.FORBIDDEN);
     }
 
-    public static ForbiddenException notAuthorizedToModifyUser(){
-        return new ForbiddenException("User not authorized to change other user");
+    public static ForbiddenException notAuthorizedToModifyUser() {
+        return new ForbiddenException("User not authorized to change another user");
     }
 }

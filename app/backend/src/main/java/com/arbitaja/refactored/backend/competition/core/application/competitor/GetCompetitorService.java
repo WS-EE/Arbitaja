@@ -8,8 +8,9 @@ import com.arbitaja.refactored.backend.competition.core.port.out.competitor.Comp
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,6 +32,7 @@ public class GetCompetitorService implements GetCompetitorUseCase {
                 .id(competitionCompetitor.getId())
                 .alias(competitionCompetitor.getAlias())
                 .personalData(competitionCompetitor.getPersonalData())
+                .publicDisplayNameType(competitionCompetitor.getPublicDisplayNameType())
                 .build())
             .collect(Collectors.toSet());
 
