@@ -19,7 +19,8 @@ public class ApiKeyFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        if (req.getRequestURI().startsWith("/competition/criteria/history/add")) {
+        if (req.getRequestURI().startsWith("/competition/criteria/history/add")
+                || req.getRequestURI().startsWith("/v2/scoring/history")) {
             String requestKey = req.getHeader("X-API-KEY");
             if (requestKey == null || !requestKey.equals(apiKey)) {
                 res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid API Key");

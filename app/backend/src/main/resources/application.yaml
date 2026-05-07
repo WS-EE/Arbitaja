@@ -72,4 +72,6 @@ arbitaja:
     mode: ${PAM_MODE:hex}
   competition:
     mode: ${COMPETITION_MODE:hex}
+  scoring:
+    mode: ${SCORING_MODE:hex}
 

@@ -430,4 +430,50 @@
             <column name="salted_password" valueComputed="crypt('123', gen_salt('bf'))"/>
         </insert>
     </changeSet>
+
+    <changeSet id="seed-basic-044-permission-view-scoring-dashboard" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="VIEW_SCORING_DASHBOARD"/>
+            <column name="key_object" value="view_scoring_dashboard"/>
+            <column name="name" value="view_scoring_dashboard"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-045-permission-manage-scoring-criteria" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="MANAGE_SCORING_CRITERIA"/>
+            <column name="key_object" value="manage_scoring_criteria"/>
+            <column name="name" value="manage_scoring_criteria"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-046-permission-record-scoring-results" author="heinrich.vannas" context="dev,test">
+        <insert tableName="permission">
+            <column name="key" value="RECORD_SCORING_RESULTS"/>
+            <column name="key_object" value="record_scoring_results"/>
+            <column name="name" value="record_scoring_results"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-047-role-permissions-admin-scoring" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_SCORING_DASHBOARD')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'MANAGE_SCORING_CRITERIA')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'RECORD_SCORING_RESULTS')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'admin')"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="seed-basic-048-role-permissions-user-view-scoring-dashboard" author="heinrich.vannas" context="dev,test">
+        <insert tableName="role_permissions">
+            <column name="permission_id" valueComputed="(SELECT id FROM permission WHERE &quot;key&quot; = 'VIEW_SCORING_DASHBOARD')"/>
+            <column name="role_id" valueComputed="(SELECT id FROM role WHERE name = 'user')"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

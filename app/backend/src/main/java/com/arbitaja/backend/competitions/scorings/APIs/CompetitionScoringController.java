@@ -3,6 +3,7 @@ package com.arbitaja.backend.competitions.scorings.APIs;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController("competitionScoring")
 @RequestMapping("/v1")
+@ConditionalOnProperty(name = "arbitaja.scoring.mode", havingValue = "legacy")
 public class CompetitionScoringController {
     private static final Logger log = LogManager.getLogger(CompetitionScoringController.class);
 
