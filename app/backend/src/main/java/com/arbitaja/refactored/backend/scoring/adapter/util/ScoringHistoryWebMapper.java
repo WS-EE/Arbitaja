@@ -5,8 +5,10 @@ import com.arbitaja.refactored.backend.scoring.adapter.in.web.history.dto.respon
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringHistoryEntry;
 import com.arbitaja.refactored.backend.scoring.core.port.in.history.RecordScoringHistoryUseCase;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class ScoringHistoryWebMapper {
 
     public RecordScoringHistoryUseCase.RecordScoringCommand toCommand(AddScoringHistoryRequest request) {

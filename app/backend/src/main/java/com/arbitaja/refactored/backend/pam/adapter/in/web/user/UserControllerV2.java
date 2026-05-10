@@ -50,7 +50,7 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "User Management v2", description = "User management operations (Hexagonal Architecture)")
-@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class UserControllerV2 {
 
     private final GetUserUseCase getUserUseCase;

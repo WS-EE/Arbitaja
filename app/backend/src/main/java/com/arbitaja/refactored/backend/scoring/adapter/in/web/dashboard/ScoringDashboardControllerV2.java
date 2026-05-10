@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v2/scoring/dashboard")
 @RequiredArgsConstructor
 @Log4j2
-@ConditionalOnProperty(name = "arbitaja.scoring.mode", havingValue = "hex", matchIfMissing = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex", matchIfMissing = true)
 public class ScoringDashboardControllerV2 {
 
     private final GetScoringDashboardUseCase getScoringDashboardUseCase;
@@ -42,11 +42,9 @@ public class ScoringDashboardControllerV2 {
     private final ScoringDashboardWebMapper mapper;
 
     @GetMapping("/competition/{competitionId}/history")
-    @RequiresScoringPermission(ScoringPermissionCode.VIEW_SCORING_DASHBOARD)
     public ResponseEntity<ScoringDashboardResponse> getDashboard(@PathVariable Integer competitionId) {
         log.info("Getting scoring dashboard for competition {}", competitionId);
-        boolean isAdmin = currentViewerIsAdmin();
-        return ResponseEntity.ok(mapper.toResponse(getScoringDashboardUseCase.getDashboard(competitionId, isAdmin)));
+        return ResponseEntity.ok(mapper.toResponse(getScoringDashboardUseCase.getDashboard(competitionId, false)));
     }
 
     @GetMapping("/competition/{competitionId}/criteria")

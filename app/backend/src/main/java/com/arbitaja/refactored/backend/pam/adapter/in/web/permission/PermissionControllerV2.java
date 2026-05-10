@@ -33,7 +33,7 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "Permission Management v2", description = "Permission management operations (Hexagonal Architecture)")
-@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class PermissionControllerV2 {
 
     private final GetPermissionUseCase getPermissionUseCase;

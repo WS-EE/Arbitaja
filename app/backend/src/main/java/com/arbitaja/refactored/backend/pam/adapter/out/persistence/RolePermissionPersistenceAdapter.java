@@ -7,6 +7,7 @@ import com.arbitaja.refactored.backend.pam.core.port.out.role.RolePermissionRepo
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class RolePermissionPersistenceAdapter implements RolePermissionRepositoryPort {
 
     private final RolePermissionJpaRepository rolePermissionJpaRepository;

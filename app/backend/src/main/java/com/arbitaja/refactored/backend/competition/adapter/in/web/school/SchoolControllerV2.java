@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping("/v2/schools")
 @RequiredArgsConstructor
 @Log4j2
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class SchoolControllerV2 {
 
     private final GetSchoolUseCase getSchoolUseCase;

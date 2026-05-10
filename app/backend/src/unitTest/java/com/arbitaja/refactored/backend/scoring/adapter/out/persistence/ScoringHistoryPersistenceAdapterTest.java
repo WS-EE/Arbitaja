@@ -2,8 +2,10 @@ package com.arbitaja.refactored.backend.scoring.adapter.out.persistence;
 
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringHistoryJpaEntity;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.mapper.ScoringPersistenceMapper;
+import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.projection.ScoringDashboardRowProjection;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.projection.ScoringHistoryWithCriterionProjection;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.repository.ScoringHistoryJpaRepository;
+import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultRow;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringHistoryEntry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,17 +65,34 @@ class ScoringHistoryPersistenceAdapterTest {
     }
 
     @Test
-    void findHistoryForCompetitionMapsAllRows() {
+    void findHistoryForCompetitionMapsRunningTotalRows() {
         Timestamp cutoff = Timestamp.valueOf("2026-04-06 18:00:00");
-        ScoringHistoryWithCriterionProjection row1 = projection(1, 10, 3.0);
-        ScoringHistoryWithCriterionProjection row2 = projection(2, 20, 4.0);
-        when(scoringHistoryRepository.findHistoryForCompetition(1, cutoff)).thenReturn(List.of(row1, row2));
-        when(mapper.toDomain(row1)).thenReturn(ScoringHistoryEntry.builder().id(1).build());
-        when(mapper.toDomain(row2)).thenReturn(ScoringHistoryEntry.builder().id(2).build());
+        Timestamp t1 = Timestamp.valueOf("2026-04-06 10:00:00");
+        Timestamp t2 = Timestamp.valueOf("2026-04-06 11:00:00");
 
-        List<ScoringHistoryEntry> result = adapter.findHistoryForCompetition(1, cutoff);
+        ScoringDashboardRowProjection row1 = dashboardRow(10, t1, 3.0);
+        ScoringDashboardRowProjection row2 = dashboardRow(20, t2, 4.0);
+        when(scoringHistoryRepository.findRunningTotalsForCompetition(1, cutoff))
+            .thenReturn(List.of(row1, row2));
+        when(mapper.toDomain(row1)).thenReturn(
+            DashboardResultRow.builder().competitorId(10).timestamp(t1).runningTotal(3.0).build());
+        when(mapper.toDomain(row2)).thenReturn(
+            DashboardResultRow.builder().competitorId(20).timestamp(t2).runningTotal(4.0).build());
+
+        List<DashboardResultRow> result = adapter.findHistoryForCompetition(1, cutoff);
 
         assertEquals(2, result.size());
+        assertEquals(3.0, result.get(0).getRunningTotal());
+        assertEquals(20, result.get(1).getCompetitorId());
+        verify(scoringHistoryRepository).findRunningTotalsForCompetition(1, cutoff);
+    }
+
+    private ScoringDashboardRowProjection dashboardRow(int competitorId, Timestamp timestamp, double runningTotal) {
+        return new ScoringDashboardRowProjection() {
+            @Override public Integer getCompetitorId() { return competitorId; }
+            @Override public Timestamp getTimestamp() { return timestamp; }
+            @Override public Double getRunningTotal() { return runningTotal; }
+        };
     }
 
     @Test

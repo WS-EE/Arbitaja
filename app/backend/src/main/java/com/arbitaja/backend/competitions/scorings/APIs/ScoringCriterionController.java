@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController("ScoringCriteria")
 @RequestMapping("/v1")
-@ConditionalOnProperty(name = "arbitaja.scoring.mode", havingValue = "legacy")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "legacy")
 public class ScoringCriterionController {
     private static final Logger log = LogManager.getLogger(ScoringCriterionController.class);
 

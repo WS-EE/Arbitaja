@@ -6,7 +6,9 @@ import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.Sc
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringHistoryJpaEntity;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringPersonalDataJpaEntity;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringSchoolJpaEntity;
+import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.projection.ScoringDashboardRowProjection;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.projection.ScoringHistoryWithCriterionProjection;
+import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultRow;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCompetition;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCompetitor;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCriterion;
@@ -128,5 +130,26 @@ class ScoringPersistenceMapperTest {
         assertEquals(3, roundTripped.getScoringCriterionId());
         assertEquals(5.0, roundTripped.getPointsGiven());
         assertEquals("ssh", roundTripped.getScoringCriterionName());
+    }
+
+    @Test
+    void dashboardRowProjectionToDomainCopiesFields() {
+        Timestamp now = Timestamp.valueOf("2026-04-06 12:00:00");
+        ScoringDashboardRowProjection projection = new ScoringDashboardRowProjection() {
+            @Override public Integer getCompetitorId() { return 10; }
+            @Override public Timestamp getTimestamp() { return now; }
+            @Override public Double getRunningTotal() { return 7.5; }
+        };
+
+        DashboardResultRow row = mapper.toDomain(projection);
+
+        assertEquals(10, row.getCompetitorId());
+        assertEquals(now, row.getTimestamp());
+        assertEquals(7.5, row.getRunningTotal());
+    }
+
+    @Test
+    void dashboardRowProjectionNullReturnsNull() {
+        assertNull(mapper.toDomain((ScoringDashboardRowProjection) null));
     }
 }

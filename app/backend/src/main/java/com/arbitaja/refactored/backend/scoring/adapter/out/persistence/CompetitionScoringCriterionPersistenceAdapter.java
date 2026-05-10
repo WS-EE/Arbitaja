@@ -8,6 +8,7 @@ import com.arbitaja.refactored.backend.scoring.core.port.out.criterion.Competiti
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitionScoringCriterionPersistenceAdapter implements CompetitionScoringCriterionRepositoryPort {
 
     private final CompetitionScoringCriterionJpaRepository repository;

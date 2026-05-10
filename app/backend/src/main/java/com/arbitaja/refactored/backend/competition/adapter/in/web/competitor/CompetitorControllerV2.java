@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v2/competitor")
 @RequiredArgsConstructor
 @Log4j2
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitorControllerV2 {
 
     private final ManageCompetitorUseCase manageCompetitorUseCase;

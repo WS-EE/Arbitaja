@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class PermissionAspect {
 
     private final CheckPermissionUseCase checkPermissionUseCase;

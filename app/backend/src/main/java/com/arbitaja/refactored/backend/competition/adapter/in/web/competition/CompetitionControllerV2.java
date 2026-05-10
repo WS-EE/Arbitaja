@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping("/v2/competition")
 @RequiredArgsConstructor
 @Log4j2
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitionControllerV2 {
 
     private final GetCompetitionUseCase getCompetitionUseCase;

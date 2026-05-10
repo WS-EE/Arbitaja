@@ -10,6 +10,7 @@ import com.arbitaja.refactored.backend.competition.core.domain.model.Competition
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitionOrganizer;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * Maps between competition persistence entities and competition management domain models.
  */
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitionPersistenceMapper {
 
     public Competition toDomain(CompetitionJpaEntity entity) {

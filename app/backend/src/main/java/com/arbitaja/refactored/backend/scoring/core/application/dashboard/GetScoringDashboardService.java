@@ -6,6 +6,7 @@ import com.arbitaja.refactored.backend.scoring.core.domain.model.CompetitorCrite
 import com.arbitaja.refactored.backend.scoring.core.domain.model.CompetitorDashboard;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.CriterionResult;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultPoint;
+import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultRow;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCompetition;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCompetitor;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCriterion;
@@ -19,11 +20,11 @@ import com.arbitaja.refactored.backend.scoring.core.port.out.lookup.ScoringCompe
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +33,18 @@ import java.util.Set;
 /**
  * Application service for scoring dashboard projections.
  *
- * <p>This service replaces the legacy N+1 dashboard implementation with a
- * single-query strategy: the persistence adapter loads every scoring history row
- * for the competition (and per-criterion latest rows for the criteria result view),
- * and this service walks the rows once to compute running totals.</p>
+ * <p>The running-total chart is computed entirely in Postgres with a window-function
+ * query on {@link ScoringDashboardQueryPort#findHistoryForCompetition}: each row already
+ * carries the cumulative score for its competitor at that timestamp, so this service
+ * only needs to bucket rows by competitor in a single linear pass.</p>
+ *
+ * <p>The criteria-result views still rely on the latest-per-criterion queries — those
+ * use a correlated {@code MAX(createdAt)} subquery to avoid the legacy per-criterion
+ * follow-up loop.</p>
  */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class GetScoringDashboardService implements GetScoringDashboardUseCase {
 
     private final ScoringCompetitionLookupPort competitionLookup;
@@ -57,17 +63,17 @@ public class GetScoringDashboardService implements GetScoringDashboardUseCase {
         }
 
         List<ScoringCompetitor> competitors = competitorLookup.findByCompetitionId(competitionId);
-        List<ScoringHistoryEntry> history = scoringDashboardQuery.findHistoryForCompetition(competitionId, cutoff);
+        List<DashboardResultRow> rows = scoringDashboardQuery.findHistoryForCompetition(competitionId, cutoff);
 
-        Map<Integer, List<ScoringHistoryEntry>> historyByCompetitor = new HashMap<>();
-        for (ScoringHistoryEntry entry : history) {
-            historyByCompetitor.computeIfAbsent(entry.getCompetitorId(), id -> new ArrayList<>()).add(entry);
+        Map<Integer, List<DashboardResultRow>> rowsByCompetitor = new HashMap<>();
+        for (DashboardResultRow row : rows) {
+            rowsByCompetitor.computeIfAbsent(row.getCompetitorId(), id -> new ArrayList<>()).add(row);
         }
 
         Set<CompetitorDashboard> competitorDashboards = new LinkedHashSet<>();
         for (ScoringCompetitor competitor : competitors) {
-            List<ScoringHistoryEntry> competitorHistory = historyByCompetitor.getOrDefault(competitor.getId(), List.of());
-            competitorDashboards.add(buildCompetitorDashboard(competitor, competitorHistory));
+            List<DashboardResultRow> competitorRows = rowsByCompetitor.getOrDefault(competitor.getId(), List.of());
+            competitorDashboards.add(buildCompetitorDashboard(competitor, competitorRows));
         }
 
         return ScoringDashboard.builder()
@@ -134,23 +140,16 @@ public class GetScoringDashboardService implements GetScoringDashboardUseCase {
         return competition;
     }
 
-    private CompetitorDashboard buildCompetitorDashboard(ScoringCompetitor competitor, List<ScoringHistoryEntry> history) {
-        Map<Integer, Double> latestPointsPerCriterion = new LinkedHashMap<>();
-        List<DashboardResultPoint> resultPoints = new ArrayList<>(history.size());
-
-        for (ScoringHistoryEntry entry : history) {
-            latestPointsPerCriterion.put(entry.getScoringCriterionId(), entry.getPointsGiven());
-            double total = 0.0;
-            for (Double value : latestPointsPerCriterion.values()) {
-                total += value;
-            }
+    private CompetitorDashboard buildCompetitorDashboard(ScoringCompetitor competitor, List<DashboardResultRow> rows) {
+        List<DashboardResultPoint> resultPoints = new ArrayList<>(rows.size());
+        for (DashboardResultRow row : rows) {
             resultPoints.add(DashboardResultPoint.builder()
-                .timestamp(entry.getCreatedAt())
-                .pointAmount(total)
+                .timestamp(row.getTimestamp())
+                .pointAmount(row.getRunningTotal())
                 .build());
         }
 
-        Double totalScore = resultPoints.isEmpty() ? 0.0 : resultPoints.getLast().getPointAmount();
+        Double totalScore = rows.isEmpty() ? 0.0 : rows.getLast().getRunningTotal();
 
         return CompetitorDashboard.builder()
             .competitorId(competitor.getId())

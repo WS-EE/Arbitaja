@@ -15,13 +15,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = ArbitajaBackendApplication.class, properties = {
-    "arbitaja.pam.mode=hex",
-    "arbitaja.competition.mode=hex",
-    "arbitaja.scoring.mode=hex"
+    "app.API_KEY=test-e2e-api-key"
 })
 @AutoConfigureMockMvc
 @Transactional
 class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
+
+    private static final String API_KEY_HEADER = "X-API-KEY";
+    private static final String TEST_API_KEY = "test-e2e-api-key";
 
     @Test
     @WithMockUser(username = "admin", roles = {"admin"})
@@ -34,6 +35,7 @@ class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
         );
 
         mockMvc.perform(post("/v2/scoring/history")
+                .header(API_KEY_HEADER, TEST_API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
@@ -53,6 +55,7 @@ class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
         );
 
         mockMvc.perform(post("/v2/scoring/history")
+                .header(API_KEY_HEADER, TEST_API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -69,6 +72,7 @@ class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
         );
 
         mockMvc.perform(post("/v2/scoring/history")
+                .header(API_KEY_HEADER, TEST_API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isNotFound());
@@ -82,6 +86,7 @@ class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
         );
 
         mockMvc.perform(post("/v2/scoring/history")
+                .header(API_KEY_HEADER, TEST_API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isForbidden());

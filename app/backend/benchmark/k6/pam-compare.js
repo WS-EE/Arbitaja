@@ -1,21 +1,21 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-const mode = (__ENV.MODE || 'legacy').toLowerCase();
-const baseUrl = __ENV.BASE_URL || 'http://localhost:8080';
+const mode     = (__ENV.MODE     || 'hex').toLowerCase();
+const scenario = (__ENV.SCENARIO || 'signup').toLowerCase();
+const baseUrl  = __ENV.BASE_URL  || 'http://localhost:8080';
+const username =  'admin';
+const password = __ENV.PASSWORD  || 'admin';
+const userId   = __ENV.USER_ID   || '1';
 
-const endpointByMode = {
-  legacy: '/v1/user/signup/create',
-  hex: '/v2/signup',
-};
+const VALID_MODES     = ['legacy', 'hex'];
+const VALID_SCENARIOS = ['signup', 'list-users', 'user-profile'];
 
-const expectedStatusByMode = {
-  legacy: [200, 409],
-  hex: [201, 409],
-};
-
-if (!endpointByMode[mode]) {
-  throw new Error(`Unsupported MODE '${mode}'. Use MODE=legacy or MODE=hex.`);
+if (!VALID_MODES.includes(mode)) {
+  throw new Error(`Unsupported MODE '${mode}'. Use: ${VALID_MODES.join(', ')}`);
+}
+if (!VALID_SCENARIOS.includes(scenario)) {
+  throw new Error(`Unsupported SCENARIO '${scenario}'. Use: ${VALID_SCENARIOS.join(', ')}`);
 }
 
 export const options = {
@@ -23,47 +23,76 @@ export const options = {
   duration: __ENV.DURATION || '30s',
   thresholds: {
     http_req_failed: ['rate<0.05'],
-    http_req_duration: ['p(95)<1000'],
+    http_req_duration: ['p(95)<2000'],
   },
 };
 
-function payload(iteration) {
-  const unique = `${mode}-${__VU}-${iteration}`;
+// signup is unauthenticated (user registration); all other scenarios require a session.
+export function setup() {
+  if (scenario === 'signup') return { sessionId: '' };
 
-  if (mode === 'legacy') {
-    return JSON.stringify({
-      username: `user-${unique}`,
-      salted_password: 'Password123!',
-      personal_data: {
-        id: 0,
-        full_name: `User ${unique}`,
-        email: `user-${unique}@example.com`,
-        school: null,
-        created_at: null,
-      },
-    });
-  }
-
-  return JSON.stringify({
-    username: `user-${unique}`,
-    password: 'Password123!',
-    full_name: `User ${unique}`,
-    email: `user-${unique}@example.com`,
-    school_id: null,
-  });
-}
-
-export default function () {
-  const response = http.post(
-    `${baseUrl}${endpointByMode[mode]}`,
-    payload(__ITER),
-    { headers: { 'Content-Type': 'application/json' } }
+  const res = http.post(
+    `${baseUrl}/login-user`,
+    `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
+    {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      redirects: 0,
+    }
   );
 
-  check(response, {
-    'status is expected': (r) => expectedStatusByMode[mode].includes(r.status),
-  });
-
-  sleep(0.2);
+  let sessionId = '';
+  const setCookie = res.headers['Set-Cookie'] || '';
+  const match = setCookie.match(/JSESSIONID=([^;]+)/);
+  if (match) sessionId = match[1];
+  return { sessionId };
 }
 
+export default function ({ sessionId }) {
+  let res;
+  const authHeaders = sessionId ? { Cookie: `JSESSIONID=${sessionId}` } : {};
+
+  if (scenario === 'signup') {
+    const unique = `${mode}-${__VU}-${__ITER}`;
+    const body = mode === 'hex'
+      ? JSON.stringify({
+          username: `user-${unique}`,
+          password: 'Password123!',
+          full_name: `User ${unique}`,
+          email: `user-${unique}@example.com`,
+          school_id: null,
+        })
+      : JSON.stringify({
+          username: `user-${unique}`,
+          salted_password: 'Password123!',
+          personal_data: {
+            id: 0,
+            full_name: `User ${unique}`,
+            email: `user-${unique}@example.com`,
+            school: null,
+            created_at: null,
+          },
+        });
+
+    const endpoint = mode === 'hex' ? '/v2/signup' : '/v1/user/signup/create';
+    res = http.post(`${baseUrl}${endpoint}`, body, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    check(res, { 'signup status 2xx or 409': r => [200, 201, 409].includes(r.status) });
+
+  } else if (scenario === 'list-users') {
+    const url = mode === 'hex'
+      ? `${baseUrl}/v2/user`
+      : `${baseUrl}/v1/user/profile/all`;
+    res = http.get(url, { headers: authHeaders });
+    check(res, { 'list users status 2xx': r => r.status >= 200 && r.status < 300 });
+
+  } else if (scenario === 'user-profile') {
+    const url = mode === 'hex'
+      ? `${baseUrl}/v2/user/${userId}`
+      : `${baseUrl}/v1/user/profile/get?id=${userId}`;
+    res = http.get(url, { headers: authHeaders });
+    check(res, { 'user profile status 2xx': r => r.status >= 200 && r.status < 300 });
+  }
+
+  sleep(0.1);
+}

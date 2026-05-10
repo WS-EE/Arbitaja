@@ -14,6 +14,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
@@ -24,6 +25,7 @@ import java.sql.Timestamp;
 @Service
 @RequiredArgsConstructor
 @Log4j2
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class UpdateUserService implements UpdateUserUseCase {
 
     private final UserRepositoryPort userRepository;

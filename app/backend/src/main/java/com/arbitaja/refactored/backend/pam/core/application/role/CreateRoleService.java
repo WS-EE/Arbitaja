@@ -11,6 +11,7 @@ import com.arbitaja.refactored.backend.pam.core.port.out.role.RoleRepositoryPort
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Log4j2
 @Transactional
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CreateRoleService implements CreateRoleUseCase {
 
     private final RoleRepositoryPort roleRepository;

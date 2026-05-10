@@ -5,8 +5,10 @@ import com.arbitaja.refactored.backend.scoring.adapter.in.web.criterion.dto.resp
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCriterion;
 import com.arbitaja.refactored.backend.scoring.core.port.in.criterion.ManageScoringCriterionUseCase;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class ScoringCriterionWebMapper {
 
     public ManageScoringCriterionUseCase.UpsertScoringCriterionCommand toCommand(ScoringCriterionUpsertRequest request) {

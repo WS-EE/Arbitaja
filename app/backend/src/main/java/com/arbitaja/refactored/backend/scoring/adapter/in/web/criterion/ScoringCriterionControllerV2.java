@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping("/v2/scoring/criteria")
 @RequiredArgsConstructor
 @Log4j2
-@ConditionalOnProperty(name = "arbitaja.scoring.mode", havingValue = "hex", matchIfMissing = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex", matchIfMissing = true)
 public class ScoringCriterionControllerV2 {
 
     private final GetScoringCriterionUseCase getScoringCriterionUseCase;

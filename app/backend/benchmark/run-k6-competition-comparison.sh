@@ -7,33 +7,33 @@ duration="30s"
 vus="10"
 username="admin"
 password="admin"
-user_id="1"
+competition_id="1"
 output_dir="benchmark/results"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --legacy-url) legacy_url="$2"; shift 2 ;;
-    --hex-url)    hex_url="$2";    shift 2 ;;
-    --duration)   duration="$2";   shift 2 ;;
-    --vus)        vus="$2";        shift 2 ;;
-    --username)   username="$2";   shift 2 ;;
-    --password)   password="$2";   shift 2 ;;
-    --user-id)    user_id="$2";    shift 2 ;;
-    --output-dir) output_dir="$2"; shift 2 ;;
+    --legacy-url)    legacy_url="$2";    shift 2 ;;
+    --hex-url)       hex_url="$2";       shift 2 ;;
+    --duration)      duration="$2";      shift 2 ;;
+    --vus)           vus="$2";           shift 2 ;;
+    --username)      username="$2";      shift 2 ;;
+    --password)      password="$2";      shift 2 ;;
+    --competition-id) competition_id="$2"; shift 2 ;;
+    --output-dir)    output_dir="$2";    shift 2 ;;
     -h|--help)
       cat <<'EOF'
-Usage: benchmark/run-k6-comparison.sh [options]
+Usage: benchmark/run-k6-competition-comparison.sh [options]
 
 Options:
-  --legacy-url <url>    Legacy backend URL (default: http://localhost:9090)
-  --hex-url <url>       Hex backend URL (default: http://localhost:8080)
-  --duration <value>    k6 duration (default: 30s)
-  --vus <int>           k6 virtual users (default: 10)
-  --username <user>     Login username (default: admin)
-  --password <pass>     Login password (default: admin)
-  --user-id <id>        User ID for user-profile scenario (default: 1)
-  --output-dir <path>   Results folder (default: benchmark/results)
-  -h, --help            Show this help
+  --legacy-url <url>       Legacy backend URL (default: http://localhost:9090)
+  --hex-url <url>          Hex backend URL (default: http://localhost:8080)
+  --duration <value>       k6 duration (default: 30s)
+  --vus <int>              k6 virtual users (default: 10)
+  --username <user>        Login username (default: admin)
+  --password <pass>        Login password (default: admin)
+  --competition-id <id>    Competition ID for competitors scenario (default: 1)
+  --output-dir <path>      Results folder (default: benchmark/results)
+  -h, --help               Show this help
 EOF
       exit 0
       ;;
@@ -47,9 +47,9 @@ cd "$project_root"
 
 mkdir -p "$output_dir"
 timestamp="$(date +%Y%m%d-%H%M%S)"
-script_path="benchmark/k6/pam-compare.js"
+script_path="benchmark/k6/competition-compare.js"
 
-scenarios=("signup" "list-users" "user-profile")
+scenarios=("list-competitions" "competitors-in-competition")
 modes=("legacy" "hex")
 
 declare -A summaries
@@ -59,7 +59,7 @@ common_args=(
   -e "VUS=$vus"
   -e "USERNAME=$username"
   -e "PASSWORD=$password"
-  -e "USER_ID=$user_id"
+  -e "COMPETITION_ID=$competition_id"
 )
 
 for scenario in "${scenarios[@]}"; do
@@ -78,7 +78,7 @@ for scenario in "${scenarios[@]}"; do
   done
 done
 
-comparison_csv="$output_dir/pam-comparison-$timestamp.csv"
+comparison_csv="$output_dir/competition-comparison-$timestamp.csv"
 
 python3 - "${summaries[@]}" "$comparison_csv" <<'PY'
 import csv, json, sys, os

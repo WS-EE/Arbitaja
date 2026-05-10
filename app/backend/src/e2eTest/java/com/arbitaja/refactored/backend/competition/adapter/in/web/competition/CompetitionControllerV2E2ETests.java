@@ -18,10 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = ArbitajaBackendApplication.class, properties = {
-    "arbitaja.pam.mode=hex",
-    "arbitaja.competition.mode=hex"
-})
+@SpringBootTest(classes = ArbitajaBackendApplication.class)
 @AutoConfigureMockMvc
 @Transactional
 class CompetitionControllerV2E2ETests extends CompetitionWebE2EBase {

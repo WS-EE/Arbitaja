@@ -7,6 +7,7 @@ import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class GetUserService implements GetUserUseCase {
 
     private final UserRepositoryPort userRepository;

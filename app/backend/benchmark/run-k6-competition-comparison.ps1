@@ -5,7 +5,7 @@ param(
     [int]   $Vus          = 10,
     [string]$Username     = "admin",
     [string]$Password     = "admin",
-    [string]$UserId       = "1",
+    [string]$CompetitionId = "1",
     [string]$OutputDir    = "benchmark/results"
 )
 
@@ -18,8 +18,8 @@ Set-Location $projectRoot
 New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
 
 $timestamp  = Get-Date -Format "yyyyMMdd-HHmmss"
-$scriptPath = "benchmark/k6/pam-compare.js"
-$scenarios  = @("signup", "list-users", "user-profile")
+$scriptPath = "benchmark/k6/competition-compare.js"
+$scenarios  = @("list-competitions", "competitors-in-competition")
 $modes      = @("legacy", "hex")
 
 $commonArgs = @(
@@ -27,7 +27,7 @@ $commonArgs = @(
     "-e", "VUS=$Vus",
     "-e", "USERNAME=$Username",
     "-e", "PASSWORD=$Password",
-    "-e", "USER_ID=$UserId"
+    "-e", "COMPETITION_ID=$CompetitionId"
 )
 
 $summaries = @{}
@@ -62,7 +62,7 @@ foreach ($scenario in $scenarios) {
     }
 }
 
-$comparisonCsv = Join-Path $OutputDir "pam-comparison-$timestamp.csv"
+$comparisonCsv = Join-Path $OutputDir "competition-comparison-$timestamp.csv"
 $rows | Export-Csv -Path $comparisonCsv -NoTypeInformation
 
 Write-Host ""

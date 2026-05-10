@@ -13,6 +13,7 @@ import com.arbitaja.refactored.backend.scoring.core.port.out.lookup.ScoringCompe
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
@@ -29,6 +30,7 @@ import java.time.Instant;
  */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class RecordScoringHistoryService implements RecordScoringHistoryUseCase {
 
     private final ScoringCompetitionLookupPort competitionLookup;

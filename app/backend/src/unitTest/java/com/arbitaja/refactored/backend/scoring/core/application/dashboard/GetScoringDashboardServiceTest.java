@@ -6,6 +6,7 @@ import com.arbitaja.refactored.backend.scoring.core.domain.model.CompetitionScor
 import com.arbitaja.refactored.backend.scoring.core.domain.model.CompetitorCriteriaResults;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.CompetitorDashboard;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.CriterionResult;
+import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultRow;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCompetition;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCompetitor;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCriterion;
@@ -75,17 +76,19 @@ class GetScoringDashboardServiceTest {
         Timestamp t2 = Timestamp.from(Instant.parse("2026-04-06T11:00:00Z"));
         Timestamp t3 = Timestamp.from(Instant.parse("2026-04-06T12:00:00Z"));
 
-        ScoringHistoryEntry alicePoint1 = ScoringHistoryEntry.builder()
-            .competitorId(10).scoringCriterionId(100).pointsGiven(3.0).createdAt(t1).build();
-        ScoringHistoryEntry alicePoint2 = ScoringHistoryEntry.builder()
-            .competitorId(10).scoringCriterionId(101).pointsGiven(2.0).createdAt(t2).build();
-        ScoringHistoryEntry aliceUpdate = ScoringHistoryEntry.builder()
-            .competitorId(10).scoringCriterionId(100).pointsGiven(5.0).createdAt(t3).build();
-        ScoringHistoryEntry bobPoint = ScoringHistoryEntry.builder()
-            .competitorId(20).scoringCriterionId(100).pointsGiven(4.0).createdAt(t1).build();
+        // The repository already produces running totals via SQL window functions;
+        // each row is a (competitor, timestamp, runningTotal) snapshot in order.
+        DashboardResultRow aliceRow1 = DashboardResultRow.builder()
+            .competitorId(10).timestamp(t1).runningTotal(3.0).build();
+        DashboardResultRow aliceRow2 = DashboardResultRow.builder()
+            .competitorId(10).timestamp(t2).runningTotal(5.0).build();
+        DashboardResultRow aliceRow3 = DashboardResultRow.builder()
+            .competitorId(10).timestamp(t3).runningTotal(7.0).build();
+        DashboardResultRow bobRow = DashboardResultRow.builder()
+            .competitorId(20).timestamp(t1).runningTotal(4.0).build();
 
         when(scoringDashboardQuery.findHistoryForCompetition(1, competition().getEndTime()))
-            .thenReturn(List.of(alicePoint1, alicePoint2, aliceUpdate, bobPoint));
+            .thenReturn(List.of(aliceRow1, aliceRow2, aliceRow3, bobRow));
 
         var dashboard = service.getDashboard(1, true);
 

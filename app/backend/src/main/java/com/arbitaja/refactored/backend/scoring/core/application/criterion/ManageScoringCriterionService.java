@@ -9,6 +9,7 @@ import com.arbitaja.refactored.backend.scoring.core.port.out.lookup.ScoringCompe
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class ManageScoringCriterionService implements ManageScoringCriterionUseCase {
 
     private final ScoringCriterionRepositoryPort scoringCriterionRepository;

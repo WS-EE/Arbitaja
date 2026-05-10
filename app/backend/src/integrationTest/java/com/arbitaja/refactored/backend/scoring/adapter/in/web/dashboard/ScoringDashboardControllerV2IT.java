@@ -66,34 +66,18 @@ class ScoringDashboardControllerV2IT {
     @Test
     void getDashboardReturnsResponseFromUseCase() throws Exception {
         ScoringDashboard domain = ScoringDashboard.builder().competitionId(1).competitionName("Final").build();
-        ScoringDashboardResponse response = new ScoringDashboardResponse(1, "Final", new LinkedHashSet<>());
+        ScoringDashboardResponse response = new ScoringDashboardResponse(new LinkedHashSet<>());
 
-        when(checkScoringPermissionUseCase.userIsAdmin("alice")).thenReturn(false);
         when(getScoringDashboardUseCase.getDashboard(1, false)).thenReturn(domain);
         when(mapper.toResponse(domain)).thenReturn(response);
 
         mockMvc.perform(get("/v2/scoring/dashboard/competition/1/history"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.competition_id").value(1))
-            .andExpect(jsonPath("$.competition_name").value("Final"));
-    }
-
-    @Test
-    void getDashboardPassesAdminFlagWhenViewerIsAdmin() throws Exception {
-        ScoringDashboard domain = ScoringDashboard.builder().competitionId(1).competitionName("Final").build();
-        ScoringDashboardResponse response = new ScoringDashboardResponse(1, "Final", new LinkedHashSet<>());
-
-        when(checkScoringPermissionUseCase.userIsAdmin("alice")).thenReturn(true);
-        when(getScoringDashboardUseCase.getDashboard(1, true)).thenReturn(domain);
-        when(mapper.toResponse(domain)).thenReturn(response);
-
-        mockMvc.perform(get("/v2/scoring/dashboard/competition/1/history"))
-            .andExpect(status().isOk());
+            .andExpect(jsonPath("$.competitors").isArray());
     }
 
     @Test
     void getDashboardReturns404WhenCompetitionMissing() throws Exception {
-        when(checkScoringPermissionUseCase.userIsAdmin("alice")).thenReturn(false);
         when(getScoringDashboardUseCase.getDashboard(404, false))
             .thenThrow(EntityNotFoundException.competition(404));
 

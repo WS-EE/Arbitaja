@@ -3,12 +3,14 @@ package com.arbitaja.refactored.backend.scoring.adapter.out.persistence;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringHistoryJpaEntity;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.mapper.ScoringPersistenceMapper;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.repository.ScoringHistoryJpaRepository;
+import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultRow;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringHistoryEntry;
 import com.arbitaja.refactored.backend.scoring.core.port.out.history.ScoringDashboardQueryPort;
 import com.arbitaja.refactored.backend.scoring.core.port.out.history.ScoringHistoryRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class ScoringHistoryPersistenceAdapter implements ScoringHistoryRepositoryPort, ScoringDashboardQueryPort {
 
     private final ScoringHistoryJpaRepository scoringHistoryRepository;
@@ -33,8 +36,8 @@ public class ScoringHistoryPersistenceAdapter implements ScoringHistoryRepositor
     }
 
     @Override
-    public List<ScoringHistoryEntry> findHistoryForCompetition(@NonNull Integer competitionId, @NonNull Timestamp cutoff) {
-        return scoringHistoryRepository.findHistoryForCompetition(competitionId, cutoff).stream()
+    public List<DashboardResultRow> findHistoryForCompetition(@NonNull Integer competitionId, @NonNull Timestamp cutoff) {
+        return scoringHistoryRepository.findRunningTotalsForCompetition(competitionId, cutoff).stream()
             .map(mapper::toDomain)
             .toList();
     }

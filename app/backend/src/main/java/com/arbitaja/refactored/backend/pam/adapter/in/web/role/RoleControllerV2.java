@@ -38,7 +38,7 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "Role Management v2", description = "Role management operations (Hexagonal Architecture)")
-@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class RoleControllerV2 {
 
     private final GetRoleUseCase getRoleUseCase;

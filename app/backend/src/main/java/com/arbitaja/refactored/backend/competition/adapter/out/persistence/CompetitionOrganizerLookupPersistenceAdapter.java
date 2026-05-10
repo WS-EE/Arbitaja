@@ -7,6 +7,7 @@ import com.arbitaja.refactored.backend.competition.core.port.out.competition.Com
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ import java.util.Optional;
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitionOrganizerLookupPersistenceAdapter implements CompetitionOrganizerLookupPort {
 
     private final CompetitionOrganizerJpaRepository organizerRepository;

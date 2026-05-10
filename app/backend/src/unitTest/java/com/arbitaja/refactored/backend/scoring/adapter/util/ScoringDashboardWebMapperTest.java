@@ -37,8 +37,6 @@ class ScoringDashboardWebMapperTest {
 
         ScoringDashboardResponse response = mapper.toResponse(dashboard);
 
-        assertEquals(1, response.competitionId());
-        assertEquals("Final", response.competitionName());
         assertEquals(1, response.competitors().size());
         ScoringDashboardResponse.CompetitorDashboardResponse competitorResponse =
             response.competitors().iterator().next();

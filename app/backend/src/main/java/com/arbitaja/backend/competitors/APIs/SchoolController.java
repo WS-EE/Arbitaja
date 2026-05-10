@@ -26,7 +26,7 @@ import java.util.Map;
 
 @RestController("school")
 @RequestMapping("/v1/school")
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "legacy", matchIfMissing = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "legacy", matchIfMissing = true)
 public class SchoolController {
 
     private static final Logger log = LogManager.getLogger(SchoolController.class);

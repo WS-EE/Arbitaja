@@ -1,5 +1,6 @@
 package com.arbitaja.refactored.backend.scoring.core.port.out.history;
 
+import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultRow;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringHistoryEntry;
 import lombok.NonNull;
 
@@ -16,11 +17,15 @@ import java.util.List;
 public interface ScoringDashboardQueryPort {
 
     /**
-     * Loads all scoring history rows for a competition with {@code created_at &le; cutoff},
-     * ordered by competitor and creation timestamp so callers can compute running totals
-     * with a single linear pass.
+     * Returns the running-total chart for a competition. Each row already carries
+     * {@code runningTotal} at that timestamp for that competitor, computed in the
+     * database with a window function — the application service does not need to
+     * accumulate per-criterion state in memory.
+     *
+     * <p>Rows are ordered by competitor and creation timestamp so callers can
+     * group them in a single linear pass.</p>
      */
-    List<ScoringHistoryEntry> findHistoryForCompetition(@NonNull Integer competitionId, @NonNull Timestamp cutoff);
+    List<DashboardResultRow> findHistoryForCompetition(@NonNull Integer competitionId, @NonNull Timestamp cutoff);
 
     /**
      * Loads, in a single query, the most recent score for every (competitor, criterion)

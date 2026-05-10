@@ -21,7 +21,7 @@ import java.util.Map;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice(basePackages = "com.arbitaja.refactored.backend.scoring")
 @Log4j2
-@ConditionalOnProperty(name = "arbitaja.scoring.mode", havingValue = "hex", matchIfMissing = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex", matchIfMissing = true)
 public class ScoringExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)

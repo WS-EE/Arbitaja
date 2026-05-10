@@ -10,18 +10,19 @@ import com.arbitaja.refactored.backend.scoring.core.domain.model.CompetitorDashb
 import com.arbitaja.refactored.backend.scoring.core.domain.model.CriterionResult;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringDashboard;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class ScoringDashboardWebMapper {
 
     public ScoringDashboardResponse toResponse(ScoringDashboard dashboard) {
         Set<ScoringDashboardResponse.CompetitorDashboardResponse> competitors = new LinkedHashSet<>();
         for (CompetitorDashboard competitor : dashboard.getCompetitors()) {
             competitors.add(new ScoringDashboardResponse.CompetitorDashboardResponse(
-                competitor.getCompetitorId(),
                 competitor.getCompetitorName(),
                 competitor.getTotalScore(),
                 competitor.getResults().stream()
@@ -32,7 +33,7 @@ public class ScoringDashboardWebMapper {
                     .toList()
             ));
         }
-        return new ScoringDashboardResponse(dashboard.getCompetitionId(), dashboard.getCompetitionName(), competitors);
+        return new ScoringDashboardResponse(competitors);
     }
 
     public CompetitionScoringCriteriaResultsResponse toResponse(CompetitionScoringCriteriaResults results) {

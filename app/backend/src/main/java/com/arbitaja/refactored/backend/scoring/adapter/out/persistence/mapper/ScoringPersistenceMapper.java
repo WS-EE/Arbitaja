@@ -4,17 +4,22 @@ import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.Sc
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringCompetitorJpaEntity;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringCriterionJpaEntity;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringHistoryJpaEntity;
+import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.projection.ScoringCompetitorProjection;
+import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.projection.ScoringDashboardRowProjection;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.projection.ScoringHistoryWithCriterionProjection;
+import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultRow;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCompetition;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCompetitor;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCriterion;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringHistoryEntry;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Maps between scoring persistence entities and scoring domain models.
  */
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class ScoringPersistenceMapper {
 
     public ScoringCriterion toDomain(ScoringCriterionJpaEntity entity) {
@@ -86,6 +91,19 @@ public class ScoringPersistenceMapper {
             .build();
     }
 
+    public ScoringCompetitor toDomain(ScoringCompetitorProjection projection) {
+        if (projection == null) {
+            return null;
+        }
+        return ScoringCompetitor.builder()
+            .id(projection.getId())
+            .alias(projection.getAlias())
+            .publicDisplayNameType(projection.getPublicDisplayNameType())
+            .fullName(projection.getFullName())
+            .schoolName(projection.getSchoolName())
+            .build();
+    }
+
     public ScoringHistoryJpaEntity toEntity(ScoringHistoryEntry entry) {
         if (entry == null) {
             return null;
@@ -127,6 +145,17 @@ public class ScoringPersistenceMapper {
             .scoringCriterionName(projection.getScoringCriterionName())
             .pointsGiven(projection.getPointsGiven())
             .createdAt(projection.getCreatedAt())
+            .build();
+    }
+
+    public DashboardResultRow toDomain(ScoringDashboardRowProjection projection) {
+        if (projection == null) {
+            return null;
+        }
+        return DashboardResultRow.builder()
+            .competitorId(projection.getCompetitorId())
+            .timestamp(projection.getTimestamp())
+            .runningTotal(projection.getRunningTotal())
             .build();
     }
 }

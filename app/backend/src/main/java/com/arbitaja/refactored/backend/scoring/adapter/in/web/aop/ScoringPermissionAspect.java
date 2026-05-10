@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "arbitaja.scoring.mode", havingValue = "hex", matchIfMissing = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex", matchIfMissing = true)
 public class ScoringPermissionAspect {
 
     private final CheckScoringPermissionUseCase checkPermissionUseCase;

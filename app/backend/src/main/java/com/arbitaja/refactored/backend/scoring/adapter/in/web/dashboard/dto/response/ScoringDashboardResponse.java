@@ -7,16 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 public record ScoringDashboardResponse(
-    @JsonProperty("competition_id")
-    Integer competitionId,
-    @JsonProperty("competition_name")
-    String competitionName,
     Set<CompetitorDashboardResponse> competitors
 ) {
 
     public record CompetitorDashboardResponse(
-        @JsonProperty("competitor_id")
-        Integer competitorId,
         String name,
         @JsonProperty("total_score")
         Double totalScore,

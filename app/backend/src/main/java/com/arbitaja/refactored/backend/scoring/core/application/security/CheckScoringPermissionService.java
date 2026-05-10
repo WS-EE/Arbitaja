@@ -5,6 +5,7 @@ import com.arbitaja.refactored.backend.scoring.core.port.in.security.CheckScorin
 import com.arbitaja.refactored.backend.scoring.core.port.out.security.ScoringPermissionGatewayPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CheckScoringPermissionService implements CheckScoringPermissionUseCase {
 
     private final ScoringPermissionGatewayPort permissionGateway;
