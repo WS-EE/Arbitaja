@@ -44,7 +44,8 @@ public class ScoringDashboardControllerV2 {
     @GetMapping("/competition/{competitionId}/history")
     public ResponseEntity<ScoringDashboardResponse> getDashboard(@PathVariable Integer competitionId) {
         log.info("Getting scoring dashboard for competition {}", competitionId);
-        return ResponseEntity.ok(mapper.toResponse(getScoringDashboardUseCase.getDashboard(competitionId, false)));
+        boolean isAdmin = currentViewerIsAdmin();
+        return ResponseEntity.ok(mapper.toResponse(getScoringDashboardUseCase.getDashboard(competitionId, isAdmin)));
     }
 
     @GetMapping("/competition/{competitionId}/criteria")

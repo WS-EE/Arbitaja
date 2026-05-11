@@ -27,7 +27,7 @@ import org.hibernate.proxy.HibernateProxy;
                   sh.competitor_id,
                   sh.created_at,
                   sh.id,
-                  sh.points_given - COALESCE(LAG(sh.points_given) OVER (
+                  sh.points_given::numeric - COALESCE(LAG(sh.points_given::numeric) OVER (
                       PARTITION BY sh.competitor_id, sh.scoring_criteria_id
                       ORDER BY sh.created_at, sh.id
                   ), 0) AS delta

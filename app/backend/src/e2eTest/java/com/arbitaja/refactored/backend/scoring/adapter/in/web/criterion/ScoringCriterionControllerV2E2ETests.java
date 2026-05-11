@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = ArbitajaBackendApplication.class, properties = {
-    "arbitaja.scoring.mode=hex"
+    "arbitaja.mode=hex"
 })
 @AutoConfigureMockMvc
 @Transactional

@@ -16,15 +16,12 @@ module, following the same style as PAM and Competition.
 
 ## Runtime toggle
 
-Scoring mode is controlled with:
+Scoring mode is controlled by the `arbitaja.mode` property, resolved from the `MODE` environment variable (defaults to `hex` when unset):
 
-- `arbitaja.scoring.mode=legacy` (legacy controllers)
-- `arbitaja.scoring.mode=hex` (default in `application.yaml`)
+- `MODE=legacy` — activates the legacy controllers
+- `MODE=hex` — activates the hexagonal controllers (default)
 
-Related profile files:
-
-- `src/main/resources/application-scoring-hex.yaml`
-- `src/main/resources/application-scoring-legacy.yaml`
+Set `MODE` in the environment or in the `.env` file consumed by Docker Compose.
 
 ## Endpoints in hex mode
 
