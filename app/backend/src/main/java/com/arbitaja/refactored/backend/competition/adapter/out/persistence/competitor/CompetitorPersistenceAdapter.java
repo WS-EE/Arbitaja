@@ -14,6 +14,7 @@ import java.util.Set;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -23,6 +24,7 @@ import java.util.Optional;
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitorPersistenceAdapter implements CompetitorRepositoryPort {
 
     private final CompetitorJpaRepository competitorRepository;

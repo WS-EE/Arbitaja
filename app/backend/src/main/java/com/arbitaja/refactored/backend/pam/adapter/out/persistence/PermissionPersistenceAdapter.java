@@ -9,6 +9,7 @@ import com.arbitaja.refactored.backend.pam.core.port.out.permission.PermissionRe
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class PermissionPersistenceAdapter implements PermissionRepositoryPort {
 
     private final PermissionJpaRepository permissionJpaRepository;

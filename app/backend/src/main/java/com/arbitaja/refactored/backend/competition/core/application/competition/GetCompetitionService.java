@@ -8,6 +8,7 @@ import com.arbitaja.refactored.backend.competition.core.port.out.competition.Com
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class GetCompetitionService implements GetCompetitionUseCase {
 
     private final CompetitionRepositoryPort competitionRepository;

@@ -58,6 +58,8 @@ app:
     /login-user,
     /v1/user/signup/create,
     /v2/signup,
+    /v2/scoring/history,
+    /v2/scoring/dashboard/**,
     /swagger-ui/**,
     /swagger/**,
     /api-docs/**,
@@ -68,8 +70,5 @@ app:
     /health"
 
 arbitaja:
-  pam:
-    mode: ${PAM_MODE:hex}
-  competition:
-    mode: ${COMPETITION_MODE:hex}
+  mode: ${MODE:hex}
 

@@ -10,12 +10,14 @@ import com.arbitaja.refactored.backend.competition.core.port.out.competition.Com
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Persistence adapter for competition-competitor membership mutations.
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitionMembershipPersistenceAdapter implements CompetitionMembershipPort {
 
     private final CompetitionJpaRepository competitionRepository;

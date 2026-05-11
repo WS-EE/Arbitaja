@@ -36,7 +36,7 @@ import java.util.Map;
 @EnableMethodSecurity
 @RestController("user")
 @RequestMapping("/v1/user")
-@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "legacy", matchIfMissing = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "legacy", matchIfMissing = true)
 public class UserController {
     private static final Logger log = LogManager.getLogger(UserController.class);
 

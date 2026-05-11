@@ -9,6 +9,7 @@ import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class UserPersistenceAdapter implements UserRepositoryPort {
 
     private final UserJpaRepository userJpaRepository;

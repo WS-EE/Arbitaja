@@ -3,11 +3,13 @@ package com.arbitaja.refactored.backend.competition.adapter.out.persistence.mapp
 import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entity.CompetitorSchoolJpaEntity;
 import com.arbitaja.refactored.backend.competition.core.domain.model.School;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Maps between school persistence entities and school domain model.
  */
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class SchoolPersistenceMapper {
 
     public School toDomain(CompetitorSchoolJpaEntity entity) {

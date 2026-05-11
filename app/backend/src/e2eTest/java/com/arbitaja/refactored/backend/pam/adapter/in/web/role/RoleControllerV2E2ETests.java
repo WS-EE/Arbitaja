@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = ArbitajaBackendApplication.class, properties = "arbitaja.pam.mode=hex")
+@SpringBootTest(classes = ArbitajaBackendApplication.class, properties = "arbitaja.mode=hex")
 @AutoConfigureMockMvc
 @Transactional
 class RoleControllerV2E2ETests extends PamWebE2EBase {

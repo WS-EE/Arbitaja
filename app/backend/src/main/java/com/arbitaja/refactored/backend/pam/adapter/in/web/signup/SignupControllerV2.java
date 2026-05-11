@@ -34,7 +34,7 @@ import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCo
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "Signup Management v2", description = "Signup management operations (Hexagonal Architecture)")
-@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class SignupControllerV2 {
 
     private final CreateUserUseCase createUserUseCase;

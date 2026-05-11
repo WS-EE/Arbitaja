@@ -31,7 +31,7 @@ import java.util.Map;
 @EnableMethodSecurity
 @RestController("competition")
 @RequestMapping("/v1/competition")
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "legacy", matchIfMissing = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "legacy", matchIfMissing = true)
 public class CompetitionController {
     private static final Logger log = LogManager.getLogger(CompetitionController.class);
 

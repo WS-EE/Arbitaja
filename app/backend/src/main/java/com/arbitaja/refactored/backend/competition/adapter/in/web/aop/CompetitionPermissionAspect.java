@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitionPermissionAspect {
 
 	private final CheckCompetitionPermissionUseCase checkPermissionUseCase;

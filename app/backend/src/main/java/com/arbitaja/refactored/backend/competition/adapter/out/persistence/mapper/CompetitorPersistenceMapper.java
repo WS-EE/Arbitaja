@@ -5,6 +5,7 @@ import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entit
 import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entity.CompetitorSchoolJpaEntity;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.sql.Timestamp;
 
@@ -12,6 +13,7 @@ import java.sql.Timestamp;
  * Maps between competitor persistence entities and the competition-management domain model.
  */
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitorPersistenceMapper {
 
     public com.arbitaja.refactored.backend.competition.core.domain.model.Competitor toDomain(CompetitorJpaEntity entity) {

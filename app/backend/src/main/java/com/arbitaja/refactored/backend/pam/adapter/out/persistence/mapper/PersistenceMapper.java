@@ -4,6 +4,7 @@ import com.arbitaja.refactored.backend.pam.adapter.out.persistence.entity.*;
 import com.arbitaja.refactored.backend.pam.core.domain.model.*;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
  * Mapper for converting between domain models and JPA entities.
  */
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class PersistenceMapper {
 
     // User mappings

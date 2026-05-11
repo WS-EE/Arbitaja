@@ -20,7 +20,7 @@ import java.util.Map;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice(basePackages = "com.arbitaja.refactored.backend.competition")
 @Log4j2
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitionExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)

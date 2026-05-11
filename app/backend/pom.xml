@@ -348,6 +348,7 @@
                 <configuration>
                     <includes>
                         <include>**/*IT.java</include>
+                        <include>**/*E2ETests.java</include>
                     </includes>
                 </configuration>
                 <executions>

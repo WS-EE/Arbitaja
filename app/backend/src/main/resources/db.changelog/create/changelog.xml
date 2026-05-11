@@ -440,4 +440,24 @@
     <changeSet author="heinrich.vannas (generated)" id="1773649464411-72">
         <addForeignKeyConstraint baseColumnNames="added_by_user_id" baseTableName="scoring_history" constraintName="fkxx7wipkk2vg5fy3s9lor88ft" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="user" validate="true"/>
     </changeSet>
+    <changeSet id="add-scoring-history-dashboard-index" author="heinrich.vannas">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql"/>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_scoring_history_dashboard
+                ON scoring_history (
+                                    competition_id,
+                                    competitor_id,
+                                    scoring_criteria_id,
+                                    created_at,
+                                    id
+                    )
+                INCLUDE (points_given)
+        WHERE competitor_id IS NOT NULL
+        </sql>
+        <rollback>
+            <sql>DROP INDEX IF EXISTS idx_scoring_history_dashboard</sql>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

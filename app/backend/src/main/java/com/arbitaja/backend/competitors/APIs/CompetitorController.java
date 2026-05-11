@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @EnableMethodSecurity
 @RestController("competitor")
 @RequestMapping("/v1/competitor")
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "legacy", matchIfMissing = true)
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "legacy", matchIfMissing = true)
 public class CompetitorController {
     private static final Logger log = LogManager.getLogger(CompetitorController.class);
 

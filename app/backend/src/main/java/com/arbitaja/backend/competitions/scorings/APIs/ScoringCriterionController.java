@@ -5,12 +5,14 @@ import com.arbitaja.backend.competitions.scorings.dataobjects.ScoringCriterion;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("ScoringCriteria")
 @RequestMapping("/v1")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "legacy")
 public class ScoringCriterionController {
     private static final Logger log = LogManager.getLogger(ScoringCriterionController.class);
 

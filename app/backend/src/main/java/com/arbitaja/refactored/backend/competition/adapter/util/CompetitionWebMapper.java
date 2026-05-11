@@ -5,6 +5,7 @@ import com.arbitaja.refactored.backend.competition.adapter.in.web.competition.dt
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competition;
 import com.arbitaja.refactored.backend.competition.core.port.in.competition.ManageCompetitionUseCase;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
  * Maps web DTOs to use-case commands and domain models to API responses.
  */
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitionWebMapper {
 
     public ManageCompetitionUseCase.UpsertCompetitionCommand toCommand(CompetitionUpsertRequest request) {

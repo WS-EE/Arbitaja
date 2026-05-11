@@ -16,7 +16,7 @@ import java.util.Arrays;
  */
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "arbitaja.competition.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class PamCompetitionPermissionGatewayAdapter implements CompetitionPermissionGatewayPort {
 
     private final CheckPermissionUseCase checkPermissionUseCase;

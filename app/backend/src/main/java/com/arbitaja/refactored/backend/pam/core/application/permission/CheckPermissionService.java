@@ -8,9 +8,11 @@ import com.arbitaja.refactored.backend.pam.core.port.out.permission.PermissionRe
 import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CheckPermissionService implements CheckPermissionUseCase {
 
     private final UserRepositoryPort userRepositoryPort;

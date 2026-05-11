@@ -8,6 +8,7 @@ import com.arbitaja.refactored.backend.competition.core.port.out.school.SchoolRe
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Optional;
  */
 @Component("competitionSchoolPersistenceAdapter")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class SchoolPersistenceAdapter implements SchoolRepositoryPort {
 
     private final CompetitorSchoolJpaRepository schoolRepository;

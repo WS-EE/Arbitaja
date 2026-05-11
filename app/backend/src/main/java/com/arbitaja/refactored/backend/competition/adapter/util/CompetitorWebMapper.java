@@ -6,8 +6,10 @@ import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData;
 import com.arbitaja.refactored.backend.competition.core.port.in.competitor.ManageCompetitorUseCase;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Component
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class CompetitorWebMapper {
 
     public ManageCompetitorUseCase.UpsertCompetitorCommand toCommand(CompetitorUpsertRequest request) {

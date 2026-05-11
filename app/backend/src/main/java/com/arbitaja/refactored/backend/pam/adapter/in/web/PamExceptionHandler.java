@@ -22,7 +22,7 @@ import java.util.Map;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice(basePackages = "com.arbitaja.refactored.backend.pam")
 @Log4j2
-@ConditionalOnProperty(name = "arbitaja.pam.mode", havingValue = "hex")
+@ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
 public class PamExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
