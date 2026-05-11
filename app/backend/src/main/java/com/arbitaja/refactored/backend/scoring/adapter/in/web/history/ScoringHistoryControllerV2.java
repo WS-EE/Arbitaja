@@ -1,10 +1,8 @@
 package com.arbitaja.refactored.backend.scoring.adapter.in.web.history;
 
-import com.arbitaja.refactored.backend.scoring.adapter.in.web.annotations.RequiresScoringPermission;
 import com.arbitaja.refactored.backend.scoring.adapter.in.web.history.dto.request.AddScoringHistoryRequest;
 import com.arbitaja.refactored.backend.scoring.adapter.in.web.history.dto.response.ScoringHistoryEntryResponse;
 import com.arbitaja.refactored.backend.scoring.adapter.util.ScoringHistoryWebMapper;
-import com.arbitaja.refactored.backend.scoring.core.domain.enums.ScoringPermissionCode;
 import com.arbitaja.refactored.backend.scoring.core.port.in.history.RecordScoringHistoryUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +32,6 @@ public class ScoringHistoryControllerV2 {
     private final ScoringHistoryWebMapper mapper;
 
     @PostMapping
-    @RequiresScoringPermission(ScoringPermissionCode.RECORD_SCORING_RESULTS)
     @Operation(summary = "Record a scoring result", description = "Records a new scoring history entry for a competitor")
     @Parameters({
         @Parameter(name = "X-API-KEY", description = "API key for authentication", required = true, in = ParameterIn.HEADER)

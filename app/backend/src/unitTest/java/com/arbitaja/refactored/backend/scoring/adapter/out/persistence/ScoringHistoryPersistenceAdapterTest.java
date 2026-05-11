@@ -32,17 +32,9 @@ class ScoringHistoryPersistenceAdapterTest {
     @InjectMocks
     private ScoringHistoryPersistenceAdapter adapter;
 
-    private ScoringHistoryWithCriterionProjection projection(int id, int competitorId, double points) {
+    private ScoringHistoryWithCriterionProjection projection() {
         Timestamp now = Timestamp.valueOf("2026-04-06 12:00:00");
-        return new ScoringHistoryWithCriterionProjection() {
-            @Override public Integer getId() { return id; }
-            @Override public Integer getCompetitionId() { return 1; }
-            @Override public Integer getCompetitorId() { return competitorId; }
-            @Override public Integer getScoringCriterionId() { return 3; }
-            @Override public String getScoringCriterionName() { return "ssh"; }
-            @Override public Double getPointsGiven() { return points; }
-            @Override public Timestamp getCreatedAt() { return now; }
-        };
+        return new ScoringHistoryWithCriterionProjection(1, 1, 10, 3, "ssh", 5.0, now);
     }
 
     @Test
@@ -70,8 +62,8 @@ class ScoringHistoryPersistenceAdapterTest {
         Timestamp t1 = Timestamp.valueOf("2026-04-06 10:00:00");
         Timestamp t2 = Timestamp.valueOf("2026-04-06 11:00:00");
 
-        ScoringDashboardRowProjection row1 = dashboardRow(10, t1, 3.0);
-        ScoringDashboardRowProjection row2 = dashboardRow(20, t2, 4.0);
+        ScoringDashboardRowProjection row1 = new ScoringDashboardRowProjection(10, t1, 3.0);
+        ScoringDashboardRowProjection row2 = new ScoringDashboardRowProjection(20, t2, 4.0);
         when(scoringHistoryRepository.findRunningTotalsForCompetition(1, cutoff))
             .thenReturn(List.of(row1, row2));
         when(mapper.toDomain(row1)).thenReturn(
@@ -87,17 +79,10 @@ class ScoringHistoryPersistenceAdapterTest {
         verify(scoringHistoryRepository).findRunningTotalsForCompetition(1, cutoff);
     }
 
-    private ScoringDashboardRowProjection dashboardRow(int competitorId, Timestamp timestamp, double runningTotal) {
-        return new ScoringDashboardRowProjection() {
-            @Override public Integer getCompetitorId() { return competitorId; }
-            @Override public Timestamp getTimestamp() { return timestamp; }
-            @Override public Double getRunningTotal() { return runningTotal; }
-        };
-    }
 
     @Test
     void findLatestPerCompetitorAndCriterionDelegatesToRepository() {
-        ScoringHistoryWithCriterionProjection row = projection(1, 10, 5.0);
+        ScoringHistoryWithCriterionProjection row = projection();
         when(scoringHistoryRepository.findLatestPerCompetitorAndCriterion(1)).thenReturn(List.of(row));
         when(mapper.toDomain(row)).thenReturn(ScoringHistoryEntry.builder().id(1).build());
 

@@ -98,15 +98,8 @@ class ScoringPersistenceMapperTest {
     @Test
     void scoringHistoryProjectionToDomainCopiesFields() {
         Timestamp now = Timestamp.valueOf("2026-04-06 12:00:00");
-        ScoringHistoryWithCriterionProjection projection = new ScoringHistoryWithCriterionProjection() {
-            @Override public Integer getId() { return 99; }
-            @Override public Integer getCompetitionId() { return 1; }
-            @Override public Integer getCompetitorId() { return 2; }
-            @Override public Integer getScoringCriterionId() { return 3; }
-            @Override public String getScoringCriterionName() { return "ssh"; }
-            @Override public Double getPointsGiven() { return 5.0; }
-            @Override public Timestamp getCreatedAt() { return now; }
-        };
+        ScoringHistoryWithCriterionProjection projection =
+            new ScoringHistoryWithCriterionProjection(99, 1, 2, 3, "ssh", 5.0, now);
 
         ScoringHistoryEntry entry = mapper.toDomain(projection);
 
@@ -135,11 +128,7 @@ class ScoringPersistenceMapperTest {
     @Test
     void dashboardRowProjectionToDomainCopiesFields() {
         Timestamp now = Timestamp.valueOf("2026-04-06 12:00:00");
-        ScoringDashboardRowProjection projection = new ScoringDashboardRowProjection() {
-            @Override public Integer getCompetitorId() { return 10; }
-            @Override public Timestamp getTimestamp() { return now; }
-            @Override public Double getRunningTotal() { return 7.5; }
-        };
+        ScoringDashboardRowProjection projection = new ScoringDashboardRowProjection(10, now, 7.5);
 
         DashboardResultRow row = mapper.toDomain(projection);
 

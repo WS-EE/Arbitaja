@@ -8,9 +8,9 @@ const apiKey   = __ENV.API_KEY   || 'default_api_key';
 const username =  'admin';
 const password = __ENV.PASSWORD  || 'admin';
 
-const competitionId = __ENV.COMPETITION_ID || '1';
-const competitorId  = __ENV.COMPETITOR_ID  || '1';
-const criteriaId    = __ENV.CRITERIA_ID    || '1';
+const competitionId  = __ENV.COMPETITION_ID || '1';
+const competitorIds  = (__ENV.COMPETITOR_IDS || __ENV.COMPETITOR_ID || '1').split(',').map(s => s.trim());
+const criteriaIds    = (__ENV.CRITERIA_IDS   || __ENV.CRITERIA_ID   || '1').split(',').map(s => s.trim());
 
 const VALID_MODES     = ['legacy', 'hex'];
 const VALID_SCENARIOS = ['dashboard-history', 'dashboard-criteria', 'dashboard-criteria-competitor', 'add-scoring'];
@@ -59,6 +59,9 @@ export function setup() {
 
 export default function ({ sessionId }) {
   let res;
+  const idx          = (__VU - 1 + __ITER) % competitorIds.length;
+  const competitorId = competitorIds[idx];
+  const criteriaId   = criteriaIds[idx % criteriaIds.length];
 
   if (scenario === 'dashboard-history') {
     const url = mode === 'hex'

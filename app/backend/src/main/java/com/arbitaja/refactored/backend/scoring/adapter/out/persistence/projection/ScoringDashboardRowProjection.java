@@ -8,11 +8,8 @@ import java.sql.Timestamp;
  * <p>{@code runningTotal} is computed by the database window function,
  * so the application layer does not need to track per-criterion state.</p>
  */
-public interface ScoringDashboardRowProjection {
-
-    Integer getCompetitorId();
-
-    Timestamp getTimestamp();
-
-    Double getRunningTotal();
-}
+public record ScoringDashboardRowProjection(
+    Integer competitorId,
+    Timestamp timestamp,
+    Double runningTotal
+) {}

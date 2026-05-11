@@ -138,13 +138,13 @@ public class ScoringPersistenceMapper {
             return null;
         }
         return ScoringHistoryEntry.builder()
-            .id(projection.getId())
-            .competitionId(projection.getCompetitionId())
-            .competitorId(projection.getCompetitorId())
-            .scoringCriterionId(projection.getScoringCriterionId())
-            .scoringCriterionName(projection.getScoringCriterionName())
-            .pointsGiven(projection.getPointsGiven())
-            .createdAt(projection.getCreatedAt())
+            .id(projection.id())
+            .competitionId(projection.competitionId())
+            .competitorId(projection.competitorId())
+            .scoringCriterionId(projection.scoringCriterionId())
+            .scoringCriterionName(projection.scoringCriterionName())
+            .pointsGiven(projection.pointsGiven())
+            .createdAt(projection.createdAt())
             .build();
     }
 
@@ -152,10 +152,9 @@ public class ScoringPersistenceMapper {
         if (projection == null) {
             return null;
         }
-        return DashboardResultRow.builder()
-            .competitorId(projection.getCompetitorId())
-            .timestamp(projection.getTimestamp())
-            .runningTotal(projection.getRunningTotal())
-            .build();
+        return new DashboardResultRow(
+            projection.competitorId(),
+            projection.timestamp(),
+            projection.runningTotal());
     }
 }

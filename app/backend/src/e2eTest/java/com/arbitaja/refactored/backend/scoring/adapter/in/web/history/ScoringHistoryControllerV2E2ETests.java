@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,7 +24,6 @@ class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
     private static final String TEST_API_KEY = "test-e2e-api-key";
 
     @Test
-    @WithMockUser(username = "admin", roles = {"admin"})
     void recordScoreSuccess() throws Exception {
         ensureFirstCompetitionIsActive();
         Integer criterionId = createCriterionLinkedToCompetition(50.0);
@@ -46,7 +44,6 @@ class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"admin"})
     void recordScoreOutOfRangeReturns400() throws Exception {
         Integer criterionId = createCriterionLinkedToCompetition(50.0);
 
@@ -63,7 +60,6 @@ class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"admin"})
     void recordScoreForNonexistentCompetitionReturns404() throws Exception {
         Integer criterionId = createCriterionLinkedToCompetition(50.0);
 
@@ -79,16 +75,14 @@ class ScoringHistoryControllerV2E2ETests extends ScoringWebE2EBase {
     }
 
     @Test
-    @WithMockUser(username = "noRolesTestUser")
-    void recordScoreWithoutPermissionForbidden() throws Exception {
+    void recordScoreWithoutApiKeyReturnsUnauthorized() throws Exception {
         AddScoringHistoryRequest request = new AddScoringHistoryRequest(
             firstCompetitionId(), firstCompetitorId(), 1, 10.0
         );
 
         mockMvc.perform(post("/v2/scoring/history")
-                .header(API_KEY_HEADER, TEST_API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 }

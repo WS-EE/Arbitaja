@@ -2,6 +2,7 @@ package com.arbitaja.refactored.backend.scoring.adapter.out.persistence;
 
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringHistoryJpaEntity;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.mapper.ScoringPersistenceMapper;
+import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.projection.ScoringDashboardRowProjection;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.repository.ScoringHistoryJpaRepository;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.DashboardResultRow;
 import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringHistoryEntry;
@@ -9,10 +10,12 @@ import com.arbitaja.refactored.backend.scoring.core.port.out.history.ScoringDash
 import com.arbitaja.refactored.backend.scoring.core.port.out.history.ScoringHistoryRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +26,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "arbitaja.mode", havingValue = "hex")
+@Log4j2
 public class ScoringHistoryPersistenceAdapter implements ScoringHistoryRepositoryPort, ScoringDashboardQueryPort {
 
     private final ScoringHistoryJpaRepository scoringHistoryRepository;
@@ -37,9 +41,12 @@ public class ScoringHistoryPersistenceAdapter implements ScoringHistoryRepositor
 
     @Override
     public List<DashboardResultRow> findHistoryForCompetition(@NonNull Integer competitionId, @NonNull Timestamp cutoff) {
-        return scoringHistoryRepository.findRunningTotalsForCompetition(competitionId, cutoff).stream()
-            .map(mapper::toDomain)
-            .toList();
+        List<ScoringDashboardRowProjection> row = scoringHistoryRepository.findRunningTotalsForCompetition(competitionId, cutoff);
+        List<DashboardResultRow> result = new ArrayList<>(row.size());
+        for (ScoringDashboardRowProjection projection : row) {
+            result.add(mapper.toDomain(projection));
+        }
+        return result;
     }
 
     @Override

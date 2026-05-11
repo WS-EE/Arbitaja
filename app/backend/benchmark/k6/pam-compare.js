@@ -7,6 +7,7 @@ const baseUrl  = __ENV.BASE_URL  || 'http://localhost:8080';
 const username =  'admin';
 const password = __ENV.PASSWORD  || 'admin';
 const userId   = __ENV.USER_ID   || '1';
+const runId    = __ENV.RUN_ID    || '0';
 
 const VALID_MODES     = ['legacy', 'hex'];
 const VALID_SCENARIOS = ['signup', 'list-users', 'user-profile'];
@@ -52,7 +53,7 @@ export default function ({ sessionId }) {
   const authHeaders = sessionId ? { Cookie: `JSESSIONID=${sessionId}` } : {};
 
   if (scenario === 'signup') {
-    const unique = `${mode}-${__VU}-${__ITER}`;
+    const unique = `${mode}-${runId}-${__VU}-${__ITER}`;
     const body = mode === 'hex'
       ? JSON.stringify({
           username: `user-${unique}`,
