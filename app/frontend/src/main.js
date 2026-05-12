@@ -12,10 +12,11 @@ import VueCookies from 'vue-cookies'
 import axios from "axios";
 import PrimeVue from 'primevue/config';
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate'
+import { API_BASE_URL } from '@/services/http'
 
 // Use enviromental variables for axios endpoint
-console.log('Using backend api endpoint of: ' + import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_API_ENDPOINT)
-axios.defaults.baseURL = import.meta.env.VITE_APP_BASE_URL + import.meta.env.VITE_APP_API_ENDPOINT
+console.log('Using backend api endpoint of: ' + API_BASE_URL)
+axios.defaults.baseURL = API_BASE_URL
 axios.defaults.withCredentials = true
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.headers.put['Content-Type'] = 'application/json';

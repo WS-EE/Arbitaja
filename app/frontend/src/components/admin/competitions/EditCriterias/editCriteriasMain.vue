@@ -5,6 +5,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
+import { endpoints } from '@/services/endpoints';
 
 // Import components
 import addEditCriteria from '@/components/admin/competitions/EditCriterias/addEditCriteria.vue'
@@ -26,11 +27,6 @@ function showAlert(message, type, timeout){
 }
 
 // Main Content
-const emptyCriteria = {
-            name: '',
-            description: '',
-            totalPoints: '',
-        }
 const isLoading = ref(true)
 const competition = ref([]);
 const criterias = ref([]);
@@ -47,7 +43,7 @@ const getCompetitionById = async(id) => {
         isLoading.value = true;
 
         // If prop schools is not defined try to get them ourselves
-        const response = await axios.get('v1/competition/get?id=' + id);
+        const response = await axios.get(endpoints.competitions.details(id));
         competition.value = response.data
         
     } catch(error) {
@@ -63,18 +59,11 @@ const getCompetitionById = async(id) => {
 // function for getting criterias based on competition
 const getCriteriasByCompetition = async(competitionId) => {
     try {
-        // Set loading true
+         // Set loading true
         isLoadingCriterias.value = true
 
-        // Get criterias based on competition id
-        const response = await axios.get(
-            'v1/scoring/criteria/by/competition',
-            { 
-                params: { 
-                    competition_id: competitionId 
-                } 
-            }
-        )
+         // Get criterias based on competition id
+        const response = await axios.get(endpoints.scoring.criteria.byCompetition(competitionId))
 
         // Set criterias based on the response
         criterias.value = response.data
@@ -111,7 +100,7 @@ const onTableChanged = () => {
         <div v-else class="container">
             <!-- Header of the html -->
             <h1>Competition: {{ competition.name }}</h1>
-            <p>Organizer: <b>{{ competition.organizer_id.full_name }}</b></p>
+            <p>Organizer: <b>{{ competition.organizer.full_name }}</b></p>
             
             <!-- Buttons for action of adding -->
             <div class="row">

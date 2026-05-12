@@ -4,6 +4,7 @@ import axios from 'axios';
 import { RouterLink } from 'vue-router';
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 import { useUserStore } from '@/stores/userStore';
+import { endpoints } from '@/services/endpoints';
 
 const allUsers = ref([]);
 const isLoadingUsers = ref(true)
@@ -13,13 +14,7 @@ const curUserId = ref();
 
 // Get if the user in list is the current user
 const currentUser = (id) => {
-    // If user is current user return true to disable delete
-    if (id === curUserId.value) {
-        return true;
-    } else {
-    // else show delete
-        return false;
-    }
+    return id === curUserId.value;
 }
 
 // Get all signup users
@@ -28,7 +23,7 @@ const getAllUsers = async() => {
     // Try getting user data
     try{
         // Try getting the Users
-        const response = await axios.get('/v2/user')
+        const response = await axios.get(endpoints.users.list)
         allUsers.value = response.data
     } catch(error) {
         // Throw console log error if fail
@@ -66,7 +61,7 @@ const unsetUserToDelete = () => {
 // Delete user
 const deleteUser = async(userID, userName) => {
     try {
-        await axios.delete('v1/user/profile/delete', { params: {id: userID} })
+         await axios.delete(endpoints.users.deleteProfile(userID))
         showAlert('User <strong>'+userName+'</strong> has been succesfully deleted.', 'success')
     } catch(error){
         // Throw error if fail

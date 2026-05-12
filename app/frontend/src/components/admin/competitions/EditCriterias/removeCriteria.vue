@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 const props = defineProps({
     modalId: {
         type: String,
@@ -38,12 +39,8 @@ const emit = defineEmits(['removeCriteria'])
 
 const removeCompetitor = async(criteriaId, criteriaName) => {
     try {
-        // Delete competitor
-        await axios.delete
-        (
-            'v1/scoring/criteria/delete',
-            { params: { scoring_id: criteriaId } }
-        )
+         // Delete competitor
+        await axios.delete(endpoints.scoring.criteria.remove(criteriaId))
 
         // emit event
         emit('removeCriteria')

@@ -6,6 +6,7 @@ import { RouterLink, useRoute } from 'vue-router';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import { now } from '@vueuse/core';
 import { DateTime } from 'luxon';
+import { endpoints } from '@/services/endpoints';
 
 // check the active link
 const isAdmin = () => {
@@ -42,7 +43,7 @@ const getAllCompetition = async() => {
     // Try getting all competitions
     try{
         // Try getting all competitions
-        const response = await axios.get('v1/competition/all/get')
+        const response = await axios.get(endpoints.competitions.list)
         competitions.value = response.data
         
         // sort competitions based on type
@@ -67,13 +68,8 @@ const unsetCompetitionToDelete = () => {
 const deleteCompetition = async() => {
     // Delete the comp based on the variables we set earlier
     try{
-        // Delete competition based on ID
-        await axios.delete("/competition/delete", {
-        params: { id: setCompetitionId.value }, // Send `id` as a query parameter
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
+         // Delete competition based on ID
+        await axios.delete(endpoints.competitions.remove(setCompetitionId.value));
         showAlert('competition ' + setCompetitionName.value + ' has been deleted', 'warning')
         
         // Unset to delete after deleting the competition
@@ -101,7 +97,7 @@ const sortCompetitionsByTime = async(competitions) => {
         }
 
         // if end time is larger then now and smaller then start it is ongoing
-        if (endTime >= now() & startTime <= now()) {
+        if (endTime >= now() && startTime <= now()) {
             ongoingCompetitions.value.push(competitions[i])
         }
         
@@ -164,10 +160,10 @@ function showAlert(message, type, timeout){
                 <div class="card mt-2 mb-2">
                     <div class="card-body">
                         <h3 class="card-title">{{ competition.name }}</h3>
-                        <p class="card-text">
+                        <div class="card-text">
                             <div class="row">
                                 <div class="col-4">Organizer:</div>
-                                <div class="col">{{ competition.organizer_id.full_name }}</div>
+                                <div class="col">{{ competition.organizer.full_name }}</div>
                             </div>
                             <div class="row">
                                 <div class="col-4">Start time:</div>
@@ -177,7 +173,7 @@ function showAlert(message, type, timeout){
                                 <div class="col-4">End time:</div>
                                 <div class="col">{{ (convertISOtoHuman(competition.end_time)) }}</div>
                             </div>
-                        </p>
+                        </div>
                         <RouterLink v-if="isAdmin()" class="btn btn-success" :to="'/admin/competition/get/' + competition.id">View</RouterLink>
                         <RouterLink v-else class="btn btn-dark" :to="'/competition/' + competition.id">View</RouterLink>
                         <RouterLink class="btn btn-outline-dark ms-2" :to="'/admin/competition/edit/' + competition.id" v-if="isAdmin()">Edit</RouterLink>
@@ -192,10 +188,10 @@ function showAlert(message, type, timeout){
                 <div class="card mt-2 mb-2">
                     <div class="card-body">
                         <h3 class="card-title">{{ competition.name }}</h3>
-                        <p class="card-text">
+                        <div class="card-text">
                             <div class="row">
                                 <div class="col-4">Organizer:</div>
-                                <div class="col">{{ competition.organizer_id.full_name }}</div>
+                                <div class="col">{{ competition.organizer.full_name }}</div>
                             </div>
                             <div class="row">
                                 <div class="col-4">Start time:</div>
@@ -205,7 +201,7 @@ function showAlert(message, type, timeout){
                                 <div class="col-4">End time:</div>
                                 <div class="col">{{ (convertISOtoHuman(competition.end_time)) }}</div>
                             </div>
-                        </p>
+                        </div>
                         <RouterLink v-if="isAdmin()" class="btn btn-success" :to="'/admin/competition/get/' + competition.id">View</RouterLink>
                         <RouterLink v-else class="btn btn-dark" :to="'/competition/' + competition.id">View</RouterLink>
                         <RouterLink class="btn btn-outline-dark ms-2" :to="'/admin/competition/edit/' + competition.id" v-if="isAdmin()">Edit</RouterLink>
@@ -220,10 +216,10 @@ function showAlert(message, type, timeout){
                 <div class="card mt-2 mb-2">
                     <div class="card-body">
                         <h3 class="card-title">{{ competition.name }}</h3>
-                        <p class="card-text">
+                        <div class="card-text">
                             <div class="row">
                                 <div class="col-4">Organizer:</div>
-                                <div class="col">{{ competition.organizer_id.full_name }}</div>
+                                <div class="col">{{ competition.organizer.full_name }}</div>
                             </div>
                             <div class="row">
                                 <div class="col-4">Start time:</div>
@@ -233,7 +229,7 @@ function showAlert(message, type, timeout){
                                 <div class="col-4">End time:</div>
                                 <div class="col">{{ (convertISOtoHuman(competition.end_time)) }}</div>
                             </div>
-                        </p>
+                        </div>
                         <RouterLink v-if="isAdmin()" class="btn btn-success" :to="'/admin/competition/get/' + competition.id">View</RouterLink>
                         <RouterLink v-else class="btn btn-dark" :to="'/competition/' + competition.id">View</RouterLink>
                         <RouterLink class="btn btn-outline-dark ms-2" :to="'/admin/competition/edit/' + competition.id" v-if="isAdmin()">Edit</RouterLink>

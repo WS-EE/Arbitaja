@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 const props = defineProps({
     modalId: {
         type: String,
@@ -63,7 +64,7 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
             }
         
             // add the new criteria
-            await axios.post('v1/scoring/criteria/add', newCriteria)
+            await axios.post(endpoints.scoring.criteria.create, newCriteria)
 
             // show alert of success
             await showAlert(props.buttonName + ' <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
@@ -81,8 +82,8 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
                 description: addEditCriteria.description,
                 totalPoints: addEditCriteria.totalPoints
             }
-            // Register the item with personal data
-            await axios.put('v1/scoring/criteria/update', updateCriteria)
+             // Register the item with personal data
+             await axios.put(endpoints.scoring.criteria.update(updateCriteria.id), updateCriteria)
 
             // Edit alert success
             await showAlert('Editing criteria <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
@@ -201,7 +202,7 @@ function showAlert(message, type, timeout){
                         </div>
                         <div class="col">
                             <input 
-                                type="texarea"
+                                type="textarea"
                                 placeholder="This is an awesome criteria"
                                 id="criteriaName"
                                 class="rounded p-1 form-control" v-model="modalCriteria.description">

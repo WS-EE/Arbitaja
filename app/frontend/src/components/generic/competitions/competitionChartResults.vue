@@ -28,7 +28,9 @@ watch(() => props.autoRefresh, (newVal) => {
 })
 
 watch(() => props.refreshInterval, () => {
-    startAutoRefresh();
+    if (props.autoRefresh) {
+        startAutoRefresh();
+    }
 })
 
 function startAutoRefresh() {
@@ -48,11 +50,6 @@ function stopAutoRefresh() {
 
 onUnmounted(() => {
     stopAutoRefresh() // Clean up interval on component destroy
-     // Clean up chart
-    if (chartInstance) {
-        chartInstance.destroy()
-        chartInstance = null
-    }
 })
 //
 // Auto refresh BLOCK END
@@ -72,11 +69,13 @@ function showAlert(message, type, timeout){
 }
 
 
-// Import required moduls
-import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
-import axios from 'axios';
-import { Chart, registerables } from 'chart.js'
+// Import required modules
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import axios from 'axios'
+import { Line } from 'vue-chartjs'
+import { Chart as ChartJS, registerables } from 'chart.js'
 import 'chartjs-adapter-date-fns'
+import { endpoints } from '@/services/endpoints'
 
 // Import pulse loader
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
@@ -84,6 +83,68 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 // Set empty variable
 const isLoadingResults = ref(true)
 const results = ref([])
+const chartPalette = [
+    '#0d6efd',
+    '#198754',
+    '#fd7e14',
+    '#dc3545',
+    '#6f42c1',
+    '#20c997',
+    '#0dcaf0',
+]
+
+const chartData = computed(() => ({
+    datasets: results.value.map((competitor, index) => ({
+        label: competitor.name,
+        data: [...(competitor.results ?? [])]
+            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+            .map((result) => ({
+                x: new Date(result.timestamp),
+                y: result.point_amount,
+            })),
+        borderColor: chartPalette[index % chartPalette.length],
+        backgroundColor: 'transparent',
+        pointRadius: 2,
+        tension: 0.15,
+        parsing: false,
+    })),
+}))
+
+const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    interaction: {
+        mode: 'index',
+        intersect: false,
+    },
+    plugins: {
+        legend: {
+            position: 'bottom',
+        },
+    },
+    scales: {
+        x: {
+            type: 'time',
+            time: {
+                unit: 'minute',
+            },
+            title: {
+                display: true,
+                text: 'Timestamp',
+            },
+        },
+        y: {
+            beginAtZero: true,
+            title: {
+                display: true,
+                text: 'Points',
+            },
+        },
+    },
+}
+
+ChartJS.register(...registerables)
 
 // Get results
 const getResultsByCompetitionId = async (id) => {
@@ -93,12 +154,7 @@ const getResultsByCompetitionId = async (id) => {
 
         // Get the results
         const response = await axios.get(
-            'v1/dashboard/competition/history',
-            {
-                params: {
-                    competition_id: '' + id
-                }
-            }
+            endpoints.scoring.history.dashboard(id)
         )
 
         // Set results
@@ -114,72 +170,10 @@ const getResultsByCompetitionId = async (id) => {
 // Get results and create chart on mount
 onMounted(async () => {
     await getResultsByCompetitionId(props.competitionId)
-    nextTick(() => createChart())
-})
-
-
-// Create chart (vibe code, I have no idea what is going on here)
-// VIBE CODE BLOCK START
-Chart.register(...registerables)
-const chartCanvas = ref(null)
-let chartInstance = null
-function getRandomColor() {
-    return `hsl(${Math.random() * 360}, 100%, 50%)`
-}
-function createChart() {
-  if (!chartCanvas.value) return
-
-  const ctx = chartCanvas.value.getContext('2d')
-
-  // Destroy old chart if it exists
-  if (chartInstance) {
-    chartInstance.destroy()
-    chartInstance = null
-  }
-
-  const datasets = results.value.map((competitor) => {
-    const data = competitor.results
-      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
-      .map((result) => ({
-        x: new Date(result.timestamp),
-        y: result.point_amount
-      }))
-
-    return {
-      label: competitor.name,
-      data,
-      borderColor: getRandomColor(),
-      fill: false,
-      tension: 0
+    if (props.autoRefresh) {
+        startAutoRefresh()
     }
-  })
-
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: { datasets },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          type: 'time',
-          time: { unit: 'minute' },
-          title: { display: true, text: 'Timestamp' }
-        },
-        y: {
-          title: { display: true, text: 'Points' }
-        }
-      }
-    }
-  })
-}
-
-watch(results, () => {
-  // Only create chart when canvas is present
-  nextTick(() => {
-    createChart()
-  })
 })
-// END OF VIBE CODE BLOCK
 </script>
 
 <template>
@@ -190,6 +184,8 @@ watch(results, () => {
     <div v-if="isLoadingResults" class="position-absolute top-50 start-50">
         <PulseLoader />
     </div>
-    <!-- Show canvas -->
-    <canvas v-show="!isLoadingResults" ref="chartCanvas"></canvas>
+    <!-- Show chart -->
+    <div v-show="!isLoadingResults" class="position-relative" style="min-height: 420px;">
+        <Line :data="chartData" :options="chartOptions" />
+    </div>
 </template>

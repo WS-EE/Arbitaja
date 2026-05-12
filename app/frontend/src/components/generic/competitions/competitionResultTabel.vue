@@ -21,6 +21,7 @@ import { onMounted, onUnmounted, ref, watch, computed } from 'vue'
 
 // Import axios
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 
 // Import pulseloader
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
@@ -37,12 +38,7 @@ const getCompetitionResults = async(competitionId) => {
 
         // Get the results
         const response = await axios.get(
-            'v1/dashboard/competition/history',
-            { 
-                params: {
-                    competition_id: ''+competitionId 
-                }
-            }
+            endpoints.scoring.history.dashboard(competitionId)
         )
 
         // Set results
@@ -142,9 +138,11 @@ function showAlert(message, type, timeout){
     <!-- Table -->
     <table v-else class="table table-striped mt-3">
         <thead>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Total Points</th>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Total Points</th>
+            </tr>
         </thead>
         <tbody>
             <tr v-for="(competitor, index) in sortedComptitors">

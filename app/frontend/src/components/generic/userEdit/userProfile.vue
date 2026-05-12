@@ -19,7 +19,8 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Get school list
 import axios from 'axios';
-const allSchools = ref(''); 
+import { endpoints } from '@/services/endpoints';
+const allSchools = ref('');
 
 // Set user parameters to empty
 const isAdmin = computed(() => store.hasPrivilege('EDIT_USERS'))
@@ -29,12 +30,11 @@ const email = ref('')
 const username = ref('')
 const roles = ref([])
 const school = ref(null)
-const successAlert = ref('')
 const isLoading = ref(true)
 
 const getSchools = async() => {
     try {
-        const response = await axios.get('v1/school/all/get')
+        const response = await axios.get(endpoints.schools.list)
         allSchools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
@@ -80,7 +80,7 @@ const filteredSchools = computed(() => {
 const saveProfile = (async () =>{
     try {
         // Update data with PUT request
-        const response = await axios.put(`v2/user/${userid.value}`, {
+        const response = await axios.put(endpoints.users.details(userid.value), {
           username: username.value,
           full_name: fullName.value,
           email: email.value,
@@ -206,12 +206,14 @@ import changePassword from './changePassword.vue';
                         </button>
                         <ul class="dropdown-menu">
                             <!-- Search bar for schools -->
-                            <div class="input-group rounded">
-                                <input type="search" class="form-control rounded ms-1 me-1" 
-                                    placeholder="Search" aria-label="Search" aria-describedby="search-addon"
-                                    v-model="searchSchools"
-                                />
-                            </div>
+                            <li class="px-2 py-1">
+                                <div class="input-group rounded">
+                                    <input type="search" class="form-control rounded ms-1 me-1"
+                                        placeholder="Search" aria-label="Search" aria-describedby="search-addon"
+                                        v-model="searchSchools"
+                                    />
+                                </div>
+                            </li>
                             <!-- Dropdown menu links -->
                             <li 
                                 v-for="school in filteredSchools" 

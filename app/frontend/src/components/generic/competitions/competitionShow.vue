@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { DateTime } from 'luxon';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+import { endpoints } from '@/services/endpoints';
 
 import competitionChartResults from './competitionChartResults.vue';
 import competitionResultTabel from './competitionResultTabel.vue';
@@ -37,7 +38,6 @@ const setTimeIntervalForAutoUpdate = [
     { timeout: 60000, name: "60sec" }
 ]
 
-const isRefreshingResults = ref(false)
 const competition = ref([]);
 const results = ref([]);
 const isCompetition = ref(true)
@@ -52,7 +52,7 @@ const getCompetition = async() => {
         const competition_id = route.params.id
         
         // Try competition data
-        const response = await axios.get('v1/competition/get?id=' + competition_id)
+        const response = await axios.get(endpoints.competitions.details(competition_id))
         competition.value = response.data
 
         // Format dates
@@ -73,7 +73,7 @@ const getResults = async() => {
     try {
         const competition_id = route.params.id
 
-        const response = await axios.get('v1/dashboard/competition/history?competition_id=' + competition_id)
+        const response = await axios.get(endpoints.scoring.history.dashboard(competition_id))
         results.value = response.data.competitors
     } catch(error) {
         // Throw console log error if fail
@@ -135,12 +135,12 @@ function showAlert(message, type, timeout){
                 <div class="border rounded">
                     <div class="p-2">
                         <p class="pt-2">ID: {{ competition.id }}</p>
-                        <p>Organizer: {{ competition.organizer_id.full_name }}</p>
+                        <p>Organizer: {{ competition.organizer.full_name }}</p>
                         <p>Start Time: {{ start_time }}</p>
                         <p>End Time: {{ end_time }}</p>
                     </div>
                 </div>
-                <h5 class="pt-2">
+                <div class="pt-2">
                     <div class="form-check form-switch">
                         <input 
                             class="form-check-input" 
@@ -173,7 +173,7 @@ function showAlert(message, type, timeout){
                         </div>
                     </div>
                     
-                </h5>
+                </div>
             </div>
             <!-- Show data about competitions -->
             <div class="col-sm-12 col-md-10">

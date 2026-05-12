@@ -47,7 +47,7 @@ const onEditCompetitor = () => {
                 <td>{{ competitor.alias }}</td>
                 <td>{{ competitor.personal_data.full_name }}</td>
                 <td class="d-none d-lg-table-cell">{{ competitor.personal_data.email }}</td>
-                <td class="d-none d-md-table-cell">{{ competitor.personal_data.school.name }}</td>
+                <td class="d-none d-md-table-cell">{{ competitor.personal_data.school_id }}</td>
                 <td v-if="addActions">
                     <addEditCompetitor
                         addButtonDivClass="btn btn-dark bi bi-pencil me-1"
@@ -61,6 +61,7 @@ const onEditCompetitor = () => {
                     <removeCompetitor 
                         addButtonDivClass="btn btn-danger bi bi-trash"
                         modalId="DeleteModal"
+                        :competitionId="props.competitionId"
                         :competitorId="competitor.id"
                         :competitorName="competitor.personal_data.full_name"
                         @removeCompetitor="onRemoveCompetitor()"

@@ -5,6 +5,7 @@ import logo from '@/assets/media/logo.svg';
 import axios from 'axios';
 import router from '@/router';
 import { useUserStore } from '@/stores/userStore';
+import { endpoints } from '@/services/endpoints';
 
 const userStore = useUserStore();
 
@@ -21,7 +22,7 @@ const isUserAdmin = computed(() => userStore.hasPrivilege('ADMIN'))
 // User logout function
 const userLogout = async () => {
     try {
-        await axios.post('logout');
+        await axios.post(endpoints.auth.logout);
     } catch(error) {
         // We are expecting 401 response when logging out.
         await router.replace('/home');
@@ -102,13 +103,13 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
     </div>
     <nav class="navbar navbar-expand-md">
         <div class="container-fluid">
-            <RouterLink class="navbar-brand" to="/home"><img :src="logo" width="30">Arbitaja</RouterLink>
+            <RouterLink class="navbar-brand" to="/home"><img :src="logo" alt="Arbitaja logo" width="30">Arbitaja</RouterLink>
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation" >
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                 <div class="offcanvas-header">
-                    <RouterLink class="navbar-brand" to="/home"><img :src="logo" width="30">Arbitaja</RouterLink>
+                    <RouterLink class="navbar-brand" to="/home"><img :src="logo" alt="Arbitaja logo" width="30">Arbitaja</RouterLink>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
@@ -172,9 +173,6 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
 
 <style scoped>
 
-.big-box {
-    background-color: var(--big-block-background);
-}
 
 .nav-item:hover {
     background-color: var(--button-dark) !important;

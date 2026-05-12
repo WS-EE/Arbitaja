@@ -22,9 +22,8 @@ POSTGRES_PASSWORD=VeryTrickyPassword
 
 This is the url used when backend connects to database
 ```
-POSTGRES_URL=jdbc:postgresql://db:5432/arbitaja
+POSTGRES_URL=db:5432
 ```
-> Note that `/arbitaja` needs to be the same as `POSTGRES_DB` variable
 ---
 
 These variables are used for axios.
@@ -33,7 +32,7 @@ Axios is used for the backend to call the frontend
 They are also used for CORS.
 ```
 VITE_APP_BASE_URL=http://localhost/
-VITE_APP_API_ENDPOINT=api/v1/
+VITE_APP_API_ENDPOINT=api/
 ```
 > Unless you change this variable, the website will only be available from `http://localhost`.
 > This is fine when developing.

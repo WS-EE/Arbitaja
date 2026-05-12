@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import logo from '@/assets/media/logo.svg';
 import { RouterLink } from "vue-router";
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 
 
 const username = ref("");
@@ -19,7 +20,7 @@ const userSignup = async () => {
     // check if passwords match
     if (password.value === rePassword.value){
       // Try to signup user
-      const response = await axios.post('v1/user/signup/create', {
+      const response = await axios.post(endpoints.users.signupCreate, {
         username: username.value,
         salted_password: password.value,
         personal_data: {

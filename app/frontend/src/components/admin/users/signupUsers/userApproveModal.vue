@@ -12,6 +12,7 @@ const props = defineProps({
 
 import axios from 'axios';
 import { ref } from 'vue';
+import { endpoints } from '@/services/endpoints';
 
 const singupUsers = ref(props.users)
 const allSchools = ref(props.schools)
@@ -43,7 +44,7 @@ const emit = defineEmits(['approveSignupUser'])
 // approve user
 const approveUser = async() => {
     try {
-        await axios.post('v1/user/signup/approve', commitedUserData.value)
+         await axios.post(endpoints.users.signupApprove(commitedUserData.value.id), commitedUserData.value)
         showAlert('User ' + commitedUserData.value.username + ' has been approved.', 'success')
         await emit('approveSignupUser')
     } catch(error){
@@ -54,14 +55,7 @@ const approveUser = async() => {
 // approve user
 const deleteUser = async() => {
     try {
-        await axios.delete('v1/user/signup/approve',
-            { 
-                params: { 
-                    id: commitedUserData.value.id 
-                }
-            }
-
-        )
+         await axios.delete(endpoints.users.signupDecline(commitedUserData.value.id))
         showAlert('User ' + commitedUserData.value.username + ' has been deleted.', 'success')
         await emit('approveSignupUser')
     } catch(error){

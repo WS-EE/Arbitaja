@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 
 // Import components
 import approveModal from './userApproveModal.vue';
@@ -16,7 +17,7 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const getSignupUsers = async() => {
     try{
         // Try getting the Users
-        const response = await axios.get('v1/user/signup/get')
+        const response = await axios.get(endpoints.users.signupList)
         singupUsers.value = response.data.signup_users
     } catch(error) {
         // Throw console log error if fail
@@ -28,7 +29,7 @@ const getSignupUsers = async() => {
 const getSchools = async() => {
     try {
         // Try getting school data
-        const response = await axios.get('v1/school/all/get')
+        const response = await axios.get(endpoints.schools.list)
         schools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. <br> Error: ' + error, 'danger', 9000)

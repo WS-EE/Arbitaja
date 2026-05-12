@@ -17,6 +17,7 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Import axios
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 
 // Import vue modules
 import { ref, onMounted, computed } from 'vue';
@@ -65,7 +66,7 @@ const getAllCompetitors = async () => {
         isLoadingCompetirors.value = true
 
         // Get competitors
-        const response = await axios.get('v1/competitor/get/all')
+        const response = await axios.get(endpoints.competitors.list)
 
         // Set competitors
         allCompetitors.value = response.data
@@ -85,14 +86,8 @@ const emit = defineEmits(['competitorAdd'])
 const addCompetitorToCompetition = async (competitionId, competitorId) => {
     try {
 
-        // Create object for the axios to post
-        const apiBody = {
-            competition: { id: competitionId },
-            competitor: { id: competitorId }
-        }
-
-        // Add exstiting competitor to competition
-        await axios.post('v1/competitor/add/to/competition', apiBody)
+         // Add exstiting competitor to competition
+        await axios.post(endpoints.competitions.addCompetitor(competitionId, competitorId))
 
         // alert success
         showAlert('Success on adding competitor to competition.', 'success')
@@ -200,12 +195,14 @@ onMounted(async() => {
                                 </button>
 
                                 <ul class="dropdown-menu">
-                                    <div class="input-group rounded">
-                                        <input type="search" class="form-control rounded me-1 ms-1" 
-                                            placeholder="Search" aria-label="Search" aria-describedby="search-addon" 
-                                            v-model="searchCompetitor"
-                                        />
-                                    </div>
+                                    <li class="px-2 py-1">
+                                        <div class="input-group rounded">
+                                            <input type="search" class="form-control rounded me-1 ms-1"
+                                                placeholder="Search" aria-label="Search" aria-describedby="search-addon"
+                                                v-model="searchCompetitor"
+                                            />
+                                        </div>
+                                    </li>
                                     <!-- Dropdown menu links -->
                                     <li v-for="competitor in filteredCompetitors" @click="setCompetitorToAdd(competitor)"
                                         class="dropdown-item">

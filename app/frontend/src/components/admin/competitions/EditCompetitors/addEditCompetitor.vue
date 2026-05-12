@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 const props = defineProps({
     modalId: {
         type: String,
@@ -86,7 +87,7 @@ const editCompetitor = async(id, displayTypeId, alias, personalDataId) => {
         }
 
         // Edit data of competitor
-        await axios.put('v1/competitor/edit', editedCompetitor)
+         await axios.put(endpoints.competitors.update(id), editedCompetitor)
 
         // Show success on edit
         showAlert('Edit competitor <strong>' + alias + '</strong> was a success.', 'success')
@@ -165,7 +166,7 @@ function showAlert(message, type, timeout){
 const getSchools = async() => {
     try {
         isLoadingSchool.value = true
-        const response = await axios.get('v1/school/all/get')
+        const response = await axios.get(endpoints.schools.list)
         allSchools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
@@ -178,7 +179,7 @@ const getSchools = async() => {
 const getAllUsers = async() => {
     try {
         isLoadingUsers.value = true
-        const response = await axios.get('v1/user/profile/all')
+        const response = await axios.get(endpoints.users.profileAll)
         allUsers.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
@@ -350,12 +351,14 @@ const filteredUsers = computed(() => {
                                         {{ userName }}
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <div class="input-group rounded">
-                                            <input type="search" class="form-control rounded me-1 ms-1" 
-                                                placeholder="Search" aria-label="Search" aria-describedby="search-addon" 
-                                                v-model="searchUsers"
-                                            />
-                                        </div>
+                                        <li class="px-2 py-1">
+                                            <div class="input-group rounded">
+                                                <input type="search" class="form-control rounded me-1 ms-1"
+                                                    placeholder="Search" aria-label="Search" aria-describedby="search-addon"
+                                                    v-model="searchUsers"
+                                                />
+                                            </div>
+                                        </li>
                                         <!-- Dropdown menu links -->
                                         <li 
                                             v-for="user in filteredUsers" 
@@ -399,12 +402,14 @@ const filteredUsers = computed(() => {
                                         {{ personalData.school.name }}
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <div class="input-group rounded">
-                                            <input type="search" class="form-control rounded me-1 ms-1" 
-                                                placeholder="Search" aria-label="Search" aria-describedby="search-addon" 
-                                                v-model="searchSchools"
-                                            />
-                                        </div>
+                                        <li class="px-2 py-1">
+                                            <div class="input-group rounded">
+                                                <input type="search" class="form-control rounded me-1 ms-1"
+                                                    placeholder="Search" aria-label="Search" aria-describedby="search-addon"
+                                                    v-model="searchSchools"
+                                                />
+                                            </div>
+                                        </li>
                                         <!-- Dropdown menu links -->
                                         <li 
                                             v-for="school in filteredSchools" 

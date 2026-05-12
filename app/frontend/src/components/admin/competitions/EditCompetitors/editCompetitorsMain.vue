@@ -5,6 +5,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
+import { endpoints } from '@/services/endpoints';
 
 // Import components
 import addCompetitor from '@/components/admin/competitions/EditCompetitors/addEditCompetitor.vue';
@@ -42,7 +43,7 @@ const getCompetition = async() => {
         isLoading.value = true;
 
         // If prop schools is not defined try to get them ourselves
-        const response = await axios.get('v1/competition/get?id=' + competition_id);
+        const response = await axios.get(endpoints.competitions.details(competition_id));
         competition.value = response.data
         
     } catch(error) {
@@ -63,7 +64,7 @@ const getCompetitors = async() => {
         const competition_id = route.params.id
 
         // Get and set competitors
-        const response = await axios.get('v1/competitor/get/all/in/competition?id=' + competition_id);
+        const response = await axios.get(endpoints.competitors.detailsInCompetition(competition_id));
         competitors.value = response.data
 
     } catch(error) {
@@ -99,27 +100,27 @@ const onTableChanged = () => {
         <div v-else class="container">
             <!-- Header of the html -->
             <h1>Competition: {{ competition.name }}</h1>
-            <p>Organizer: <b>{{ competition.organizer_id.full_name }}</b></p>
+            <p>Organizer: <b>{{ competition.organizer.full_name }}</b></p>
             
             <!-- Buttons for action of adding -->
-            <div class="row">
-                <addCompetitor
+             <div class="row">
+                 <addCompetitor
                     buttonName="Add Competitor"
                     modalId="addCompetitor"
                     :isLinked=false
-                    :apiEndpoint="'/competitor/add?isLinked=false&competition_id=' + competition_id"
-                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
+                    :apiEndpoint="endpoints.competitors.create"
+                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1"
                     @addItem="onAddCompetitor()"
-                />
-                <addCompetitor
+                 />
+                 <addCompetitor
                     buttonName="Add Linked Competitor"
                     modalId="addLinkedCompetitor"
                     :isLinked=true
                     :existingCompetitors="competitors"
-                    :apiEndpoint="'/competitor/add?isLinked=true&competition_id=' + competition_id"
-                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
+                    :apiEndpoint="endpoints.competitors.create"
+                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1"
                     @addItem="onAddCompetitor()"
-                />
+                 />
                 <addExistingCompetitor
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1" 
                     :competitionId="competition_id"
@@ -131,13 +132,13 @@ const onTableChanged = () => {
                 <PulseLoader />
             </div>
             <!-- competitors show -->
-            <div v-else>
-                <competitorTable 
-                    :competitors="competitors" 
-                    :addActions="true" 
+             <div v-else>
+                 <competitorTable
+                    :competitors="competitors"
+                    :addActions="true"
                     @tableChanged="onTableChanged()" 
-                />
-            </div>
+                 />
+             </div>
         </div>
     </div>
     <!-- Action Buttons -->

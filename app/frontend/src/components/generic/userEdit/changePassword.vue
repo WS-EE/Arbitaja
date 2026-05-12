@@ -4,6 +4,7 @@ import { ref } from 'vue';
 
 // Import axios
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 
 // Get props
 const props = defineProps({
@@ -58,7 +59,7 @@ const resetPassword = async(userId, oldPassword, setPassword, confirmSetPassword
         if (setPassword === confirmSetPassword) {
 
             // try reseting password
-            await axios.put(`/v2/user/change-password/${userId}`, apiObject)
+            await axios.put(endpoints.users.changePassword(userId), apiObject)
 
             // Show alert password changed
             showAlert('Password changed successfully!', 'success')

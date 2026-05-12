@@ -7,6 +7,7 @@ public record CompetitorResponse(
     String alias,
     @JsonProperty("public_display_name_type")
     Integer publicDisplayNameType,
+    @JsonProperty("personal_data")
     PersonalDataResponse personalData
 ) {
     public record PersonalDataResponse(

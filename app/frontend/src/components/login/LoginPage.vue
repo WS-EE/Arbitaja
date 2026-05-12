@@ -4,6 +4,7 @@ import { ref, onBeforeMount } from 'vue';
 import logo from '@/assets/media/logo.svg';
 import { useRouter } from "vue-router";
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 
 // import cookie handler
 import { useCookies } from '@/assets/js/useCookies';
@@ -27,7 +28,7 @@ const userLogin = () => {
   formData.append('password', password.value);
   formData.append('rememberMe', rememberMe.value ? 'true' : 'false');
 
-  axios.post('login-user', formData, {
+  axios.post(endpoints.auth.login, formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },

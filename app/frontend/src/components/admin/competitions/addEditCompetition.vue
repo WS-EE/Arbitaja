@@ -6,6 +6,7 @@ import { useRoute, RouterLink } from 'vue-router';
 import { DateTime } from "luxon";
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
+import { endpoints } from '@/services/endpoints';
 
 // Import displayalert
 // Alert function
@@ -51,15 +52,8 @@ const competition_id = route.params.id
 const getCriteriasByCompetition = async(competitionId) => {
     try {
 
-        // Get criterias based on competition id
-        const response = await axios.get(
-            'v1/scoring/criteria/by/competition',
-            { 
-                params: { 
-                    competition_id: competitionId 
-                } 
-            }
-        )
+         // Get criterias based on competition id
+        const response = await axios.get(endpoints.scoring.criteria.byCompetition(competitionId))
 
         // Set criterias based on the response
         criterias.value = response.data
@@ -80,7 +74,7 @@ const getCompetitionById = async(id) => {
         if (props.isEdit === true){
 
             // If prop schools is not defined try to get them ourselves
-            const response = await axios.get('v1/competition/get?id=' + id);
+            const response = await axios.get(endpoints.competitions.details(id));
             competition.value = response.data
 
             // Format dates
@@ -106,14 +100,14 @@ const getCompetitionById = async(id) => {
                 start_time: null,
                 end_time: null,
                 score_showtime: null,
-                organizer_id: { full_name: 'Not set' }
+                organizer_id: null
             })
         }
 
         // Get all users
         // Try getting the Users
-        const allUsers = await axios.get('v1/user/profile/all')
-        
+        const allUsers = await axios.get(endpoints.users.profileAll)
+
         // Get all the admin users
         allUsers.data.forEach((user) => {
             user.roles.forEach((role) => {
@@ -140,10 +134,7 @@ const getCompetitorsByCompetition = async(competitionId) => {
         isLoadingcompetitors.value = true
 
         // Get and set competitors
-        const response = await axios.get(
-            'v1/competitor/get/all/in/competition',
-            { params: { id: competitionId } } 
-        );
+        const response = await axios.get(endpoints.competitors.detailsInCompetition(competitionId));
         competitors.value = response.data
 
     } catch(error) {
@@ -189,11 +180,11 @@ const saveComp = async() => {
             .toUTC()
             .toISO()
 
-        // Try to edit or add competition
-        if (props.isEdit === true){
-            await axios.put('v1/competition/edit', competition.value)
+         // Try to edit or add competition
+         if (props.isEdit === true){
+            await axios.put(endpoints.competitions.update(competition.value.id), competition.value)
         } else {
-            await axios.post('v1/competition/add', competition.value)
+            await axios.post(endpoints.competitions.create, competition.value)
         }
 
         // Show success when everything is done
@@ -299,7 +290,7 @@ const saveComp = async() => {
                 
                 <div class="btn-group">
                     <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ competition.organizer_id.full_name }}
+                        {{ competition.organizer.full_name }}
                     </button>
                     <ul class="dropdown-menu">
                         <li 

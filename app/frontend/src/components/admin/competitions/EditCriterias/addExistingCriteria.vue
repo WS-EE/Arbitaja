@@ -17,6 +17,7 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Import axios
 import axios from 'axios';
+import { endpoints } from '@/services/endpoints';
 
 // Import vue modules
 import { ref, onMounted, computed } from 'vue';
@@ -59,7 +60,7 @@ const getAllCriterias = async () => {
         isLoadingCompetirors.value = true
 
         // Get Criterias
-        const response = await axios.get('v1/scoring/criteria/get/all')
+        const response = await axios.get(endpoints.scoring.criteria.list)
 
         // Set Criterias
         allCriterias.value = response.data
@@ -79,14 +80,8 @@ const emit = defineEmits(['CriteriaAdd'])
 const addCriteriaToCompetition = async (competitionId, CriteriaId) => {
     try {
 
-        // Create object for the axios to post
-        const apiParams = {
-            competition_id: competitionId,
-            scoring_id: CriteriaId
-        }
-
-        // Add exstiting Criteria to competition
-        const response = await axios.post('v1/scoring/criteria/add/to/competition', null, { params: apiParams })
+         // Add exstiting Criteria to competition
+        await axios.post(endpoints.scoring.criteria.addToCompetition(CriteriaId, competitionId))
 
         // alert success
         showAlert('Success on adding Criteria to competition.', 'success')
@@ -190,12 +185,14 @@ onMounted(async() => {
                                 </button>
 
                                 <ul class="dropdown-menu">
-                                    <div class="input-group rounded">
-                                        <input type="search" class="form-control rounded me-1 ms-1" 
-                                            placeholder="Search" aria-label="Search" aria-describedby="search-addon" 
-                                            v-model="searchCriteria"
-                                        />
-                                    </div>
+                                    <li class="px-2 py-1">
+                                        <div class="input-group rounded">
+                                            <input type="search" class="form-control rounded me-1 ms-1"
+                                                placeholder="Search" aria-label="Search" aria-describedby="search-addon"
+                                                v-model="searchCriteria"
+                                            />
+                                        </div>
+                                    </li>
                                     <!-- Dropdown menu links -->
                                     <li v-for="Criteria in filteredCriterias" @click="setCriteriaToAdd(Criteria)"
                                         class="dropdown-item">
