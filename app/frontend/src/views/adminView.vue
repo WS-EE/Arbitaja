@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router';
 
 import { onMounted, ref } from 'vue';
 import router from '@/router';
-import {useUserStore} from "@/stores/userStore.js";
+import {useUserStore} from "@/stores/userStore";
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 
 // Set isUser admin variable

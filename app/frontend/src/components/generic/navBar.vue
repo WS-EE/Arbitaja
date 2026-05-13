@@ -2,10 +2,9 @@
 import { computed, getCurrentInstance } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import logo from '@/assets/media/logo.svg';
-import axios from 'axios';
 import router from '@/router';
 import { useUserStore } from '@/stores/userStore';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 
 const userStore = useUserStore();
 
@@ -22,7 +21,7 @@ const isUserAdmin = computed(() => userStore.hasPrivilege('ADMIN'))
 // User logout function
 const userLogout = async () => {
     try {
-        await axios.post(endpoints.auth.logout);
+        await apiClient.auth.logout();
     } catch(error) {
         // We are expecting 401 response when logging out.
         await router.replace('/home');

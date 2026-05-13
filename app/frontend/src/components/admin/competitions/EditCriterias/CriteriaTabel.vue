@@ -2,10 +2,10 @@
 // Set props
 const props = defineProps({ 
     criterias: {
-        type: Object,
+        type: Array,
         required: true
     },
-    competitionId: {
+    competition_id: {
         type: String,
         required: true
     },
@@ -36,17 +36,19 @@ const onRemoveCriteria = () => {
     <!-- Table -->
     <table class="table table-striped mt-3">
         <thead>
-            <th scope="col">ID</th>
-            <th scope="col">Name</th>
-            <th scope="col">Max Points</th>
-            <th scope="col" class="d-none d-lg-table-cell">Description</th>
-            <th scope="col" v-if="addActions">Actions</th>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Max Points</th>
+                <th scope="col" class="d-none d-lg-table-cell">Description</th>
+                <th scope="col" v-if="addActions">Actions</th>
+            </tr>
         </thead>
         <tbody>
-            <tr v-for="criteria in criterias">
+            <tr v-for="criteria in criterias" :key="criteria.id">
                 <th scope="row">{{ criteria.id }}</th>
                 <td>{{ criteria.name }}</td>
-                <td>{{ criteria.totalPoints }}</td>
+                <td>{{ criteria.total_points }}</td>
                 <td class="d-none d-lg-table-cell">{{ criteria.description }}</td>
                 <td v-if="addActions">
                     <addEditCriteria
@@ -56,8 +58,8 @@ const onRemoveCriteria = () => {
                         :modalHeader="'Edit criteria ' + criteria.name"
                         :useButtonNameAsModalHeader="false"
                         :isAdd="false"
-                        :competitionId="competitionId"
-                        addButtonDivClass="btn btn-dark me-1 bi bi-pencil" 
+                        :competition_id="competition_id"
+                        addButtonDivClass="btn btn-dark me-1 bi bi-pencil"
                         @addEditCriteria="onEditCriteria()"
                     />
                     <removeCriteria

@@ -3,8 +3,7 @@ import { ref, onBeforeMount } from 'vue';
 
 import logo from '@/assets/media/logo.svg';
 import { useRouter } from "vue-router";
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api';
 
 // import cookie handler
 import { useCookies } from '@/assets/js/useCookies';
@@ -23,16 +22,10 @@ const { loadAuth } = useAuthRehydrate()
 const userLogin = () => {
   getLogonError.value = false
 
-  const formData = new URLSearchParams();
-  formData.append('username', username.value);
-  formData.append('password', password.value);
-  formData.append('rememberMe', rememberMe.value ? 'true' : 'false');
-
-  axios.post(endpoints.auth.login, formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      withCredentials: true
+  apiClient.auth.login({
+      username: username.value,
+      password: password.value,
+      rememberMe: rememberMe.value,
     })
     .then(async function (response) {
       if(response.status === 200){

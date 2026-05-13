@@ -1,89 +1,55 @@
 <script setup>
-// Define props
+import { computed, onMounted, ref, toRef } from 'vue'
+import VChart from 'vue-echarts'
+import { use } from 'echarts/core'
+import { LineChart } from 'echarts/charts'
+import {
+    GridComponent,
+    LegendComponent,
+    TitleComponent,
+    TooltipComponent,
+} from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import displayAlert from '@/components/generic/displayAlert.vue'
+import { apiClient } from '@/services/api'
+import { useAutoRefresh } from '@/composables/useAutoRefresh'
+
+// Register only what's needed (tree-shakeable)
+use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent, TitleComponent])
+
+// --- Props ---
 const props = defineProps({
-    competitionId: {
+    competition_id: {
         type: Number,
-        required: true
+        required: true,
     },
     refreshInterval: {
         type: Number,
-        default: 30000
+        default: 30000,
     },
     autoRefresh: {
         type: Boolean,
-        default: false
-    }
+        default: false,
+    },
 })
 
-// Auto refresh BLOCK START
-// Auto-refresh handling
-let intervalHandle = null
-
-watch(() => props.autoRefresh, (newVal) => {
-    if (newVal) {
-        startAutoRefresh()
-    } else {
-        stopAutoRefresh()
-    }
-})
-
-watch(() => props.refreshInterval, () => {
-    if (props.autoRefresh) {
-        startAutoRefresh();
-    }
-})
-
-function startAutoRefresh() {
-    stopAutoRefresh() // Clear any existing one
-
-    intervalHandle = setInterval(() => {
-        getResultsByCompetitionId(props.competitionId)
-    }, props.refreshInterval)
-}
-
-function stopAutoRefresh() {
-    if (intervalHandle !== null) {
-        clearInterval(intervalHandle)
-        intervalHandle = null
-    }
-}
-
-onUnmounted(() => {
-    stopAutoRefresh() // Clean up interval on component destroy
-})
-//
-// Auto refresh BLOCK END
-//
-
-// Alert function
+// --- Alert ---
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
 
-import displayAlert from '@/components/generic/displayAlert.vue';
-
-function showAlert(message, type, timeout){
+function showAlert(message, type, timeout = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
 }
 
-
-// Import required modules
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import axios from 'axios'
-import { Line } from 'vue-chartjs'
-import { Chart as ChartJS, registerables } from 'chart.js'
-import 'chartjs-adapter-date-fns'
-import { endpoints } from '@/services/endpoints'
-
-// Import pulse loader
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-
-// Set empty variable
+// --- Data ---
 const isLoadingResults = ref(true)
 const results = ref([])
-const chartPalette = [
+
+const CHART_PALETTE = [
     '#0d6efd',
     '#198754',
     '#fd7e14',
@@ -93,99 +59,111 @@ const chartPalette = [
     '#0dcaf0',
 ]
 
-const chartData = computed(() => ({
-    datasets: results.value.map((competitor, index) => ({
-        label: competitor.name,
-        data: [...(competitor.results ?? [])]
-            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
-            .map((result) => ({
-                x: new Date(result.timestamp),
-                y: result.point_amount,
-            })),
-        borderColor: chartPalette[index % chartPalette.length],
-        backgroundColor: 'transparent',
-        pointRadius: 2,
-        tension: 0.15,
-        parsing: false,
-    })),
-}))
-
-const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: false,
-    interaction: {
-        mode: 'index',
-        intersect: false,
-    },
-    plugins: {
-        legend: {
-            position: 'bottom',
-        },
-    },
-    scales: {
-        x: {
-            type: 'time',
-            time: {
-                unit: 'minute',
-            },
-            title: {
-                display: true,
-                text: 'Timestamp',
-            },
-        },
-        y: {
-            beginAtZero: true,
-            title: {
-                display: true,
-                text: 'Points',
-            },
-        },
-    },
-}
-
-ChartJS.register(...registerables)
-
-// Get results
-const getResultsByCompetitionId = async (id) => {
-    try {
-        // Set Loading value to true
-        isLoadingResults.value = true
-
-        // Get the results
-        const response = await axios.get(
-            endpoints.scoring.history.dashboard(id)
+// --- ECharts option (reactive) ---
+const chartOption = computed(() => {
+    const maxTimestamp = Math.max(
+        ...results.value.flatMap(c =>
+            (c.results ?? []).map(r => new Date(r.timestamp).getTime())
         )
+    )
+      return {
+        animation: false,
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '12%',
+          containLabel: true,
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {type: 'cross'},
+          formatter(params) {
+            const time = new Date(params[0].value[0]).toLocaleTimeString()
+            const lines = params.map(
+                (p) => `<span style="color:${p.color}">●</span> ${p.seriesName}: <b>${p.value[1]}</b>`
+            )
+            return `${time}<br/>${lines.join('<br/>')}`
+          },
+        },
+        legend: {
+          bottom: 0,
+          type: 'scroll',
+        },
+        xAxis: {
+          type: 'time',
+          name: 'Timestamp',
+          nameLocation: 'middle',
+          nameGap: 30,
+        },
+        yAxis: {
+          type: 'value',
+          name: 'Points',
+          nameLocation: 'middle',
+          nameGap: 40,
+          minInterval: 1,
+        },
+        series: results.value.map((competitor, index) => {
+          const sorted = [...(competitor.results ?? [])]
+              .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
 
-        // Set results
-        results.value = response.data.competitors
+          const data = sorted.map(r => [r.timestamp, r.point_amount])
 
+          // Extend to the global max timestamp with the last known value
+          const last = sorted.at(-1)
+          if (last && new Date(last.timestamp).getTime() < maxTimestamp) {
+            data.push([maxTimestamp, last.point_amount])
+          }
+          return {
+            name: competitor.name,
+            type: 'line',
+            step: 'end',
+            symbol: 'circle',
+            symbolSize: 4,
+            color: CHART_PALETTE[index % CHART_PALETTE.length],
+            data,
+          }
+        })
+      }
+})
+
+// --- Fetch ---
+async function fetchResults() {
+    try {
+        isLoadingResults.value = true
+        const response = await apiClient.scoring.dashboard.history(props.competition_id)
+        results.value = response.competitors
     } catch (error) {
-        showAlert('Couldn\'t get competitors for the chart. Error:' + error, 'warning')
+        showAlert(`Couldn't load chart data. Error: ${error}`, 'warning')
     } finally {
         isLoadingResults.value = false
     }
 }
 
-// Get results and create chart on mount
+// --- Auto-refresh ---
+useAutoRefresh(fetchResults, toRef(props, 'refreshInterval'), toRef(props, 'autoRefresh'))
+
+// --- Lifecycle ---
 onMounted(async () => {
-    await getResultsByCompetitionId(props.competitionId)
-    if (props.autoRefresh) {
-        startAutoRefresh()
-    }
+    await fetchResults()
 })
 </script>
 
 <template>
-    <!-- Display alert -->
     <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
 
-    <!-- Pulseloader when changed -->
-    <div v-if="isLoadingResults" class="position-absolute top-50 start-50">
-        <PulseLoader />
-    </div>
-    <!-- Show chart -->
-    <div v-show="!isLoadingResults" class="position-relative" style="min-height: 420px;">
-        <Line :data="chartData" :options="chartOptions" />
+    <div class="position-relative" style="min-height: 420px;">
+        <!-- Loading spinner -->
+        <div v-if="isLoadingResults" class="position-absolute top-50 start-50">
+            <PulseLoader />
+        </div>
+
+        <!-- Chart -->
+        <VChart
+            v-show="!isLoadingResults"
+            class="w-100 h-100"
+            style="min-height: 420px;"
+            :option="chartOption"
+            autoresize
+        />
     </div>
 </template>

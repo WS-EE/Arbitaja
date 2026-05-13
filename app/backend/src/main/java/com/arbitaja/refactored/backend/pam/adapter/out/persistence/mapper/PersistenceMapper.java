@@ -256,4 +256,12 @@ public class PersistenceMapper {
             .createdAt(domain.getCreatedAt())
             .build();
     }
+
+    public UserRoleJpaEntity toEntity(@NonNull UserRole domain){
+        return UserRoleJpaEntity.builder()
+                .id(domain.getId())
+                .user(toEntity(domain.getUser()))
+                .role(toEntity(domain.getRole()))
+                .build();
+    }
 }

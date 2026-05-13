@@ -15,9 +15,8 @@ function showAlert(message, type, timeout) {
 // Import pulseloader
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
-// Import axios
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+// Import apiClient
+import { apiClient } from '@/services/api'
 
 // Import vue modules
 import { ref, onMounted, computed } from 'vue';
@@ -28,13 +27,13 @@ const props = defineProps({
         type: String,
         default: 'btn btn-success'
     },
-    competitionId: {
+    competition_id: {
         type: String,
         required: true
     },
     existingCompetitors: {
-        type: Object,
-        default: []
+        type: Array,
+        default: () => []
     }
 })
 
@@ -66,10 +65,7 @@ const getAllCompetitors = async () => {
         isLoadingCompetirors.value = true
 
         // Get competitors
-        const response = await axios.get(endpoints.competitors.list)
-
-        // Set competitors
-        allCompetitors.value = response.data
+        allCompetitors.value = await apiClient.competitors.list()
 
     } catch (error) {
         showAlert('Couldn\'t get all the competitors for adding existing competitors. Error: ' + error, 'danger')
@@ -87,7 +83,7 @@ const addCompetitorToCompetition = async (competitionId, competitorId) => {
     try {
 
          // Add exstiting competitor to competition
-        await axios.post(endpoints.competitions.addCompetitor(competitionId, competitorId))
+        await apiClient.competitions.addCompetitor(competitionId, competitorId)
 
         // alert success
         showAlert('Success on adding competitor to competition.', 'success')
@@ -110,10 +106,15 @@ const setCompetitorToAdd = (competitor) => {
 
 // Filter out competitor that already exist
 const unLinkedCompetitors = computed(() => {
-    const existingUserIds = new Set(props.existingCompetitors.map(user => user.id))
-    return allCompetitors.value.filter(
-        user => !existingUserIds.has(user.id)
+    const existingCompetitorIds = new Set(
+        props.existingCompetitors
+            .map(competitor => competitor?.id)
+            .filter(id => id != null)
     )
+    return allCompetitors.value.filter(competitor => {
+        const competitorId = competitor?.id
+        return competitorId != null && !existingCompetitorIds.has(competitorId)
+    })
 })
 
 // filter users based on name
@@ -121,7 +122,7 @@ const searchCompetitor = ref('');
 const filteredCompetitors = computed(() => {
   const query = searchCompetitor.value.toLowerCase()
   return unLinkedCompetitors.value.filter(user =>
-    user.personal_data.full_name.toLowerCase().includes(query)
+    (user?.personal_data?.full_name ?? '').toLowerCase().includes(query)
   )
 })
 
@@ -204,7 +205,7 @@ onMounted(async() => {
                                         </div>
                                     </li>
                                     <!-- Dropdown menu links -->
-                                    <li v-for="competitor in filteredCompetitors" @click="setCompetitorToAdd(competitor)"
+                                    <li v-for="competitor in filteredCompetitors" :key="competitor.id" @click="setCompetitorToAdd(competitor)"
                                         class="dropdown-item">
                                         ID: {{ competitor.id }}|Full Name: {{ competitor.personal_data.full_name }}
                                     </li>
@@ -214,7 +215,7 @@ onMounted(async() => {
                     </div>
                     <div class="modal-footer">
                         <button
-                            @click.prevent="addCompetitorToCompetition(props.competitionId, competitorToAdd.id)"
+                            @click.prevent="addCompetitorToCompetition(props.competition_id, competitorToAdd.id)"
                             type="button" class="btn btn-success" data-bs-dismiss="modal"
                         >
                             Add

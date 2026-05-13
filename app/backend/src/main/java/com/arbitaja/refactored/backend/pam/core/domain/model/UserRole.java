@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = {"user", "role"})
 @ToString(exclude = {"user"})
 public class UserRole {
 

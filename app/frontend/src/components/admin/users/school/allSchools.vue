@@ -13,10 +13,7 @@ const props = defineProps({
     },
 })
 import { onMounted, ref, watch } from 'vue';
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
-
-
+import { apiClient } from '@/services/api'
 
 // schools to loop over
 const schools = ref();
@@ -43,9 +40,8 @@ function changeLimit(schools, limit){
 onMounted(async () => {
     try {
         // If prop schools is not defined try to get them ourselves
-        if (props.schools === undefined){  
-            const response = await axios.get(endpoints.schools.list)
-            schools.value = response.data
+        if (props.schools === undefined){
+            schools.value = await apiClient.schools.list()
 
         // else get the variables from props
         } else {
@@ -88,7 +84,7 @@ function unsetSchoolToDelete(){
 const deleteSchool = async() => {
     try{
          // Delete school based on ID
-        await axios.delete(endpoints.schools.remove(setSchoolId.value));
+        await apiClient.schools.remove(setSchoolId.value);
         showAlert('School ' + setSchoolName + ' has been deleted', 'warning')
         
         // Unset to delete after deleting the school

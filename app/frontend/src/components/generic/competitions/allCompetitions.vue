@@ -1,12 +1,11 @@
 <script setup>
 
 import { onMounted, ref, computed } from 'vue';
-import axios from 'axios';
 import { RouterLink, useRoute } from 'vue-router';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import { now } from '@vueuse/core';
 import { DateTime } from 'luxon';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 
 // check the active link
 const isAdmin = () => {
@@ -43,11 +42,10 @@ const getAllCompetition = async() => {
     // Try getting all competitions
     try{
         // Try getting all competitions
-        const response = await axios.get(endpoints.competitions.list)
-        competitions.value = response.data
-        
+        competitions.value = await apiClient.competitions.list()
+
         // sort competitions based on type
-        sortCompetitionsByTime(competitions.value)
+        await sortCompetitionsByTime(competitions.value)
     } catch(error) {
         // Throw console log error if fail
         showAlert('Couldn\'t get data for competitions. <br> Error: ' + error, 'danger', 9000)
@@ -69,7 +67,7 @@ const deleteCompetition = async() => {
     // Delete the comp based on the variables we set earlier
     try{
          // Delete competition based on ID
-        await axios.delete(endpoints.competitions.remove(setCompetitionId.value));
+        await apiClient.competitions.remove(setCompetitionId.value);
         showAlert('competition ' + setCompetitionName.value + ' has been deleted', 'warning')
         
         // Unset to delete after deleting the competition

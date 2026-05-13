@@ -1,5 +1,5 @@
 <script setup>
-import { useUserStore} from "@/stores/userStore.js";
+import { useUserStore} from "@/stores/userStore";
 
 const store = useUserStore()
 
@@ -18,8 +18,8 @@ import { onMounted, ref, computed } from 'vue';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Get school list
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
+
 const allSchools = ref('');
 
 // Set user parameters to empty
@@ -34,8 +34,7 @@ const isLoading = ref(true)
 
 const getSchools = async() => {
     try {
-        const response = await axios.get(endpoints.schools.list)
-        allSchools.value = response.data
+        allSchools.value = await apiClient.schools.list()
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     }
@@ -80,7 +79,7 @@ const filteredSchools = computed(() => {
 const saveProfile = (async () =>{
     try {
         // Update data with PUT request
-        const response = await axios.put(endpoints.users.details(userid.value), {
+        const response = await apiClient.users.update(userid.value, {
           username: username.value,
           full_name: fullName.value,
           email: email.value,
@@ -88,10 +87,10 @@ const saveProfile = (async () =>{
         })
 
         // On positive response load new data.
-        if (response.status === 200){
+        if (response){
 
             // Set new parameters from reponse.data
-            const newUserParameters = response.data
+            const newUserParameters = response
 
             // Map out parameters
             fullName.value = newUserParameters.personal_data.full_name

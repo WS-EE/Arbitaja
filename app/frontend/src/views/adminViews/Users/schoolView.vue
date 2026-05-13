@@ -2,9 +2,8 @@
 import AddSchool from '@/components/admin/users/school/addSchool.vue';
 import allSchools from '@/components/admin/users/school/allSchools.vue';
 
-import axios from 'axios';
 import { onMounted,ref } from 'vue';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const isLoadingSchools = ref(true)
@@ -20,8 +19,7 @@ const onAddSchool = async() => {
 const getSchools = async() => {
     try {
         // Try getting school data
-        const response = await axios.get(endpoints.schools.list)
-        schools.value = response.data
+        schools.value = await apiClient.schools.list()
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. <br> Error: ' + error, 'danger', 9000)
     }

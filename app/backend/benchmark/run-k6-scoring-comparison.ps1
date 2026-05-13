@@ -40,7 +40,7 @@ try {
         -WebSession $ws -MaximumRedirection 0 | Out-Null
 } catch {}
 $cookie = $ws.Cookies.GetCookies($HexUrl) | Where-Object Name -eq "JSESSIONID"
-if (-not $cookie) { throw "Login failed — JSESSIONID not returned. Check credentials." }
+if (-not $cookie) { throw "Login failed - JSESSIONID not returned. Check credentials." }
 $script:Session = $ws
 Write-Host "  Logged in (JSESSIONID=$($cookie.Value.Substring(0,8))...)"
 

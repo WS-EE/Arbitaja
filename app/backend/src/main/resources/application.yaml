@@ -33,7 +33,7 @@ spring:
 
 springdoc:
   api-docs:
-    path: /api-docs
+    path: ${API_DOCS_ENDPOINT:/api-docs}
   swagger-ui:
     path: /swagger
     disable-swagger-default-url: true

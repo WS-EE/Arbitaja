@@ -1,27 +1,36 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
+import { API_BASE_URL } from '@/services/http'
+
 import loginView from '@/views/loginView.vue';
 import notFoundView from '@/views/notFoundView.vue';
+
 import homeView from '@/views/userViews/homeView.vue';
 import userView from '@/views/userView.vue';
 import userProfileView from '@/views/userViews/userProfileView.vue';
+
 import adminView from '@/views/adminView.vue';
+
 import LoginPage from '@/components/login/LoginPage.vue';
 import SignupPage from '@/components/login/SignupPage.vue';
+
 import singupApproveView from '@/views/adminViews/Users/singupApproveView.vue';
 import schoolView from '@/views/adminViews/Users/schoolView.vue';
 import AdminUsersView from '@/views/adminViews/Users/adminUsersView.vue';
 import editUserProfile from '@/views/adminViews/Users/editUserProfile.vue';
+
 import allCompetitions from '@/views/competitionViews/allCompetitions.vue';
 import competitionShow from '@/views/competitionViews/competitionShow.vue';
+
 import addCompetitionView from '@/views/adminViews/competitions/addCompetitionView.vue';
 import editCompetitionView from '@/views/adminViews/competitions/editCompetitionView.vue';
 import editCompetitionCompetitorView from '@/views/adminViews/competitions/editCompetitionCompetitorView.vue';
 import editCompetitionCriteriasView from '@/views/adminViews/competitions/editCompetitionCriteriasView.vue';
+import adminRolesView from '@/views/adminViews/roles/adminRolesView.vue';
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHistory(API_BASE_URL),
     routes: [
         {
             path: '/login',
@@ -130,6 +139,7 @@ const router = createRouter({
                         {
                             path: 'role',
                             name: 'adminUsersRole',
+                            component: adminRolesView
                         },
                         {
                             path: 'singup',
@@ -149,24 +159,38 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  const requiresAuth = Boolean(to.meta.requiresAuth || to.meta.requiresPrivilege);
-  const store = useUserStore();
+    const store = useUserStore()
 
-  if (requiresAuth) {
-    await ensureAuthRehydrated({ force: !store.id })
-  }
+    const requiresAuth =
+        Boolean(to.meta.requiresAuth) ||
+        Boolean(to.meta.requiresPrivilege)
 
-  // 1. Session check resolved by /v2/user/auth via auth rehydration
-  if (requiresAuth && !store.id) {
-    return { path: '/' }
-  }
-
-  // 2. Privilege check (equivalent to useRequirePrivilege)
-  if (to.meta.requiresPrivilege) {
-    if (!store.hasPrivilege(to.meta.requiresPrivilege)) {
-      return { path: '/', query: { forbidden: '' } }
+    if (requiresAuth) {
+        await ensureAuthRehydrated({
+            force: !store.id,
+        })
     }
-  }
+
+    if (requiresAuth && !store.id) {
+        return {
+            path: '/login',
+            query: {
+                redirect: to.fullPath,
+            },
+        }
+    }
+
+    if (
+        to.meta.requiresPrivilege &&
+        !store.hasPrivilege(to.meta.requiresPrivilege)
+    ) {
+        return {
+            path: '/',
+            query: { forbidden: '1' },
+        }
+    }
+
+    return true
 })
 
 export default router

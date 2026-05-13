@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api';
+
 const props = defineProps({
     modalId: {
         type: String,
@@ -26,16 +26,16 @@ const props = defineProps({
         type: Boolean,
         required: true
     },
-    competitionId: {
+    competition_id: {
         type: String,
-        required: true
+        default: ''
     },
     criteria: {
         type: Object,
         default: {
             name: '',
             description: '',
-            totalPoints: '',
+            total_points: '',
         }
     }
 })
@@ -48,10 +48,10 @@ const isLoading = ref(true)
 const emit = defineEmits(['addEditCriteria'])
 
 // Create either linked competitor or a "dummy" competitor
-const addEditCriteria = async(addEditCriteria, competitionId) => {
+const addEditCriteria = async(addEditCriteria, competition_id) => {
     try {
-        // Set CompetitionId for the object
-        modalCriteria.value.competitionId = competitionId
+        // Set competition_id for the object
+        modalCriteria.value.competition_id = competition_id
         
         // Make the api call
         if (props.isAdd) {
@@ -59,12 +59,12 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
             const newCriteria = {
                 name: addEditCriteria.name,
                 description: addEditCriteria.description,
-                totalPoints: addEditCriteria.totalPoints,
-                competitionId: competitionId
+                total_points: addEditCriteria.total_points,
+                competition_id: competition_id
             }
         
             // add the new criteria
-            await axios.post(endpoints.scoring.criteria.create, newCriteria)
+            await apiClient.scoring.criteria.create(newCriteria)
 
             // show alert of success
             await showAlert(props.buttonName + ' <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
@@ -72,7 +72,7 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
             // Add empty value to fields
             modalCriteria.value.id = ''
             modalCriteria.value.name = ''
-            modalCriteria.value.totalPoints = ''
+            modalCriteria.value.total_points = ''
             modalCriteria.value.description = ''
 
         } else {
@@ -80,10 +80,10 @@ const addEditCriteria = async(addEditCriteria, competitionId) => {
                 id: addEditCriteria.id,
                 name: addEditCriteria.name,
                 description: addEditCriteria.description,
-                totalPoints: addEditCriteria.totalPoints
+                total_points: addEditCriteria.total_points
             }
              // Register the item with personal data
-             await axios.put(endpoints.scoring.criteria.update(updateCriteria.id), updateCriteria)
+             await apiClient.scoring.criteria.update(updateCriteria.id, updateCriteria)
 
             // Edit alert success
             await showAlert('Editing criteria <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
@@ -193,7 +193,7 @@ function showAlert(message, type, timeout){
                                 type="number"
                                 placeholder="1.5"
                                 id="criteriaName"
-                                class="rounded p-1 form-control" v-model="modalCriteria.totalPoints">
+                                class="rounded p-1 form-control" v-model="modalCriteria.total_points">
                         </div>
                     </div>
                     <div class="row mt-2 mb-2">
@@ -201,17 +201,17 @@ function showAlert(message, type, timeout){
                             <label for="fullName" class="form-label">Description</label>
                         </div>
                         <div class="col">
-                            <input 
-                                type="textarea"
+                            <textarea
                                 placeholder="This is an awesome criteria"
                                 id="criteriaName"
-                                class="rounded p-1 form-control" v-model="modalCriteria.description">
+                                class="rounded p-1 form-control"
+                                v-model="modalCriteria.description"></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button v-if="isAdd" @click.prevent="addEditCriteria(modalCriteria, props.competitionId)" type="button" class="btn btn-success" data-bs-dismiss="modal">Add</button>
-                    <button v-else @click.prevent="addEditCriteria(modalCriteria, props.competitionId)" type="button" class="btn btn-success" data-bs-dismiss="modal">Edit</button>
+                    <button v-if="isAdd" @click.prevent="addEditCriteria(modalCriteria, props.competition_id)" type="button" class="btn btn-success" data-bs-dismiss="modal">Add</button>
+                    <button v-else @click.prevent="addEditCriteria(modalCriteria, props.competition_id)" type="button" class="btn btn-success" data-bs-dismiss="modal">Edit</button>
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>

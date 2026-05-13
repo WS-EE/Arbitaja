@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 const props = defineProps({
     modalId: {
         type: String,
@@ -11,8 +10,8 @@ const props = defineProps({
         type: String,
         default: 'btn btn-success',
     },
-    competitionId: {
-        type: Number,
+    competition_id: {
+        type: String,
         required: true
     },
     competitorId: {
@@ -47,7 +46,7 @@ const emit = defineEmits(['removeCompetitor'])
 const removeCompetitor = async(competitorId, competitorName) => {
     try {
          // Delete competitor from competition
-        await axios.delete(endpoints.competitions.removeCompetitor(props.competitionId, competitorId))
+        await apiClient.competitions.removeCompetitor(props.competition_id, competitorId)
 
         // emit event
         emit('removeCompetitor')

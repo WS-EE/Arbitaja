@@ -16,8 +16,7 @@ function showAlert(message, type, timeout) {
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Import axios
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 
 // Import vue modules
 import { ref, onMounted, computed } from 'vue';
@@ -28,13 +27,13 @@ const props = defineProps({
         type: String,
         default: 'btn btn-success'
     },
-    competitionId: {
+    competition_id: {
         type: String,
-        required: true
+        default: ''
     },
     existingCriterias: {
-        type: Object,
-        default: []
+        type: Array,
+        default: () => []
     }
 })
 
@@ -47,7 +46,7 @@ const CriteriaToAdd = ref({})
 function setCriteriaToAddEmpty() {
     CriteriaToAdd.value = { 
         id: '',
-        totalPoints: '',
+        total_points: '',
         name: 'Not Set'
     }
 }
@@ -60,10 +59,7 @@ const getAllCriterias = async () => {
         isLoadingCompetirors.value = true
 
         // Get Criterias
-        const response = await axios.get(endpoints.scoring.criteria.list)
-
-        // Set Criterias
-        allCriterias.value = response.data
+        allCriterias.value = await apiClient.scoring.criteria.list()
 
     } catch (error) {
         showAlert('Couldn\'t get all the Criterias for adding existing Criterias. Error: ' + error, 'danger')
@@ -81,7 +77,7 @@ const addCriteriaToCompetition = async (competitionId, CriteriaId) => {
     try {
 
          // Add exstiting Criteria to competition
-        await axios.post(endpoints.scoring.criteria.addToCompetition(CriteriaId, competitionId))
+        await apiClient.scoring.criteria.linkToCompetition(CriteriaId, competitionId)
 
         // alert success
         showAlert('Success on adding Criteria to competition.', 'success')
@@ -169,7 +165,7 @@ onMounted(async() => {
                             Total Points:
                         </div>
                         <div class="col">
-                            <strong>{{ CriteriaToAdd.totalPoints }}</strong>
+                            <strong>{{ CriteriaToAdd.total_points }}</strong>
                         </div>
                     </div>
                     <div class="row mt-2 mb-2">
@@ -204,7 +200,7 @@ onMounted(async() => {
                     </div>
                     <div class="modal-footer">
                         <button
-                            @click.prevent="addCriteriaToCompetition(props.competitionId, CriteriaToAdd.id)"
+                            @click.prevent="addCriteriaToCompetition(props.competition_id, CriteriaToAdd.id)"
                             type="button" class="btn btn-success" data-bs-dismiss="modal"
                         >
                             Add

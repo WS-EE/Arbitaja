@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import {apiClient} from '@/services/api';
+import displayAlert from '@/components/generic/displayAlert.vue';
+
 const props = defineProps({
     modalId: {
         type: String,
@@ -28,12 +29,12 @@ const props = defineProps({
         default: false
     },
     existingCompetitors: {
-        type: Object,
-        default: []
+        type: Array,
+        default: () => []
     },
     competitor: {
         type: Object,
-        default: []
+        default: () => ({})
     },
     modalHeader: {
         type: String,
@@ -72,22 +73,40 @@ const changeType = (id) => {
     publicDisplayType.value = id
 }
 
+const buildCompetitorPayload = (personalData, linkedPersonalDataId = null, includeId = false, id = null) => {
+    const payload = {
+        alias: publicAlias.value,
+        public_display_name_type: publicDisplayType.value ? Number(publicDisplayType.value) : null,
+        personal_data_id: linkedPersonalDataId ? Number(linkedPersonalDataId) : null,
+        full_name: personalData?.full_name || null,
+        email: personalData?.email || null,
+        school_id: personalData?.school?.id ? Number(personalData.school.id) : null,
+    }
+
+    if (!includeId) {
+        return payload
+    }
+
+    return {
+        id,
+        ...payload,
+    }
+}
+
 // Edit a competitor
 const editCompetitor = async(id, displayTypeId, alias, personalDataId) => {
     try {
         
         // Create edit competitor data object
         const editedCompetitor = {
-            id: id, 
-            public_display_name_type: displayTypeId, 
-            alias: alias, 
-            personal_data: {
-                id: personalDataId
-            }
+            id,
+            alias,
+            public_display_name_type: displayTypeId ? Number(displayTypeId) : null,
+            personal_data_id: personalDataId ? Number(personalDataId) : null,
         }
 
         // Edit data of competitor
-         await axios.put(endpoints.competitors.update(id), editedCompetitor)
+         await apiClient.competitors.update(id, editedCompetitor)
 
         // Show success on edit
         showAlert('Edit competitor <strong>' + alias + '</strong> was a success.', 'success')
@@ -102,26 +121,11 @@ const editCompetitor = async(id, displayTypeId, alias, personalDataId) => {
 // Create either linked competitor or a "dummy" competitor
 const createCompetitor = async(newPersonalData, linkedPersonalDataId) => {
     try {
-        // Convert to plain object
-        const plainPersonalData = JSON.parse(JSON.stringify(newPersonalData))
-        
         // Make the api call
         if (props.isLinked) {
-            const customItem = {
-                "public_display_name_type": publicDisplayType.value,
-                "alias": publicAlias.value,
-                "personal_data": { "id": linkedPersonalDataId }
-            }
-            await axios.post(props.apiEndpoint, customItem)
+            await apiClient.competitors.create(buildCompetitorPayload(null, linkedPersonalDataId))
         } else {
-            // addcompetitor
-            const customItem = {
-                "public_display_name_type": publicDisplayType.value,
-                "alias": publicAlias.value,
-                "personal_data": plainPersonalData
-            }
-            // Register the item with personal data
-            await axios.post(props.apiEndpoint, customItem)
+            await apiClient.competitors.create(buildCompetitorPayload(newPersonalData))
         }
         
         // show alert of success
@@ -154,8 +158,6 @@ const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
 
-import displayAlert from '@/components/generic/displayAlert.vue';
-
 function showAlert(message, type, timeout){
     alertMessage.value = message
     alertType.value = type
@@ -166,8 +168,7 @@ function showAlert(message, type, timeout){
 const getSchools = async() => {
     try {
         isLoadingSchool.value = true
-        const response = await axios.get(endpoints.schools.list)
-        allSchools.value = response.data
+        allSchools.value = await apiClient.schools.list()
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     } finally {
@@ -179,8 +180,7 @@ const getSchools = async() => {
 const getAllUsers = async() => {
     try {
         isLoadingUsers.value = true
-        const response = await axios.get(endpoints.users.profileAll)
-        allUsers.value = response.data
+        allUsers.value = await apiClient.users.list()
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     } finally {
@@ -190,9 +190,12 @@ const getAllUsers = async() => {
 
 // Do change the linked user displayed on the dropdown of the modal
 const changeLinkedUser = (id, name, newPersonalData) => {
+    if (id == null || !newPersonalData) {
+        return
+    }
     userPersonalDataId.value = id
     userName.value = name
-    personalData.value = newPersonalData
+    personalData.value = { ...newPersonalData }
 }
 
 
@@ -240,10 +243,15 @@ const filteredSchools = computed(() => {
 
 // filter out users that are already added
 const unLinkedUsers = computed(() => {
-    const existingUserIds = new Set(props.existingCompetitors.map(user => user.personal_data.id))
-    return allUsers.value.filter(
-        user => !existingUserIds.has(user.personal_data.id)
+    const existingUserIds = new Set(
+        props.existingCompetitors
+            .map(user => user?.personal_data?.id)
+            .filter(id => id != null)
     )
+    return allUsers.value.filter(user => {
+        const personalDataId = user?.personal_data?.id
+        return personalDataId != null && !existingUserIds.has(personalDataId)
+    })
 })
 
 // filter users based on name
@@ -251,7 +259,7 @@ const searchUsers = ref('');
 const filteredUsers = computed(() => {
   const query = searchUsers.value.toLowerCase()
   return unLinkedUsers.value.filter(user =>
-    user.personal_data.full_name.toLowerCase().includes(query)
+    (user?.personal_data?.full_name ?? '').toLowerCase().includes(query)
   )
 })
 
@@ -362,10 +370,10 @@ const filteredUsers = computed(() => {
                                         <!-- Dropdown menu links -->
                                         <li 
                                             v-for="user in filteredUsers" 
-                                            @click="changeLinkedUser(user.personal_data.id, user.personal_data.full_name, user.personal_data)" 
+                                            @click="changeLinkedUser(user?.personal_data?.id, user?.personal_data?.full_name, user?.personal_data)"
                                             class="dropdown-item"
                                         >
-                                            {{ user.personal_data.full_name }}
+                                            {{ user?.personal_data?.full_name }}
                                         </li>
                                     </ul>
                                 </div>

@@ -10,9 +10,8 @@ const props = defineProps({
     },
 })
 
-import axios from 'axios';
 import { ref } from 'vue';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 
 const singupUsers = ref(props.users)
 const allSchools = ref(props.schools)
@@ -41,10 +40,19 @@ function changeSchool(id, name){
 
 const emit = defineEmits(['approveSignupUser'])
 
+// Build payload for signup approval
+const buildSignupPayload = () => ({
+    username: commitedUserData.value.username,
+    password: commitedUserData.value.password,
+    email: commitedUserData.value.personal_data?.email ?? commitedUserData.value.email,
+    full_name: commitedUserData.value.personal_data?.full_name ?? commitedUserData.value.full_name,
+    school_id: commitedUserData.value.personal_data?.school?.id ?? commitedUserData.value.school_id,
+})
+
 // approve user
 const approveUser = async() => {
     try {
-         await axios.post(endpoints.users.signupApprove(commitedUserData.value.id), commitedUserData.value)
+         await apiClient.users.approveSignup(commitedUserData.value.id, buildSignupPayload())
         showAlert('User ' + commitedUserData.value.username + ' has been approved.', 'success')
         await emit('approveSignupUser')
     } catch(error){
@@ -55,7 +63,7 @@ const approveUser = async() => {
 // approve user
 const deleteUser = async() => {
     try {
-         await axios.delete(endpoints.users.signupDecline(commitedUserData.value.id))
+         await apiClient.users.declineSignup(commitedUserData.value.id)
         showAlert('User ' + commitedUserData.value.username + ' has been deleted.', 'success')
         await emit('approveSignupUser')
     } catch(error){

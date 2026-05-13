@@ -1,11 +1,10 @@
 <script setup>
 
 import { onMounted, ref} from 'vue';
-import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { DateTime } from 'luxon';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 
 import competitionChartResults from './competitionChartResults.vue';
 import competitionResultTabel from './competitionResultTabel.vue';
@@ -52,8 +51,7 @@ const getCompetition = async() => {
         const competition_id = route.params.id
         
         // Try competition data
-        const response = await axios.get(endpoints.competitions.details(competition_id))
-        competition.value = response.data
+        competition.value = await apiClient.competitions.details(competition_id)
 
         // Format dates
         start_time.value = DateTime.fromISO(competition.value.start_time, { zone: "utc" })
@@ -73,8 +71,8 @@ const getResults = async() => {
     try {
         const competition_id = route.params.id
 
-        const response = await axios.get(endpoints.scoring.history.dashboard(competition_id))
-        results.value = response.data.competitors
+        const response = await apiClient.scoring.dashboard.history(competition_id)
+        results.value = response.competitors
     } catch(error) {
         // Throw console log error if fail
         showAlert('Couldn\'t get data for Users. <br> Error: ' + error, 'danger', 9000)
@@ -179,16 +177,16 @@ function showAlert(message, type, timeout){
             <div class="col-sm-12 col-md-10">
                 <h3 class="col pt-2 rounded">Results:</h3>
                 <competitionChartResults 
-                    :competitionId="competition.id"
-                    :refreshInterval="autoUpdateInterval.interval" 
+                    :competition_id="competition.id"
+                    :refreshInterval="autoUpdateInterval.interval"
                     :autoRefresh="autoUpdateInterval.enabled"
                 />
             </div>
         </div>
         <div class="row">
             <competitionResultTabel 
-                :competitionId="competition.id" 
-                :refreshInterval="autoUpdateInterval.interval" 
+                :competition_id="competition.id"
+                :refreshInterval="autoUpdateInterval.interval"
                 :autoRefresh="autoUpdateInterval.enabled"
             />
         </div>

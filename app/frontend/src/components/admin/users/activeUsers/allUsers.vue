@@ -1,12 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
 import { RouterLink } from 'vue-router';
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 import { useUserStore } from '@/stores/userStore';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 
-const allUsers = ref([]);
+const allUsers = ref();
 const isLoadingUsers = ref(true)
 const deleteUserId = ref();
 const deleteUserName = ref('');
@@ -23,8 +22,7 @@ const getAllUsers = async() => {
     // Try getting user data
     try{
         // Try getting the Users
-        const response = await axios.get(endpoints.users.list)
-        allUsers.value = response.data
+        allUsers.value = await apiClient.users.list()
     } catch(error) {
         // Throw console log error if fail
         showAlert('Couldn\'t get data for Users. <br> Error: ' + error, 'danger', 9000)
@@ -61,7 +59,7 @@ const unsetUserToDelete = () => {
 // Delete user
 const deleteUser = async(userID, userName) => {
     try {
-         await axios.delete(endpoints.users.deleteProfile(userID))
+         await apiClient.users.delete(userID)
         showAlert('User <strong>'+userName+'</strong> has been succesfully deleted.', 'success')
     } catch(error){
         // Throw error if fail

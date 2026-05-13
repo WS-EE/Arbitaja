@@ -12,14 +12,13 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Get the user we want to edit
 import userProfile from '@/components/generic/userEdit/userProfile.vue';
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
+
 const user = ref([])
 
 onMounted(async() =>{
     try {
-        const response = await axios.get(endpoints.users.details(userID))
-        user.value = response.data
+        user.value = await apiClient.users.details(userID)
     } catch(e) {
 
     } finally {

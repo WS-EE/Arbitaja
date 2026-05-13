@@ -3,8 +3,7 @@ import { ref } from 'vue';
 
 import logo from '@/assets/media/logo.svg';
 import { RouterLink } from "vue-router";
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api';
 
 
 const username = ref("");
@@ -20,19 +19,17 @@ const userSignup = async () => {
     // check if passwords match
     if (password.value === rePassword.value){
       // Try to signup user
-      const response = await axios.post(endpoints.users.signupCreate, {
+      const response = await apiClient.users.signup({
         username: username.value,
-        salted_password: password.value,
-        personal_data: {
-          full_name: fullName.value,
-          email: email.value
-        }
+        password: password.value,
+        full_name: fullName.value,
+        email: email.value,
       })
 
       // If user is created
-      if (response.status === 200){
+      if (response?.userId || response?.username){
         // show user is created
-        showAlert('<strong>' + response.data.message + '</strong>', 'success')
+        showAlert('<strong>Signup request submitted.</strong>', 'success')
         // empty fields after success
         username.value = ''
         password.value = ''
@@ -55,7 +52,7 @@ const userSignup = async () => {
     showAlert(
       '<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to signup!</strong></h4><hr><p class=mb-0>Error: ' + 
       error + 
-      '</p><p class=mb-0><strong>' + error.response.data.error + '</strong></p>',
+      '</p><p class=mb-0><strong>' + error.response?.data?.error + '</strong></p>',
       'danger',
       6000
     )

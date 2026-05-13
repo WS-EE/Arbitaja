@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import axios from 'axios';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 const props = defineProps({
     modalId: {
         type: String,
@@ -20,7 +19,7 @@ const emit = defineEmits(['addSchool'])
 const createSchool = async(school) => {
     try {
         // Register the school
-        await axios.post(endpoints.schools.create, { "name": school })
+        await apiClient.schools.create({ name: school })
 
         // show alert of success
         await showAlert('School <strong>' + school + '</strong> has been created.', 'success')

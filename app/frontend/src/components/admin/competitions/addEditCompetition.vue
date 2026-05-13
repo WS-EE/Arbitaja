@@ -1,12 +1,11 @@
 <script setup>
 // Import modules
-import axios from 'axios';
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onMounted, computed  } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
 import { DateTime } from "luxon";
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api';
 
 // Import displayalert
 // Alert function
@@ -38,7 +37,7 @@ const isLoading = ref(true);
 const isLoadingCriteria = ref(true)
 const isLoadingcompetitors = ref(true)
 const competition = ref();
-const competitors = ref()
+const competitors = ref([])
 const start_time = ref();
 const end_time = ref();
 const score_showtime = ref();
@@ -53,11 +52,8 @@ const getCriteriasByCompetition = async(competitionId) => {
     try {
 
          // Get criterias based on competition id
-        const response = await axios.get(endpoints.scoring.criteria.byCompetition(competitionId))
+         criterias.value = await apiClient.scoring.criteria.byCompetition(competitionId)
 
-        // Set criterias based on the response
-        criterias.value = response.data
-        
     } catch (error) {
         showAlert('Something went wrong while loading criterias.', 'danger')
     } finally {
@@ -74,8 +70,8 @@ const getCompetitionById = async(id) => {
         if (props.isEdit === true){
 
             // If prop schools is not defined try to get them ourselves
-            const response = await axios.get(endpoints.competitions.details(id));
-            competition.value = response.data
+            competition.value = await apiClient.competitions.details(id);
+            setOrganizer(competition.value.organizer)
 
             // Format dates
             start_time.value = DateTime.fromISO(competition.value.start_time, { zone: "utc" })
@@ -87,12 +83,12 @@ const getCompetitionById = async(id) => {
             score_showtime.value = DateTime.fromISO(competition.value.score_showtime, { zone: "utc" })
                 .setZone(DateTime.local().zoneName)
                 .toFormat("yyyy-MM-dd'T'HH:mm");
-            
+
             // Get competition criteria
-            getCriteriasByCompetition(competition_id);
-            getCompetitorsByCompetition(competition_id);
+            await getCriteriasByCompetition(competition_id);
+            await getCompetitorsByCompetition(competition_id);
         }
-        
+
         if (props.isEdit === false){
             // set empty values for displayed items
             competition.value = ({ 
@@ -106,10 +102,10 @@ const getCompetitionById = async(id) => {
 
         // Get all users
         // Try getting the Users
-        const allUsers = await axios.get(endpoints.users.profileAll)
+        const allUsers = await apiClient.users.list()
 
         // Get all the admin users
-        allUsers.data.forEach((user) => {
+        allUsers.forEach((user) => {
             user.roles.forEach((role) => {
                 if(role.name === "admin"){
                     const adminUser = { full_name: user.personal_data.full_name, id: user.id, username: user.username }
@@ -134,8 +130,7 @@ const getCompetitorsByCompetition = async(competitionId) => {
         isLoadingcompetitors.value = true
 
         // Get and set competitors
-        const response = await axios.get(endpoints.competitors.detailsInCompetition(competitionId));
-        competitors.value = response.data
+        competitors.value = await apiClient.competitors.byCompetition(competitionId);
 
     } catch(error) {
         // Throw console log error if fail
@@ -149,18 +144,23 @@ const getCompetitorsByCompetition = async(competitionId) => {
 
 // actions on mount
 onMounted(async () => {
-    getCompetitionById(competition_id);
+    await getCompetitionById(competition_id);
 })
 
 // Change organizer
 const setOrganizer = (user) => {
-    competition.value.organizer_id = user
+  competition.value.organizer_id = user.id
 }
 
 // discard change and reload the competition values again
 const discardChanges = async() => {
-    getCompetitionById(competition_id);
+    await getCompetitionById(competition_id);
 }
+
+const selectedOrganizerName = computed(() => {
+  const match = adminUsers.value.find(u => u.id === competition.value?.organizer_id)
+  return match?.full_name ?? competition.value?.organizer?.full_name ?? 'Select organizer'
+})
 
 // Add/Save function
 const saveComp = async() => {
@@ -181,11 +181,19 @@ const saveComp = async() => {
             .toISO()
 
          // Try to edit or add competition
-         if (props.isEdit === true){
-            await axios.put(endpoints.competitions.update(competition.value.id), competition.value)
-        } else {
-            await axios.post(endpoints.competitions.create, competition.value)
-        }
+      if (props.isEdit === true) {
+          const payload = {
+            name:           competition.value.name,
+            start_time:     competition.value.start_time,
+            end_time:       competition.value.end_time,
+            score_showtime: competition.value.score_showtime,
+            publish_scores: competition.value.publish_scores,
+            organizer_id:   competition.value.organizer_id,
+          }
+          await apiClient.competitions.update(competition.value.id, payload)
+      } else {
+          await apiClient.competitions.create(competition.value)
+      }
 
         // Show success when everything is done
         await showAlert('Succesfully saved', 'success')
@@ -290,7 +298,7 @@ const saveComp = async() => {
                 
                 <div class="btn-group">
                     <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ competition.organizer.full_name }}
+                      {{ selectedOrganizerName }}
                     </button>
                     <ul class="dropdown-menu">
                         <li 
@@ -327,7 +335,7 @@ const saveComp = async() => {
                     <RouterLink :to="'/admin/competition/edit/criterias/' + competition.id" class="btn btn-outline-dark">Edit Criteria</RouterLink>
                 </ul>       
             </div>
-            <CriteriaTabel :criterias="criterias" :competitionId="competition.id"/>
+            <CriteriaTabel :criterias="criterias" :competition_id="String(competition.id)"/>
         </div>
 
     </div>

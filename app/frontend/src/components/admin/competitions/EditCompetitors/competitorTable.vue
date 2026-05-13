@@ -3,8 +3,12 @@
 // Define props
 const props = defineProps({
     competitors: {
-        type: Object,
+        type: Array,
         required: true
+    },
+    competition_id: {
+        type: String,
+        default: ''
     },
     addActions: {
         type: Boolean,
@@ -34,15 +38,17 @@ const onEditCompetitor = () => {
 <template>
     <table class="table table-striped mt-3">
         <thead>
-            <th scope="col">ID</th>
-            <th scope="col">Alias</th>
-            <th scope="col">Full Name</th>
-            <th scope="col" class="d-none d-lg-table-cell">E-Mail</th>
-            <th scope="col" class="d-none d-md-table-cell">School</th>
-            <th v-if="addActions" scope="col">Actions</th>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Alias</th>
+                <th scope="col">Full Name</th>
+                <th scope="col" class="d-none d-lg-table-cell">E-Mail</th>
+                <th scope="col" class="d-none d-md-table-cell">School</th>
+                <th v-if="addActions" scope="col">Actions</th>
+            </tr>
         </thead>
         <tbody>
-            <tr v-for="competitor in competitors">
+            <tr v-for="competitor in competitors" :key="competitor.id">
                 <th scope="row">{{ competitor.id }}</th>
                 <td>{{ competitor.alias }}</td>
                 <td>{{ competitor.personal_data.full_name }}</td>
@@ -61,7 +67,7 @@ const onEditCompetitor = () => {
                     <removeCompetitor 
                         addButtonDivClass="btn btn-danger bi bi-trash"
                         modalId="DeleteModal"
-                        :competitionId="props.competitionId"
+                        :competition_id="props.competition_id"
                         :competitorId="competitor.id"
                         :competitorName="competitor.personal_data.full_name"
                         @removeCompetitor="onRemoveCompetitor()"

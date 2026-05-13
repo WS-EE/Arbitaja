@@ -1,11 +1,10 @@
 <script setup>
 // Import modules
-import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
-import { endpoints } from '@/services/endpoints';
+import { apiClient } from '@/services/api'
 
 // Import components
 import addEditCriteria from '@/components/admin/competitions/EditCriterias/addEditCriteria.vue'
@@ -43,9 +42,8 @@ const getCompetitionById = async(id) => {
         isLoading.value = true;
 
         // If prop schools is not defined try to get them ourselves
-        const response = await axios.get(endpoints.competitions.details(id));
-        competition.value = response.data
-        
+        competition.value = await apiClient.competitions.details(id);
+
     } catch(error) {
         // Throw console log error if fail
         showAlert('Something went wrong while loading. Error:' + error, 'danger')
@@ -63,11 +61,8 @@ const getCriteriasByCompetition = async(competitionId) => {
         isLoadingCriterias.value = true
 
          // Get criterias based on competition id
-        const response = await axios.get(endpoints.scoring.criteria.byCompetition(competitionId))
+        criterias.value = await apiClient.scoring.criteria.byCompetition(competitionId)
 
-        // Set criterias based on the response
-        criterias.value = response.data
-        
     } catch (error) {
         showAlert('Something went wrong while loading criterias.', 'danger')
     } finally {
@@ -108,14 +103,14 @@ const onTableChanged = () => {
                     buttonName="Add Criteria"
                     modalId="addCriteria"
                     :isAdd="true"
-                    :competitionId="competition_id"
-                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 mt-1" 
+                    :competition_id="competition_id"
+                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 mt-1"
                     @addEditCriteria="onAddCriteria()"
                 />
                 <addExistingCriteria
                     :existingCriterias="criterias"
-                    :competitionId="competition_id"
-                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 mt-1" 
+                    :competition_id="competition_id"
+                    addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 mt-1"
                     @CriteriaAdd="onAddCriteria()"
                 />
             </div>
@@ -124,7 +119,7 @@ const onTableChanged = () => {
             </div>
             <!-- Criteria show -->
             <div v-else>
-                <CriteriaTabel :criterias="criterias" :competitionId="competition_id" :addActions="true" @tableChanged="onTableChanged()"/>
+                <CriteriaTabel :criterias="criterias" :competition_id="competition_id" :addActions="true" @tableChanged="onTableChanged()"/>
             </div>
         </div>
     </div>
