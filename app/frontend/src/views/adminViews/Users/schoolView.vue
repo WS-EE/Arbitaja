@@ -18,8 +18,11 @@ const onAddSchool = async() => {
 // Get all schools
 const getSchools = async() => {
     try {
-        // Try getting school data
-        schools.value = await apiClient.schools.list()
+        const response = await apiClient.schools.list()
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        schools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. <br> Error: ' + error, 'danger', 9000)
     }

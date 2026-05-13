@@ -15,9 +15,12 @@ public record CompetitorResponse(
         @JsonProperty("full_name")
         String fullName,
         String email,
-        @JsonProperty("school_id")
-        Integer schoolId
+        School school
     ) {
+        public record School(
+            Integer id,
+            String name
+        ){}
     }
 }
 

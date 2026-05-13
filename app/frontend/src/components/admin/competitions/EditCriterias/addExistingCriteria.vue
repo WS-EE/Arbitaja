@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // Alert function
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
@@ -6,7 +6,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout) {
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -16,7 +16,7 @@ function showAlert(message, type, timeout) {
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Import axios
-import { apiClient } from '@/services/api'
+import { apiClient, ScoringCriterionResponse } from '@/services/api'
 
 // Import vue modules
 import { ref, onMounted, computed } from 'vue';
@@ -28,26 +28,27 @@ const props = defineProps({
         default: 'btn btn-success'
     },
     competition_id: {
-        type: String,
-        default: ''
+        type: Number,
+        default: 0
     },
     existingCriterias: {
-        type: Array,
+        type: Array as () => Array<ScoringCriterionResponse>,
         default: () => []
     }
 })
 
 // Set empty parameters
-const allCriterias = ref([]);
+const allCriterias = ref<ScoringCriterionResponse[]>([]);
 const isLoadingCompetirors = ref(true)
-const CriteriaToAdd = ref({})
+const CriteriaToAdd = ref<ScoringCriterionResponse>({} as ScoringCriterionResponse);
 
 // Set Criteria to add empty
 function setCriteriaToAddEmpty() {
     CriteriaToAdd.value = { 
-        id: '',
-        total_points: '',
-        name: 'Not Set'
+        id: 0,
+        total_points: undefined,
+        name: undefined,
+        description: undefined,
     }
 }
 
@@ -59,7 +60,11 @@ const getAllCriterias = async () => {
         isLoadingCompetirors.value = true
 
         // Get Criterias
-        allCriterias.value = await apiClient.scoring.criteria.list()
+        const response = await apiClient.scoring.criteria.list()
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        allCriterias.value = response.data
 
     } catch (error) {
         showAlert('Couldn\'t get all the Criterias for adding existing Criterias. Error: ' + error, 'danger')
@@ -73,11 +78,17 @@ const getAllCriterias = async () => {
 const emit = defineEmits(['CriteriaAdd'])
 
 // Function to add Criteria to competition
-const addCriteriaToCompetition = async (competitionId, CriteriaId) => {
+const addCriteriaToCompetition = async (competitionId?: number, CriteriaId?: number) => {
     try {
 
+        if(!competitionId || !CriteriaId) {
+             throw new Error('No competition id or criteria id provided for adding criteria to competition')
+        }
          // Add exstiting Criteria to competition
-        await apiClient.scoring.criteria.linkToCompetition(CriteriaId, competitionId)
+        const response = await apiClient.scoring.criteria.linkToCompetition(CriteriaId, competitionId)
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
 
         // alert success
         showAlert('Success on adding Criteria to competition.', 'success')
@@ -94,7 +105,7 @@ const addCriteriaToCompetition = async (competitionId, CriteriaId) => {
 }
 
 // Function to set Criteria to add to competition
-const setCriteriaToAdd = (Criteria) => {
+const setCriteriaToAdd = (Criteria: ScoringCriterionResponse) => {
     CriteriaToAdd.value = Criteria
 }
 
@@ -111,7 +122,7 @@ const searchCriteria = ref('');
 const filteredCriterias = computed(() => {
   const query = searchCriteria.value.toLowerCase()
   return unLinkedCriterias.value.filter(criteria =>
-    criteria.name.toLowerCase().includes(query)
+    !criteria.name ? false : criteria.name.toLowerCase().includes(query)
   )
 })
 

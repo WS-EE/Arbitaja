@@ -1,7 +1,11 @@
-<script setup>
+<script setup lang="ts">
+import { onMounted, ref, watch } from 'vue';
+import { apiClient, SchoolResponse } from '@/services/api'
+
 const props = defineProps({
     schools: {
-        type: Object,
+        type: Array as () => SchoolResponse[],
+        default: undefined,
     },
     addDelete: {
         type: Boolean,
@@ -12,11 +16,10 @@ const props = defineProps({
         default: 0,
     },
 })
-import { onMounted, ref, watch } from 'vue';
-import { apiClient } from '@/services/api'
+
 
 // schools to loop over
-const schools = ref();
+const schools = ref<SchoolResponse[]>();
 
 // Display loading until onmount is doing stuff
 const isLoadingSchools = ref(true)
@@ -26,22 +29,30 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const addDelete = ref(true)
 
 // Add school limit
-const loopedSchools = ref([]);
+const loopedSchools = ref<SchoolResponse[]>();
 
-function changeLimit(schools, limit){
+function changeLimit(schools?: SchoolResponse[], limit?: number){
     // Limit schools
-    if (limit === 0) {
-        loopedSchools.value = schools
-    } else (
-        loopedSchools.value = schools.slice(0, limit)
-    )
+    if (schools === undefined) {
+        loopedSchools.value = []
+    } else {
+        if (limit === 0) {
+            loopedSchools.value = schools
+        } else {
+            loopedSchools.value = schools.slice(0, limit)
+        }
+    }
 }
 
 onMounted(async () => {
     try {
         // If prop schools is not defined try to get them ourselves
         if (props.schools === undefined){
-            schools.value = await apiClient.schools.list()
+            const response = await apiClient.schools.list()
+            if(!response.success) {
+                throw new Error(response.error.message || 'Unknown error');
+            }
+            schools.value = response.data
 
         // else get the variables from props
         } else {
@@ -69,22 +80,25 @@ const setSchoolId = ref();
 const setSchoolName = ref();
 
 // Set the school variables that the user wants to delete
-function setSchoolToDelete(schoolId, schoolName) {
+function setSchoolToDelete(schoolId?: number, schoolName?: string) {
     setSchoolId.value = schoolId
     setSchoolName.value = schoolName
 }
 
 // if user closes the modal un commit the school variables
 function unsetSchoolToDelete(){
-    setSchoolId.value = ""
-    setSchoolName.value = ""
+    setSchoolId.value = undefined
+    setSchoolName.value = undefined
 }
 
 // Delete the school based on the variables we set earlier
 const deleteSchool = async() => {
     try{
          // Delete school based on ID
-        await apiClient.schools.remove(setSchoolId.value);
+        const response = await apiClient.schools.remove(setSchoolId.value);
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
         showAlert('School ' + setSchoolName + ' has been deleted', 'warning')
         
         // Unset to delete after deleting the school
@@ -104,7 +118,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -135,7 +149,7 @@ watch(
     <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
     <!-- main content -->
     <div v-if="!isLoadingSchools" class="mt-2">
-        <div v-for="school in loopedSchools" :key="school.id" class="row border border-2 mt-2 justify-content-center text-center align-items-center">
+        <div v-for="school in loopedSchools" :key="school?.id" class="row border border-2 mt-2 justify-content-center text-center align-items-center">
             <div class="col-xl-2 d-xl-block d-none mt-3">
                 <p>{{ school.id }}:</p>
             </div>

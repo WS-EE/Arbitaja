@@ -3,13 +3,10 @@
 import { onMounted, ref, computed } from 'vue';
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 import { useUserStore } from '@/stores/userStore';
-import { apiClient } from '@/services/api';
+import { apiClient, RoleResponse } from '@/services/api';
 import displayAlert from '@/components/generic/displayAlert.vue';
-import { components } from "@/services/api-types";
 
-type Role = components["schemas"]["RoleResponse"];
-
-const allRoles = ref<Role[]>([]);
+const allRoles = ref<RoleResponse[]>([]);
 const isLoadingRoles = ref<boolean>(true);
 const curUserId = ref<number | undefined>();
 const deleteRoleId = ref<number | undefined>();
@@ -20,8 +17,8 @@ const alertMessage = ref<string>('');
 const alertType = ref<string>('');
 
 // Computed property for the role to be deleted
-const roleToDelete = computed<Role | undefined>(() => {
-  return allRoles.value.find(role => role.id === deleteRoleId.value);
+const roleToDelete = computed<RoleResponse>(() => {
+  return allRoles.value.find(role => role.id === deleteRoleId.value) || { id: deleteRoleId.value || 0, name: 'Unknown Role', permissions: [] };
 });
 
 const deleteRoleName = computed<string>(() => {
@@ -30,14 +27,21 @@ const deleteRoleName = computed<string>(() => {
 
 const getAllRoles = async (): Promise<void> => {
   try {
-    allRoles.value = await apiClient.roles.list();
+    const response = await apiClient.roles.list();
+    if(!response.success) {
+      throw new Error(response.error.message || 'Unknown error');
+    }
+    allRoles.value = response.data;
   } catch(error) {
     showAlert(`Couldn't get data for Roles. <br> Error: ${error}`, 'danger', 9000);
   }
 };
 
-const deleteRole = async (roleId: number, roleName: string): Promise<void> => {
+const deleteRole = async (roleId?: number, roleName?: string): Promise<void> => {
   try {
+    if(roleId === undefined) {
+      throw new Error('Role ID is undefined');
+    }
     await apiClient.roles.delete(roleId);
     await getAllRoles();
     showAlert(`Role "${roleName}" deleted successfully.`, 'success', 3000);
@@ -50,11 +54,11 @@ const unsetRoleToDelete = (): void => {
   deleteRoleId.value = undefined;
 };
 
-const setRoleToDelete = (id: number): void => {
+const setRoleToDelete = (id?: number): void => {
   deleteRoleId.value = id;
 };
 
-const currentUser = (id: number): boolean => {
+const currentUser = (id?: number): boolean => {
   return id === curUserId.value;
 };
 
@@ -108,7 +112,7 @@ onMounted(async () => {
             <p class="m-0">{{ role.name }}</p>
           </div>
           <div class="col-lg-4 col-md-3 col-sm-3">
-            <p class="m-0">{{ role.permissions.length }}</p>
+            <p class="m-0">{{ !role.permissions ? 0 : role.permissions.length }}</p>
           </div>
           <div class="col-lg-4 col-md-4 col-sm-5 ms-lg-auto text-center text-lg-end pt-2 pt-md-0">
             <button

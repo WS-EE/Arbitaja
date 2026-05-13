@@ -1,14 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { apiClient } from '@/services/api';
+import { apiClient, SignupResponse, SchoolResponse } from '@/services/api';
 
 // Import components
 import approveModal from './userApproveModal.vue';
 import addSchool from '../school/addSchool.vue';
 import allSchools from '../school/allSchools.vue';
 
-const singupUsers = ref([]);
-const schools = ref('');
+const singupUsers = ref<SignupResponse[]>([]);
+const schools = ref<SchoolResponse[]>([]);
 const isLoadingUsers = ref(true)
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
@@ -17,7 +17,10 @@ const getSignupUsers = async() => {
     try{
         // Try getting the Users
         const response = await apiClient.users.signupList()
-        singupUsers.value = response?.signup_users ?? response
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        singupUsers.value = response.data
     } catch(error) {
         // Throw console log error if fail
         showAlert('Couldn\'t get data for signup Users. <br> Error: ' + error, 'danger', 9000)
@@ -28,7 +31,11 @@ const getSignupUsers = async() => {
 const getSchools = async() => {
     try {
         // Try getting school data
-        schools.value = await apiClient.schools.list()
+        const response = await apiClient.schools.list()
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        schools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. <br> Error: ' + error, 'danger', 9000)
     }
@@ -65,7 +72,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout

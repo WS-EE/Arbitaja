@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 // active link handler
 import { RouterLink, useRoute } from 'vue-router';
 
 // check the active link
-const isLinkActive = (routePath) => {
+const isLinkActive = (routePath: string) => {
     const route = useRoute();
     return route.path === routePath;
 }

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { apiClient } from '@/services/api'
 const props = defineProps({
@@ -16,7 +16,7 @@ const schoolName = ref("")
 
 const emit = defineEmits(['addSchool'])
 
-const createSchool = async(school) => {
+const createSchool = async(school: string) => {
     try {
         // Register the school
         await apiClient.schools.create({ name: school })
@@ -41,7 +41,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout

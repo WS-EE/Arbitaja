@@ -1,13 +1,11 @@
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { fetchCurrentUserAuthorization } from '@/features/auth/actions'
-import type { UserProfileResponse, ErrorResponse } from '@/services/api'
 
 interface LoadAuthOptions {
   force?: boolean
 }
 
-type AuthResponse = UserProfileResponse | ErrorResponse;
 
 const loaded = ref(false)
 const loading = ref(false)
@@ -37,31 +35,22 @@ async function loadAuth(options: LoadAuthOptions = {}) {
 
   rehydratePromise = (async () => {
     try {
-      const result: AuthResponse =
+      const result =
           await fetchCurrentUserAuthorization()
 
-      if (!isAuthSuccess(result)) {
-        useUserStore().setUserAuthorization({
-          id: null,
-          username: null,
-          roles: [],
-          permissions: [],
-          personal_data: null,
-        });
+        if (!result.success) {
+            throw new Error(result.error.message ?? 'Failed to load authorization')
+        }
 
-        error.value = result?.message ?? 'Failed to load authorization'
-        return
-      }
-
-      userStore.setUserAuthorization(result)
+      userStore.setUserAuthorization(result.data)
       error.value = null
     } catch (e) {
       userStore.setUserAuthorization({
-        id: null,
-        username: null,
+        id: 0,
+        username: undefined,
         roles: [],
         permissions: [],
-        personal_data: null,
+        personal_data: undefined,
       })
 
       error.value =
@@ -94,10 +83,4 @@ export function useAuthRehydrate() {
     error,
     loadAuth,
   }
-}
-
-function isAuthSuccess(
-    value: AuthResponse
-): value is UserProfileResponse {
-  return typeof value === 'object' && value !== null && 'username' in value;
 }

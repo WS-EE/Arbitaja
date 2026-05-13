@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 // Import modules
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
-import { apiClient } from '@/services/api'
+import { apiClient, CompetitionResponse, CompetitorResponse } from '@/services/api'
 
 // Import components
 import addCompetitor from '@/components/admin/competitions/EditCompetitors/addEditCompetitor.vue';
@@ -19,7 +19,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -27,13 +27,13 @@ function showAlert(message, type, timeout){
 
 // Main Content
 const isLoading = ref(true)
-const competition = ref([]);
-const competitors = ref([]);
+const competition = ref<CompetitionResponse>({} as CompetitionResponse);
+const competitors = ref<CompetitorResponse[]>([]);
 const route = useRoute();
 const isLoadingcompetitors = ref(true)
 
 // Get id of the competition
-const competition_id = route.params.id
+const competition_id = Number(route.params.id)
 
 // function for getting the competition
 const getCompetition = async() => {
@@ -42,7 +42,11 @@ const getCompetition = async() => {
         isLoading.value = true;
 
         // If prop schools is not defined try to get them ourselves
-        competition.value = await apiClient.competitions.details(competition_id);
+        const response = await apiClient.competitions.details(competition_id);
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        competition.value = response.data;
 
     } catch(error) {
         // Throw console log error if fail
@@ -59,10 +63,14 @@ const getCompetitors = async() => {
         isLoadingcompetitors.value = true
 
         // Get competition id to get competitors
-        const competition_id = route.params.id
+        const competition_id = Number(route.params.id)
 
         // Get and set competitors
-        competitors.value = await apiClient.competitors.byCompetition(competition_id);
+        const response = await apiClient.competitors.byCompetition(competition_id);
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        competitors.value = response.data;
 
     } catch(error) {
         // Throw console log error if fail
@@ -97,7 +105,7 @@ const onTableChanged = () => {
         <div v-else class="container">
             <!-- Header of the html -->
             <h1>Competition: {{ competition.name }}</h1>
-            <p>Organizer: <b>{{ competition.organizer.full_name }}</b></p>
+            <p>Organizer: <b>{{ competition.organizer?.full_name }}</b></p>
             
             <!-- Buttons for action of adding -->
              <div class="row">

@@ -36,7 +36,7 @@ export const api = axios.create({
   },
 })
 
-export const withLeadingSlash = (path) => {
+export const withLeadingSlash = (path: string) => {
   if (!path) {
     return '/'
   }

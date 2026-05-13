@@ -4,6 +4,7 @@ import com.arbitaja.refactored.backend.competition.core.domain.exception.Duplica
 import com.arbitaja.refactored.backend.competition.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData;
+import com.arbitaja.refactored.backend.competition.core.domain.model.School;
 import com.arbitaja.refactored.backend.competition.core.port.in.competitor.ManageCompetitorUseCase;
 import com.arbitaja.refactored.backend.competition.core.port.out.competitor.CompetitorRepositoryPort;
 import lombok.NonNull;
@@ -52,7 +53,9 @@ public class ManageCompetitorService implements ManageCompetitorUseCase {
                 .id(command.getPersonalDataId())
                 .fullName(command.getFullName())
                 .email(command.getEmail())
-                .schoolId(command.getSchoolId())
+                .school(School.builder()
+                    .id(command.getSchoolId())
+                    .build())
                 .build())
             .build();
     }

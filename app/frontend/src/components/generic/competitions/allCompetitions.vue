@@ -1,27 +1,27 @@
-<script setup>
+<script setup lang="ts">
 
 import { onMounted, ref, computed } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import { now } from '@vueuse/core';
 import { DateTime } from 'luxon';
-import { apiClient } from '@/services/api'
+import { apiClient, CompetitionResponse } from '@/services/api'
 
 // check the active link
-const isAdmin = () => {
+const isAdmin = (): boolean => {
     const route = useRoute();
     return route.path === '/admin/competitions';
 }
 
-const competitions = ref([]);
+const competitions = ref<CompetitionResponse[]>([]);
 const isLoading = ref(true)
 const setCompetitionName = ref();
 const setCompetitionId = ref();
 
 // Competition types
-const finishedCompetitions = ref([]);
-const ongoingCompetitions = ref([]);
-const upcomingCompetitions = ref([]);
+const finishedCompetitions = ref<CompetitionResponse[]>([]);
+const ongoingCompetitions = ref<CompetitionResponse[]>([]);
+const upcomingCompetitions = ref<CompetitionResponse[]>([]);
 
 // Sort competitions
 const sortedFinishedCompetitions = computed(() => {
@@ -42,7 +42,11 @@ const getAllCompetition = async() => {
     // Try getting all competitions
     try{
         // Try getting all competitions
-        competitions.value = await apiClient.competitions.list()
+        const response = await apiClient.competitions.list()
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        competitions.value = response.data
 
         // sort competitions based on type
         await sortCompetitionsByTime(competitions.value)
@@ -53,7 +57,7 @@ const getAllCompetition = async() => {
 }
 
 // Competition delete functions
-const setCompetitionToDelete = (id, name) => {
+const setCompetitionToDelete = (id: number, name: string) => {
     setCompetitionName.value = name
     setCompetitionId.value = id
 }
@@ -83,11 +87,14 @@ const deleteCompetition = async() => {
     }
 }
 
-const sortCompetitionsByTime = async(competitions) => {
+const sortCompetitionsByTime = async(competitions: CompetitionResponse[]) => {
     for (let i = 0; i < competitions.length; i++){
         // convert time to unix timestamp
-        let endTime = DateTime.fromISO(competitions[i].end_time).ts
-        let startTime = DateTime.fromISO(competitions[i].start_time).ts
+        if (!competitions[i].end_time || !competitions[i].start_time) {
+            continue
+        }
+        let endTime = DateTime.fromISO(competitions[i].end_time).toMillis()
+        let startTime = DateTime.fromISO(competitions[i].start_time).toMillis()
 
         // if start time is larger then now it is upcoming
         if (startTime >= now()) {
@@ -106,11 +113,11 @@ const sortCompetitionsByTime = async(competitions) => {
     }
 }
 
-const isArrayEmpty = (array) => {
+const isArrayEmpty = (array: unknown[]): boolean => {
     return array.length === 0
 }
 
-const convertISOtoHuman = (date) => {
+const convertISOtoHuman = (date: string) => {
     return DateTime.fromISO(date).toFormat("dd MMM yyyy - HH:mm")
 }
 
@@ -134,7 +141,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout

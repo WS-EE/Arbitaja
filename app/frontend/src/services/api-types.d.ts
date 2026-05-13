@@ -933,7 +933,7 @@ export interface components {
              * @description Personal data id
              * @example 1
              */
-            id?: number;
+            id: number;
             /**
              * @description Full name of the user
              * @example John Doe
@@ -942,7 +942,7 @@ export interface components {
         };
         RoleResponse: {
             /** Format: int32 */
-            id?: number;
+            id: number;
             name?: string;
             permissions?: ("ADMIN" | "BASIC" | "VIEW_DASHBOARD" | "VIEW_USERS" | "EDIT_USERS" | "VIEW_SIGNUPS" | "ACCEPT_SIGNUPS" | "VIEW_ROLES" | "CREATE_UPDATE_ROLES" | "VIEW_PERMISSIONS" | "CREATE_UPDATE_PERMISSIONS" | "VIEW_COMPETITIONS" | "CREATE_UPDATE_COMPETITIONS" | "VIEW_COMPETITORS" | "CREATE_UPDATE_COMPETITORS" | "VIEW_SCHOOLS" | "CREATE_UPDATE_SCHOOLS" | "VIEW_SCORING_DASHBOARD" | "MANAGE_SCORING_CRITERIA" | "RECORD_SCORING_RESULTS")[];
         };
@@ -951,7 +951,7 @@ export interface components {
              * @description School ID
              * @example 101
              */
-            id?: Record<string, never>;
+            id: number;
             /**
              * @description School name
              * @example Springfield High School
@@ -965,7 +965,7 @@ export interface components {
              * @description User ID
              * @example 12345
              */
-            id?: number;
+            id: number;
             /**
              * @description Username of the user
              * @example john_doe
@@ -979,11 +979,11 @@ export interface components {
             personal_data?: components["schemas"]["PersonalDataResponse"];
         };
         OverwriteUserRolesRequest: {
-            roleIds?: number[];
+            roleIds: number[];
         };
         ChangePasswordRequest: {
             oldPassword?: string;
-            newPassword?: string;
+            newPassword: string;
         };
         GeneralMessageResponse: {
             message?: string;
@@ -1008,7 +1008,7 @@ export interface components {
         };
         ScoringCriterionResponse: {
             /** Format: int32 */
-            id?: number;
+            id: number;
             name?: string;
             description?: string;
             is_manual?: boolean;
@@ -1040,7 +1040,7 @@ export interface components {
         };
         PermissionResponse: {
             /** Format: int32 */
-            id?: number;
+            id: number;
             name?: string;
             key?: string;
         };
@@ -1057,7 +1057,7 @@ export interface components {
         };
         CompetitorResponse: {
             /** Format: int32 */
-            id?: number;
+            id: number;
             alias?: string;
             /** Format: int32 */
             public_display_name_type?: number;
@@ -1077,21 +1077,21 @@ export interface components {
         };
         CompetitionResponse: {
             /** Format: int32 */
-            id?: number;
-            name?: string;
+            id: number;
+            name: string;
             /** Format: date-time */
-            start_time?: string;
+            start_time: string;
             /** Format: date-time */
-            end_time?: string;
+            end_time: string;
             /** Format: date-time */
             score_showtime?: string;
             publish_scores?: boolean;
-            organizer?: components["schemas"]["OrganizerResponse"];
+            organizer: components["schemas"]["OrganizerResponse"];
             competitors?: components["schemas"]["CompetitorResponse"][];
         };
         OrganizerResponse: {
             /** Format: int32 */
-            id?: number;
+            id: number;
             full_name?: string;
             username?: string;
         };
@@ -1155,9 +1155,10 @@ export interface components {
         };
         SignupResponse: {
             /** Format: int64 */
-            userId?: number;
+            userId: number;
             username?: string;
             email?: string;
+            fullName?: string;
             /** Format: int32 */
             schoolId?: number;
         };
@@ -1173,11 +1174,11 @@ export interface components {
         };
         ScoringHistoryEntryResponse: {
             /** Format: int32 */
-            id?: number;
+            id: number;
             /** Format: int32 */
-            competition_id?: number;
+            competition_id: number;
             /** Format: int32 */
-            competitor_id?: number;
+            competitor_id: number;
             /** Format: int32 */
             criteria_id?: number;
             criteria_name?: string;
@@ -1194,16 +1195,16 @@ export interface components {
         };
         DashboardResultPointResponse: {
             /** Format: date-time */
-            timestamp?: string;
+            timestamp: string;
             /** Format: double */
-            point_amount?: number;
+            point_amount: number;
         };
         ScoringDashboardResponse: {
             competitors?: components["schemas"]["CompetitorDashboardResponse"][];
         };
         CompetitionScoringCriteriaResultsResponse: {
             /** Format: int32 */
-            competition_id?: number;
+            competition_id: number;
             competition_name?: string;
             competitors?: components["schemas"]["CompetitorCriteriaResultsResponse"][];
         };
@@ -1215,14 +1216,14 @@ export interface components {
         };
         CriterionResultResponse: {
             /** Format: int32 */
-            criterion_id?: number;
+            criterion_id: number;
             criterion_name?: string;
             /** Format: double */
             points?: number;
         };
         Role: {
             /** Format: int32 */
-            id?: number;
+            id: number;
             name?: string;
         };
         SimpleGrantedAuthority: {

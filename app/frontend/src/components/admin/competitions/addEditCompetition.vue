@@ -1,11 +1,11 @@
-<script setup>
+<script setup lang="ts">
 // Import modules
 import { ref, onMounted, computed  } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
 import { DateTime } from "luxon";
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
-import { apiClient } from '@/services/api';
+import { apiClient, CompetitionResponse, CompetitionUpsertRequest, CompetitorResponse, ScoringCriterionResponse, UserProfileResponse } from '@/services/api';
 
 // Import displayalert
 // Alert function
@@ -17,7 +17,7 @@ import displayAlert from '@/components/generic/displayAlert.vue';
 import CriteriaTabel from './EditCriterias/CriteriaTabel.vue';
 import competitorTable from './EditCompetitors/competitorTable.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -33,26 +33,33 @@ const props = defineProps({
 
 // Set empty ref variables
 const route = useRoute();
-const isLoading = ref(true);
-const isLoadingCriteria = ref(true)
-const isLoadingcompetitors = ref(true)
-const competition = ref();
-const competitors = ref([])
-const start_time = ref();
-const end_time = ref();
-const score_showtime = ref();
-const adminUsers = ref([]);
-const criterias = ref([])
+const isLoading = ref<boolean>(true);
+const isLoadingCriteria = ref<boolean>(true)
+const isLoadingcompetitors = ref<boolean>(true)
+const competition = ref<CompetitionResponse>({} as CompetitionResponse);
+const competitors = ref<CompetitorResponse[]>([]);
+const start_time = ref<string | null>('');
+const end_time = ref<string | null>('');
+const score_showtime = ref<string | null>('');
+const criterias = ref<ScoringCriterionResponse[]>([]);
+const adminUsers = ref<UserProfileResponse[]>([])
 
 // Get id of the competition
-const competition_id = route.params.id
+const competition_id: number = Number(route.params.id);
 
 // function for getting criterias based on competition
-const getCriteriasByCompetition = async(competitionId) => {
+const getCriteriasByCompetition = async(competitionId?: number) => {
     try {
+        if(competitionId === undefined) {
+            throw new Error('Competition ID is undefined');
+        }
 
          // Get criterias based on competition id
-         criterias.value = await apiClient.scoring.criteria.byCompetition(competitionId)
+         const response = await apiClient.scoring.criteria.byCompetition(competitionId)
+         if (!response.success) {
+             throw new Error(response.error.message || 'Unknown error');
+         }
+         criterias.value = response.data
 
     } catch (error) {
         showAlert('Something went wrong while loading criterias.', 'danger')
@@ -62,27 +69,37 @@ const getCriteriasByCompetition = async(competitionId) => {
 }
 
 // function for getting the competition
-const getCompetitionById = async(id) => {
+const getCompetitionById = async(id?: number) => {
     try {
         // set loading to be true
         isLoading.value = true;
         // check the active link
         if (props.isEdit === true){
+            if(id === undefined) {
+                throw new Error('Competition ID is undefined');
+            }
 
             // If prop schools is not defined try to get them ourselves
-            competition.value = await apiClient.competitions.details(id);
+            const response = await apiClient.competitions.details(id);
+            if (!response.success) {
+                throw new Error(response.error.message || 'Unknown error');
+            }
+            competition.value = response.data
             setOrganizer(competition.value.organizer)
 
+            const formatUtcToLocal = (isoString?: string | null) => {
+                if (!isoString) {
+                    return ''
+                }
+                return DateTime.fromISO(isoString, { zone: "utc" })
+                    .setZone(DateTime.local().zoneName)
+                    .toFormat("yyyy-MM-dd'T'HH:mm")
+            }
+
             // Format dates
-            start_time.value = DateTime.fromISO(competition.value.start_time, { zone: "utc" })
-                .setZone(DateTime.local().zoneName)
-                .toFormat("yyyy-MM-dd'T'HH:mm");
-            end_time.value = DateTime.fromISO(competition.value.end_time, { zone: "utc" })
-                .setZone(DateTime.local().zoneName)
-                .toFormat("yyyy-MM-dd'T'HH:mm");
-            score_showtime.value = DateTime.fromISO(competition.value.score_showtime, { zone: "utc" })
-                .setZone(DateTime.local().zoneName)
-                .toFormat("yyyy-MM-dd'T'HH:mm");
+            start_time.value = formatUtcToLocal(competition.value.start_time)
+            end_time.value = formatUtcToLocal(competition.value.end_time)
+            score_showtime.value = formatUtcToLocal(competition.value.score_showtime)
 
             // Get competition criteria
             await getCriteriasByCompetition(competition_id);
@@ -91,27 +108,26 @@ const getCompetitionById = async(id) => {
 
         if (props.isEdit === false){
             // set empty values for displayed items
-            competition.value = ({ 
-                name: null,
-                start_time: null,
-                end_time: null,
-                score_showtime: null,
-                organizer_id: null
-            })
+            competition.value = {} as CompetitionResponse;
         }
 
         // Get all users
         // Try getting the Users
-        const allUsers = await apiClient.users.list()
+        const response = await apiClient.users.list()
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        const allUsers = response.data
 
         // Get all the admin users
         allUsers.forEach((user) => {
-            user.roles.forEach((role) => {
-                if(role.name === "admin"){
-                    const adminUser = { full_name: user.personal_data.full_name, id: user.id, username: user.username }
-                    adminUsers.value.push(adminUser)
-                }
-            })
+            if(user.roles){
+                user.roles.forEach((role) => {
+                    if(role.name === "admin"){
+                        adminUsers.value.push(user)
+                    }
+                })
+            }
         });
 
     } catch(error) {
@@ -124,14 +140,21 @@ const getCompetitionById = async(id) => {
 }
 
 // Get Competitors
-const getCompetitorsByCompetition = async(competitionId) => {
+const getCompetitorsByCompetition = async(competitionId?: number) => {
     try {
         // Set competitor loading to true when starting function
         isLoadingcompetitors.value = true
 
-        // Get and set competitors
-        competitors.value = await apiClient.competitors.byCompetition(competitionId);
+        if(competitionId === undefined) {
+            throw new Error('Competition ID is undefined');
+        }
 
+         // Get competitors based on competition id
+         const response = await apiClient.competitors.byCompetition(competitionId)
+         if (!response.success) {
+             throw new Error(response.error.message || 'Unknown error');
+         }
+         competitors.value = response.data
     } catch(error) {
         // Throw console log error if fail
         showAlert('No competitors found!', 'warning')
@@ -148,8 +171,8 @@ onMounted(async () => {
 })
 
 // Change organizer
-const setOrganizer = (user) => {
-  competition.value.organizer_id = user.id
+const setOrganizer = (user: CompetitionResponse['organizer']) => {
+  competition.value.organizer = user
 }
 
 // discard change and reload the competition values again
@@ -158,48 +181,68 @@ const discardChanges = async() => {
 }
 
 const selectedOrganizerName = computed(() => {
-  const match = adminUsers.value.find(u => u.id === competition.value?.organizer_id)
-  return match?.full_name ?? competition.value?.organizer?.full_name ?? 'Select organizer'
+  const match = adminUsers.value.find(u => u.id === competition.value?.organizer?.id)
+  return match?.personal_data?.full_name ?? competition.value?.organizer?.full_name ?? 'Select organizer'
 })
 
 // Add/Save function
 const saveComp = async() => {
     try {
-        // convert date data back to UTC time 
-        // add new dates to the competition object
-        competition.value.start_time = DateTime.fromISO(start_time.value)
-            .setZone(DateTime.local().zoneName)
-            .toUTC()
-            .toISO()
-        competition.value.end_time = DateTime.fromISO(end_time.value)
-            .setZone(DateTime.local().zoneName)
-            .toUTC()
-            .toISO()
-        competition.value.score_showtime = DateTime.fromISO(score_showtime.value)
-            .setZone(DateTime.local().zoneName)
-            .toUTC()
-            .toISO()
+        if (!start_time.value || !end_time.value || !score_showtime.value) {
+            throw new Error('Start time, end time, and score show time are required');
+        }
 
-         // Try to edit or add competition
-      if (props.isEdit === true) {
-          const payload = {
+        const utcStart = DateTime.fromISO(start_time.value)
+            .setZone(DateTime.local().zoneName)
+            .toUTC()
+            .toISO();
+        const utcEnd = DateTime.fromISO(end_time.value)
+            .setZone(DateTime.local().zoneName)
+            .toUTC()
+            .toISO();
+        const utcScoreShow = DateTime.fromISO(score_showtime.value)
+            .setZone(DateTime.local().zoneName)
+            .toUTC()
+            .toISO();
+
+        if (!utcStart || !utcEnd || !utcScoreShow) {
+            throw new Error('Invalid date values');
+        }
+
+        competition.value.start_time = utcStart
+        competition.value.end_time = utcEnd
+        competition.value.score_showtime = utcScoreShow
+
+        if(competition.value.organizer?.id === undefined) {
+            throw new Error('Organizer is required');
+        }
+          const payload: CompetitionUpsertRequest = {
             name:           competition.value.name,
             start_time:     competition.value.start_time,
             end_time:       competition.value.end_time,
             score_showtime: competition.value.score_showtime,
             publish_scores: competition.value.publish_scores,
-            organizer_id:   competition.value.organizer_id,
+            organizer_id:   competition.value.organizer?.id,
           }
-          await apiClient.competitions.update(competition.value.id, payload)
+
+         // Try to edit or add competition
+      if (props.isEdit === true) {
+          const response = await apiClient.competitions.update(competition.value.id, payload)
+            if (!response.success) {
+                throw new Error(response.error.message || 'Unknown error');
+            }
       } else {
-          await apiClient.competitions.create(competition.value)
+          const response = await apiClient.competitions.create(payload)
+          if (!response.success) {
+              throw new Error(response.error.message || 'Unknown error');
+          }
       }
 
         // Show success when everything is done
         await showAlert('Succesfully saved', 'success')
     } catch(error) {
         // Throw console log error if fail
-        showAlert('Something went wrong while saveing.<br>' + error.response.data.message, 'danger')
+        showAlert('Something went wrong while saveing.<br>' + error, 'danger')
     }
 }
 
@@ -306,7 +349,7 @@ const saveComp = async() => {
                             @click="setOrganizer(user)" 
                             class="dropdown-item"
                         >
-                            {{ user.full_name }}
+                            {{ user.personal_data?.full_name }}
                         </li>
                     </ul>
                 </div>
@@ -335,7 +378,7 @@ const saveComp = async() => {
                     <RouterLink :to="'/admin/competition/edit/criterias/' + competition.id" class="btn btn-outline-dark">Edit Criteria</RouterLink>
                 </ul>       
             </div>
-            <CriteriaTabel :criterias="criterias" :competition_id="String(competition.id)"/>
+            <CriteriaTabel :criterias="criterias" :competition_id="competition.id"/>
         </div>
 
     </div>

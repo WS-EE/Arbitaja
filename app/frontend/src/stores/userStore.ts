@@ -1,37 +1,30 @@
 import { defineStore } from 'pinia'
-import { components } from "@/services/api-types";
-
 import {UserProfileResponse} from "@/services/api";
 
-interface UserState {
-  id: number | null;
-  username: string | null;
-  roles: components["schemas"]["Role"][];
-  permissions: components["schemas"]["SimpleGrantedAuthority"][];
-  personal_data: components["schemas"]["PersonalDataResponse"] | null;
-}
-
 export const useUserStore = defineStore('user', {
-  state: (): UserState => ({
-    id: null,
-    username: null,
+  state: (): UserProfileResponse => ({
+    id: 0,
+    username: undefined,
     roles: [],
     permissions: [],
-    personal_data: null,
+    personal_data: undefined,
   }),
 
   actions: {
     setUserAuthorization(data: UserProfileResponse): void {
-      this.id = data.id ?? null;
-      this.username = data.username ?? null;
-      this.roles = data.roles ?? [];
-      this.permissions = data.permissions ?? [];
-      this.personal_data = data.personal_data ?? null;
+        this.id = data.id
+        this.username = data.username
+        this.roles = data.roles
+        this.permissions = data.permissions
+        this.personal_data = data.personal_data
     },
   },
 
   getters: {
-    hasPrivilege: (state: UserState) => (privilege: string): boolean => {
+    hasPrivilege: (state: UserProfileResponse) => (privilege: string): boolean => {
+      if (!state.permissions) {
+        return false;
+      }
       return state.permissions.some(auth => auth === privilege);
     },
   },

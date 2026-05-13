@@ -31,7 +31,9 @@ public class CompetitorWebMapper {
                 p.getId(),
                 p.getFullName(),
                 p.getEmail(),
-                p.getSchoolId()
+                p.getSchool() != null ?
+                    new CompetitorResponse.PersonalDataResponse.School(p.getSchool().getId(), p.getSchool().getName())
+                    : null
             );
         }
 

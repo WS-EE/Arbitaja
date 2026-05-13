@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { apiClient } from '@/services/api'
 const props = defineProps({
@@ -11,7 +11,7 @@ const props = defineProps({
         default: 'btn btn-success',
     },
     competition_id: {
-        type: String,
+        type: Number,
         required: true
     },
     competitorId: {
@@ -31,7 +31,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -43,10 +43,14 @@ const myModalId = props.modalId
 // Set event to emit
 const emit = defineEmits(['removeCompetitor'])
 
-const removeCompetitor = async(competitorId, competitorName) => {
+const removeCompetitor = async(competitorId: number, competitorName?: string) => {
     try {
          // Delete competitor from competition
-        await apiClient.competitions.removeCompetitor(props.competition_id, competitorId)
+        const response = await apiClient.competitions.removeCompetitor(props.competition_id, competitorId)
+
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error')
+        }
 
         // emit event
         emit('removeCompetitor')
@@ -55,7 +59,7 @@ const removeCompetitor = async(competitorId, competitorName) => {
         showAlert('Competitor named ' + competitorName + ' has been removed. ID: ' + competitorId, 'success')
     } catch (error) {
         // On error show error
-        showAlert('Competitor name ' + competitorName + ' couldn\'t be removed. Error: ' + error + '<br>' + error.response.data.error , 'danger', 9000)
+        showAlert('Competitor name ' + competitorName + ' couldn\'t be removed. Error: ' + error + '<br>' + error, 'danger', 9000)
     }
 }
 

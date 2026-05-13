@@ -79,9 +79,18 @@ public class CompetitorPersistenceAdapter implements CompetitorRepositoryPort {
         }
 
         CompetitorSchoolJpaEntity school = null;
-        if (personalData.getSchoolId() != null) {
-            school = schoolRepository.findById(personalData.getSchoolId())
-                .orElseThrow(() -> EntityNotFoundException.school(personalData.getSchoolId()));
+        if(personalData.getSchool() != null) {
+            if (personalData.getSchool().getId() != null) {
+                school = schoolRepository.findById(personalData.getSchool().getId())
+                    .orElseThrow(() -> EntityNotFoundException.school(personalData.getSchool().getId()));
+            } else if (personalData.getSchool().getName() != null && !personalData.getSchool().getName().isBlank()) {
+                school = schoolRepository.findByName(personalData.getSchool().getName())
+                    .orElseGet(() -> schoolRepository.save(CompetitorSchoolJpaEntity.builder()
+                        .name(personalData.getSchool().getName())
+                        .build()));
+            } else {
+                throw new IllegalArgumentException("schoolId or schoolName is required when personalDataId is not provided");
+            }
         }
 
         return personalDataRepository.save(mapper.toNewPersonalDataEntity(personalData, school));

@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 // Import modules
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import router from '@/router';
-import { apiClient } from '@/services/api'
+import { apiClient, CompetitionResponse, ScoringCriterionResponse } from '@/services/api'
 
 // Import components
 import addEditCriteria from '@/components/admin/competitions/EditCriterias/addEditCriteria.vue'
@@ -19,7 +19,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -27,22 +27,29 @@ function showAlert(message, type, timeout){
 
 // Main Content
 const isLoading = ref(true)
-const competition = ref([]);
-const criterias = ref([]);
+const competition = ref<CompetitionResponse>({} as CompetitionResponse);
+const criterias = ref<ScoringCriterionResponse[]>([]);
 const route = useRoute();
 const isLoadingCriterias = ref(true)
 
 // Get id of the competition
-const competition_id = route.params.id
+const competition_id = Number(route.params.id)
 
 // function for getting the competition
-const getCompetitionById = async(id) => {
+const getCompetitionById = async(id?: number) => {
     try {
         // set loading to be true
         isLoading.value = true;
+        if(!id) {
+            throw new Error('No competition id provided')
+        }
 
         // If prop schools is not defined try to get them ourselves
-        competition.value = await apiClient.competitions.details(id);
+        const response = await apiClient.competitions.details(id);
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        competition.value = response.data;
 
     } catch(error) {
         // Throw console log error if fail
@@ -55,13 +62,20 @@ const getCompetitionById = async(id) => {
 
 
 // function for getting criterias based on competition
-const getCriteriasByCompetition = async(competitionId) => {
+const getCriteriasByCompetition = async(competitionId?: number) => {
     try {
          // Set loading true
         isLoadingCriterias.value = true
 
+        if(!competitionId) {
+            throw new Error('No competition id provided')
+        }
          // Get criterias based on competition id
-        criterias.value = await apiClient.scoring.criteria.byCompetition(competitionId)
+        const response = await apiClient.scoring.criteria.byCompetition(competitionId)
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        criterias.value = response.data;
 
     } catch (error) {
         showAlert('Something went wrong while loading criterias.', 'danger')
@@ -95,7 +109,7 @@ const onTableChanged = () => {
         <div v-else class="container">
             <!-- Header of the html -->
             <h1>Competition: {{ competition.name }}</h1>
-            <p>Organizer: <b>{{ competition.organizer.full_name }}</b></p>
+            <p>Organizer: <b>{{ competition.organizer?.full_name }}</b></p>
             
             <!-- Buttons for action of adding -->
             <div class="row">

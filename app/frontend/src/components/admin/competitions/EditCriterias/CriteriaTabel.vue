@@ -1,12 +1,19 @@
-<script setup>
+<script setup lang="ts">
+
+import { ScoringCriterionResponse } from '@/services/api';
+// Import components
+import addEditCriteria from '@/components/admin/competitions/EditCriterias/addEditCriteria.vue'
+import removeCriteria from '@/components/admin/competitions/EditCriterias/removeCriteria.vue';
+
+
 // Set props
 const props = defineProps({ 
     criterias: {
-        type: Array,
+        type: Array as () => Array<ScoringCriterionResponse>,
         required: true
     },
     competition_id: {
-        type: String,
+        type: Number,
         required: true
     },
     addActions: {
@@ -14,9 +21,11 @@ const props = defineProps({
         default: false
     }
 })
-// Import components
-import addEditCriteria from '@/components/admin/competitions/EditCriterias/addEditCriteria.vue'
-import removeCriteria from '@/components/admin/competitions/EditCriterias/removeCriteria.vue';
+
+// Define emits
+const emit = defineEmits<{
+    tableChanged: []
+}>();
 
 // Send event when changed removed
 const onEditCriteria = () => {

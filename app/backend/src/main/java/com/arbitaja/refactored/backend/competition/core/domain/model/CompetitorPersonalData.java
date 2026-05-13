@@ -16,6 +16,6 @@ public class CompetitorPersonalData {
     private Integer id;
     private String fullName;
     private String email;
-    private Integer schoolId;
+    private School school;
 }
 

@@ -1,13 +1,13 @@
-import { watch, onUnmounted } from 'vue'
+import { watch, onUnmounted, Ref } from 'vue'
 
 /**
  * Composable for auto-refresh functionality.
  * @param {Function} callback - The function to call on each refresh tick
- * @param {import('vue').Ref<number>} interval - Reactive ref for the interval duration (ms)
- * @param {import('vue').Ref<boolean>} enabled - Reactive ref controlling whether auto-refresh is active
+ * @param {Ref<number>} interval - Reactive ref for the interval duration (ms)
+ * @param {Ref<boolean>} enabled - Reactive ref controlling whether auto-refresh is active
  */
-export function useAutoRefresh(callback, interval, enabled) {
-    let handle = null
+export function useAutoRefresh(callback: () => void, interval: Ref<number>, enabled: Ref<boolean>) {
+    let handle: number | null = null
 
     function start() {
         stop()

@@ -1,18 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 import { useUserStore } from '@/stores/userStore';
 import { apiClient } from '@/services/api'
+import  displayAlert from '@/components/generic/displayAlert.vue';
+import { UserProfileResponse } from '@/services/api';
 
-const allUsers = ref();
+const allUsers = ref<UserProfileResponse[]>([]);
 const isLoadingUsers = ref(true)
-const deleteUserId = ref();
-const deleteUserName = ref('');
-const curUserId = ref();
+const deleteUserId = ref<number | undefined>(undefined);
+const deleteUserName = ref<string | undefined>(undefined);
+const curUserId = ref<number | undefined>(undefined);
 
 // Get if the user in list is the current user
-const currentUser = (id) => {
+const currentUser = (id?: number) => {
     return id === curUserId.value;
 }
 
@@ -22,7 +24,11 @@ const getAllUsers = async() => {
     // Try getting user data
     try{
         // Try getting the Users
-        allUsers.value = await apiClient.users.list()
+        const response = await apiClient.users.list()
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        allUsers.value = response.data
     } catch(error) {
         // Throw console log error if fail
         showAlert('Couldn\'t get data for Users. <br> Error: ' + error, 'danger', 9000)
@@ -36,7 +42,8 @@ onMounted(async () => {
 
         // Get the current authenticated user from the auth store
         await ensureAuthRehydrated({ force: true })
-        curUserId.value = useUserStore().id
+        const userStore = useUserStore();
+        curUserId.value = userStore.id === null ? undefined : userStore.id;
     } catch(error) {
         showAlert('Something went wrong. <br> Error:' + error, 'danger', 9000)
     } finally {
@@ -45,20 +52,23 @@ onMounted(async () => {
 })
 
 // Set values if user is about to be deleted
-const setUserToDelete = (id, name) => {
+const setUserToDelete = (id?: number, name?: string) => {
     deleteUserId.value = id;
     deleteUserName.value = name;
 }
 
 // Unset values if user cancled deletion
 const unsetUserToDelete = () => {
-    deleteUserId.value = '';
-    deleteUserName.value = ''
+    deleteUserId.value = undefined;
+    deleteUserName.value = undefined;
 }
 
 // Delete user
-const deleteUser = async(userID, userName) => {
+const deleteUser = async(userID?: number, userName?: string) => {
     try {
+        if(userID === undefined) {
+            throw new Error('User ID is undefined')
+        }
          await apiClient.users.delete(userID)
         showAlert('User <strong>'+userName+'</strong> has been succesfully deleted.', 'success')
     } catch(error){
@@ -76,9 +86,7 @@ const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
 
-import displayAlert from '@/components/generic/displayAlert.vue';
-
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -112,7 +120,7 @@ function showAlert(message, type, timeout){
                         <h5 class="m-0">{{ user.username }}</h5>
                     </div>
                     <div class="col-lg-2 col-md-3 col-sm-4">
-                        <p class="m-0">{{ user.personal_data.full_name }}</p>
+                        <p class="m-0">{{ user.personal_data?.full_name }}</p>
                     </div>
                     <div class="col-lg-4 col-md-3 col-sm-3">
                         <!-- Horizontal under breakpoint -->

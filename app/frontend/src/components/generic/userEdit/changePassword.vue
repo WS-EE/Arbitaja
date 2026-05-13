@@ -1,16 +1,16 @@
-<script setup>
+<script setup lang="ts">
 // Import required vue modules
 import { ref } from 'vue';
 
 // Import axios
-import { apiClient } from '@/services/api'
+import { apiClient, ChangePasswordRequest } from '@/services/api'
 
 // Get props
 const props = defineProps({
     // Get user ID to know which user to password reset
     userId: {
         type: Number,
-        requried: true
+        required: true
     },
     isAdmin: {
         type: Boolean,
@@ -26,21 +26,21 @@ const alertType = ref('')
 import displayAlert from '@/components/generic/displayAlert.vue';
 
 // Alert function
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
 }
 
 // Set empty variable for password reset
-const curPassword = ref('')
-const newPassword = ref('')
-const confirmPassword = ref('')
+const curPassword = ref<string>('')
+const newPassword = ref<string>('')
+const confirmPassword = ref<string>('')
 
 // Function to reset password
-const resetPassword = async(userId, oldPassword, setPassword, confirmSetPassword) => {
+const resetPassword = async(userId: number, oldPassword: string, setPassword: string, confirmSetPassword: string) => {
     try {
-        let apiObject = {}
+        let apiObject: ChangePasswordRequest = {} as ChangePasswordRequest
         // Create the object to be submited 
         if (props.isAdmin) {
             apiObject = {
@@ -58,7 +58,11 @@ const resetPassword = async(userId, oldPassword, setPassword, confirmSetPassword
         if (setPassword === confirmSetPassword) {
 
             // try reseting password
-            await apiClient.users.changePassword(userId, apiObject)
+            const response = await apiClient.users.changePassword(userId, apiObject)
+
+            if (!response.success) {
+                throw new Error(response.error.message || 'Unknown error')
+            }
 
             // Show alert password changed
             showAlert('Password changed successfully!', 'success')
@@ -67,7 +71,7 @@ const resetPassword = async(userId, oldPassword, setPassword, confirmSetPassword
             showAlert('Passwords don\'t match!', 'danger', 2000)
         }
     } catch(error) {
-        showAlert('Setting new password failed. Error: ' + error.response.data.message, 'danger', 9000)
+        showAlert('Setting new password failed. Error: ' + error, 'danger', 9000)
     }
 }
 

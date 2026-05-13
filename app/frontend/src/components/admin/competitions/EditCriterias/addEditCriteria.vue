@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { apiClient } from '@/services/api';
+import { apiClient, ScoringCriterionUpsertRequest } from '@/services/api';
 
 const props = defineProps({
     modalId: {
@@ -27,8 +27,8 @@ const props = defineProps({
         required: true
     },
     competition_id: {
-        type: String,
-        default: ''
+        type: Number,
+        default: 0,
     },
     criteria: {
         type: Object,
@@ -48,23 +48,19 @@ const isLoading = ref(true)
 const emit = defineEmits(['addEditCriteria'])
 
 // Create either linked competitor or a "dummy" competitor
-const addEditCriteria = async(addEditCriteria, competition_id) => {
+const addEditCriteria = async(addEditCriteria: ScoringCriterionUpsertRequest, competition_id: number, scoringCriteriaId?: number) => {
     try {
         // Set competition_id for the object
         modalCriteria.value.competition_id = competition_id
         
         // Make the api call
         if (props.isAdd) {
-            // create and object for the new criteria
-            const newCriteria = {
-                name: addEditCriteria.name,
-                description: addEditCriteria.description,
-                total_points: addEditCriteria.total_points,
-                competition_id: competition_id
-            }
         
             // add the new criteria
-            await apiClient.scoring.criteria.create(newCriteria)
+            const response = await apiClient.scoring.criteria.create(addEditCriteria)
+            if (!response.success) {
+                throw new Error(response.error.message || 'Unknown error');
+            }
 
             // show alert of success
             await showAlert(props.buttonName + ' <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
@@ -76,14 +72,14 @@ const addEditCriteria = async(addEditCriteria, competition_id) => {
             modalCriteria.value.description = ''
 
         } else {
-            const updateCriteria = {
-                id: addEditCriteria.id,
-                name: addEditCriteria.name,
-                description: addEditCriteria.description,
-                total_points: addEditCriteria.total_points
+            if(!scoringCriteriaId) {
+                throw new Error('No scoring criteria id provided for editing')
             }
              // Register the item with personal data
-             await apiClient.scoring.criteria.update(updateCriteria.id, updateCriteria)
+             const response = await apiClient.scoring.criteria.update(scoringCriteriaId, addEditCriteria)
+             if (!response.success) {
+                throw new Error(response.error.message || 'Unknown error');
+            }
 
             // Edit alert success
             await showAlert('Editing criteria <strong>' + addEditCriteria.name + '</strong> was a success.', 'success')
@@ -93,7 +89,7 @@ const addEditCriteria = async(addEditCriteria, competition_id) => {
         emit('addEditCriteria');
         
     } catch(e) {
-        showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e.response.data.error, 'danger', 9000)
+        showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e, 'danger', 9000)
     }
 }
 
@@ -114,7 +110,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout

@@ -1,14 +1,16 @@
-<script setup>
+<script setup lang="ts">
+
+import { CompetitorResponse } from '@/services/api';
 
 // Define props
 const props = defineProps({
     competitors: {
-        type: Array,
+        type: Array as () => Array<CompetitorResponse>,
         required: true
     },
     competition_id: {
-        type: String,
-        default: ''
+        type: Number,
+        default: 0
     },
     addActions: {
         type: Boolean,
@@ -51,15 +53,15 @@ const onEditCompetitor = () => {
             <tr v-for="competitor in competitors" :key="competitor.id">
                 <th scope="row">{{ competitor.id }}</th>
                 <td>{{ competitor.alias }}</td>
-                <td>{{ competitor.personal_data.full_name }}</td>
-                <td class="d-none d-lg-table-cell">{{ competitor.personal_data.email }}</td>
-                <td class="d-none d-md-table-cell">{{ competitor.personal_data.school_id }}</td>
+                <td>{{ competitor.personal_data?.full_name }}</td>
+                <td class="d-none d-lg-table-cell">{{ competitor.personal_data?.email }}</td>
+                <td class="d-none d-md-table-cell">{{ competitor.personal_data?.school?.name }}</td>
                 <td v-if="addActions">
                     <addEditCompetitor
                         addButtonDivClass="btn btn-dark bi bi-pencil me-1"
                         buttonName=""
                         :modalId="'editCompetitor' + competitor.id"
-                        :modalHeader="'Edit Competitor \'' + competitor.personal_data.full_name + '\''"
+                        :modalHeader="'Edit Competitor \'' + competitor.personal_data?.full_name + '\''"
                         :isEdit="true"
                         :competitor="competitor"
                         @editCompetitor="onEditCompetitor()"
@@ -69,7 +71,7 @@ const onEditCompetitor = () => {
                         modalId="DeleteModal"
                         :competition_id="props.competition_id"
                         :competitorId="competitor.id"
-                        :competitorName="competitor.personal_data.full_name"
+                        :competitorName="competitor.personal_data?.full_name"
                         @removeCompetitor="onRemoveCompetitor()"
                     />
                 </td>

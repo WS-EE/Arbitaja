@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 
 import { onMounted, ref} from 'vue';
 import { useRoute } from 'vue-router';
 import { DateTime } from 'luxon';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import { apiClient } from '@/services/api'
+import { apiClient, CompetitionResponse, CompetitorDashboardResponse } from '@/services/api'
 
 import competitionChartResults from './competitionChartResults.vue';
 import competitionResultTabel from './competitionResultTabel.vue';
@@ -18,13 +18,13 @@ const autoUpdateInterval = ref({
 })
 
 // Get current auto update interval
-const getAutoIntervalNameByTimeout = (timeout) => {
+const getAutoIntervalNameByTimeout = (timeout: number) => {
   const displayInterval = setTimeIntervalForAutoUpdate.find(p => p.timeout === timeout)
   return displayInterval ? displayInterval.name : 'Not Set'
 }
 
 // Set new auto update interval
-const changeAutoUpdateInterval = (timeout) => {
+const changeAutoUpdateInterval = (timeout: number) => {
     autoUpdateInterval.value.interval = timeout
 }
 
@@ -37,27 +37,31 @@ const setTimeIntervalForAutoUpdate = [
     { timeout: 60000, name: "60sec" }
 ]
 
-const competition = ref([]);
-const results = ref([]);
-const isCompetition = ref(true)
-const start_time = ref();
-const end_time = ref();
+const competition = ref<CompetitionResponse>({} as CompetitionResponse);
+const results = ref<CompetitorDashboardResponse[]>([]);
+const isCompetition = ref<boolean>(true)
+const start_time = ref<string>('');
+const end_time = ref<string>();
 
 // Get competition data
 const getCompetition = async() => { 
     // Try getting user data
     try{
         // set competition id based on link id
-        const competition_id = route.params.id
+        const competition_id = Number(route.params.id)
         
         // Try competition data
-        competition.value = await apiClient.competitions.details(competition_id)
+        const response = await apiClient.competitions.details(competition_id)
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        competition.value = response.data
 
         // Format dates
-        start_time.value = DateTime.fromISO(competition.value.start_time, { zone: "utc" })
+        start_time.value = DateTime.fromISO(!competition.value.start_time ? new Date().toISOString() : competition.value.start_time, { zone: "utc" })
             .setZone(DateTime.local().zoneName)
             .toFormat("dd/MM/yyyy HH:mm");
-        end_time.value = DateTime.fromISO(competition.value.end_time, { zone: "utc" })
+        end_time.value = DateTime.fromISO(!competition.value.end_time ? new Date().toISOString() : competition.value.end_time, { zone: "utc" })
             .setZone(DateTime.local().zoneName)
             .toFormat("dd/MM/yyyy HH:mm");
 
@@ -69,10 +73,13 @@ const getCompetition = async() => {
 
 const getResults = async() => {
     try {
-        const competition_id = route.params.id
-
-        const response = await apiClient.scoring.dashboard.history(competition_id)
-        results.value = response.competitors
+        const competition_id = Number(route.params.id)
+         // Try competition data
+         const response = await apiClient.scoring.dashboard.history(competition_id)
+         if (!response.success) {
+             throw new Error(response.error.message || 'Unknown error');
+         }
+         results.value = response.data.competitors ?? [];
     } catch(error) {
         // Throw console log error if fail
         showAlert('Couldn\'t get data for Users. <br> Error: ' + error, 'danger', 9000)
@@ -99,7 +106,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -133,7 +140,7 @@ function showAlert(message, type, timeout){
                 <div class="border rounded">
                     <div class="p-2">
                         <p class="pt-2">ID: {{ competition.id }}</p>
-                        <p>Organizer: {{ competition.organizer.full_name }}</p>
+                        <p>Organizer: {{ competition.organizer?.full_name }}</p>
                         <p>Start Time: {{ start_time }}</p>
                         <p>End Time: {{ end_time }}</p>
                     </div>

@@ -1,17 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, ref, toRef } from 'vue'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import displayAlert from '@/components/generic/displayAlert.vue'
-import { apiClient } from '@/services/api'
+import { apiClient, CompetitorDashboardResponse } from '@/services/api'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
 
 // --- Props ---
 const props = defineProps({
     competition_id: {
-        default: '',
+        type: Number,
+        required: true,
+        default: 0,
     },
     insertedResults: {
-        type: Object,
+        type: Array as () => CompetitorDashboardResponse[] | undefined,
+        default: undefined,
     },
     refreshInterval: {
         type: Number,
@@ -28,18 +31,18 @@ const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
 
-function showAlert(message, type, timeout = 3000) {
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
 }
 
 // --- Data ---
-const results = ref([])
+const results = ref<CompetitorDashboardResponse[]>([])
 const isLoadingResults = ref(true)
 
 const sortedCompetitors = computed(() =>
-    [...results.value].sort((a, b) => b.total_score - a.total_score)
+    [...(results.value ?? [])].sort((a, b) => (b.total_score ?? 0) - (a.total_score ?? 0))
 )
 
 // --- Fetch ---
@@ -47,7 +50,10 @@ async function fetchResults() {
     try {
         isLoadingResults.value = true
         const response = await apiClient.scoring.dashboard.history(props.competition_id)
-        results.value = response.competitors
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error')
+        }
+        results.value = response.data.competitors ?? []
     } catch (error) {
         showAlert(`Couldn't get competitors for the table. Error: ${error}`, 'warning')
     } finally {
@@ -61,7 +67,7 @@ useAutoRefresh(fetchResults, toRef(props, 'refreshInterval'), toRef(props, 'auto
 // --- Lifecycle ---
 onMounted(async () => {
     try {
-        if (props.insertedResults !== undefined) {
+        if (props.insertedResults && props.insertedResults.length > 0) {
             results.value = props.insertedResults
         } else {
             await fetchResults()

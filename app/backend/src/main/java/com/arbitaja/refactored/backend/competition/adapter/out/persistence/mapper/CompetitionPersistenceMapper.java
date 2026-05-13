@@ -5,10 +5,12 @@ import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entit
 import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entity.CompetitorCompetitionJpaEntity;
 import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entity.CompetitorJpaEntity;
 import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entity.CompetitorPersonalDataJpaEntity;
+import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entity.CompetitorSchoolJpaEntity;
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competition;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitionCompetitor;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitionOrganizer;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData;
+import com.arbitaja.refactored.backend.competition.core.domain.model.School;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -93,7 +95,17 @@ public class CompetitionPersistenceMapper {
             .id(personalData.getId())
             .fullName(personalData.getFullName())
             .email(personalData.getEmail())
-            .schoolId(personalData.getSchool() != null ? personalData.getSchool().getId() : null)
+            .school(toDomain(personalData.getSchool()))
+            .build();
+    }
+
+    private School toDomain(CompetitorSchoolJpaEntity school) {
+        if (school == null) {
+            return null;
+        }
+        return School.builder()
+            .id(school.getId())
+            .name(school.getName())
             .build();
     }
 

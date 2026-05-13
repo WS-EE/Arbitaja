@@ -1,26 +1,45 @@
-import { api } from './http';
+import { api } from '@/services/http';
 import type { components } from './api-types';
+import type { AxiosResponse } from 'axios';
 
-const unwrap = (promise) => promise.then((response) => response.data);
+export type ApiResponse<T> = 
+  | { success: true; data: T }
+  | { success: false; error: components['schemas']['ErrorResponse'] };
+
+const unwrap = <T>(promise: Promise<AxiosResponse<T>>): Promise<ApiResponse<T>> => 
+  promise.then(response => ({ success: true, data: response.data } as const))
+         .catch(error => ({ success: false, error: error.response?.data } as const));
 
 export type UserProfileResponse = components['schemas']['UserProfileResponse'];
 export type UpdateUserRequest = components['schemas']['UpdateUserRequest'];
 export type ChangePasswordRequest = components['schemas']['ChangePasswordRequest'];
+
 export type SignupRequest = components['schemas']['SignupRequest'];
 export type SignupResponse = components['schemas']['SignupResponse'];
+
 export type SchoolResponse = components['schemas']['SchoolResponse'];
 export type SchoolUpsertRequest = components['schemas']['SchoolUpsertRequest'];
+
 export type CompetitionResponse = components['schemas']['CompetitionResponse'];
 export type CompetitionUpsertRequest = components['schemas']['CompetitionUpsertRequest'];
+export type CompetitionCompetitorsUpdateRequest = components['schemas']['OverwriteCompetitionCompetitorsRequest'];
+
 export type CompetitorResponse = components['schemas']['CompetitorResponse'];
 export type CompetitorUpsertRequest = components['schemas']['CompetitorUpsertRequest'];
+export type PersonalDataResponse = components['schemas']['PersonalDataResponse'];
+
 export type ScoringDashboardResponse = components['schemas']['ScoringDashboardResponse'];
+export type CompetitorDashboardResponse = components['schemas']['CompetitorDashboardResponse'];
 export type ScoringCriterionResponse = components['schemas']['ScoringCriterionResponse'];
 export type ScoringCriterionUpsertRequest = components['schemas']['ScoringCriterionUpsertRequest'];
+
+export type RoleRequest = components['schemas']['Role'];
+export type RoleResponse = components['schemas']['RoleResponse'];
+
 export type GeneralMessageResponse = components['schemas']['GeneralMessageResponse'];
 export type ErrorResponse = components['schemas']['ErrorResponse']
 
-const buildFormLoginPayload = ({ username, password, rememberMe }) => {
+const buildFormLoginPayload = ({ username, password, rememberMe }: { username: string, password: string, rememberMe: boolean }) => {
   const formData = new URLSearchParams();
   formData.append('username', username);
   formData.append('password', password);
@@ -29,10 +48,10 @@ const buildFormLoginPayload = ({ username, password, rememberMe }) => {
 };
 
 export const apiClient = {
-  health: () => unwrap(api.get('/health')),
+  health: (): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.get('/health')),
   auth: {
-    currentUser: () => unwrap(api.get('/v2/user/auth')),
-    login: ({ username, password, rememberMe }) => {
+    currentUser: (): Promise<ApiResponse<UserProfileResponse>> => unwrap(api.get('/v2/user/auth')),
+    login: ({ username, password, rememberMe }: { username: string, password: string, rememberMe: boolean }) => {
       const formData = buildFormLoginPayload({ username, password, rememberMe });
       return api.post('/login-user', formData, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -41,57 +60,59 @@ export const apiClient = {
     logout: () => api.post('/logout'),
   },
   users: {
-    list: () => unwrap(api.get('/v2/user')),
-    details: (id: number) => unwrap(api.get(`/v2/user/${id}`)),
-    update: (id: number, payload) => unwrap(api.put(`/v2/user/${id}`, payload)),
-    delete: (id: number) => unwrap(api.delete(`/v2/user/${id}`)),
-    changePassword: (id: number, payload) => unwrap(api.put(`/v2/user/change-password/${id}`, payload)),
-    signup: (payload) => unwrap(api.post('/v2/signup', payload)),
-    signupList: () => unwrap(api.get('/v2/signup/signup')),
-    approveSignup: (id: number, payload) => unwrap(api.post(`/v2/signup/signup/${id}/approve`, payload)),
-    declineSignup: (id: number) => unwrap(api.delete(`/v2/signup/signup/${id}`)),
+    list: (): Promise<ApiResponse<UserProfileResponse[]>> => unwrap(api.get('/v2/user')),
+    details: (id: number): Promise<ApiResponse<UserProfileResponse>> => unwrap(api.get(`/v2/user/${id}`)),
+    update: (id: number, payload: UpdateUserRequest): Promise<ApiResponse<UserProfileResponse>> => unwrap(api.put(`/v2/user/${id}`, payload)),
+    delete: (id: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/user/${id}`)),
+    changePassword: (id: number, payload: ChangePasswordRequest): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.put(`/v2/user/change-password/${id}`, payload)),
+    signup: (payload: SignupRequest): Promise<ApiResponse<SignupResponse>> => unwrap(api.post('/v2/signup', payload)),
+    signupList: (): Promise<ApiResponse<SignupResponse[]>> => unwrap(api.get('/v2/signup/signup')),
+    approveSignup: (id: number, payload: SignupRequest): Promise<ApiResponse<SignupResponse>> => unwrap(api.post(`/v2/signup/signup/${id}/approve`, payload)),
+    declineSignup: (id: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/signup/signup/${id}`)),
   },
   schools: {
-    list: () => unwrap(api.get('/v2/schools')),
-    create: (payload) => unwrap(api.post('/v2/schools', payload)),
-    update: (id: number, payload) => unwrap(api.put(`/v2/schools/${id}`, payload)),
-    remove: (id: number) => unwrap(api.delete(`/v2/schools/${id}`)),
+    list: (): Promise<ApiResponse<SchoolResponse[]>> => unwrap(api.get('/v2/schools')),
+    create: (payload: SchoolUpsertRequest): Promise<ApiResponse<SchoolResponse>> => unwrap(api.post('/v2/schools', payload)),
+    update: (id: number, payload: SchoolUpsertRequest): Promise<ApiResponse<SchoolResponse>> => unwrap(api.put(`/v2/schools/${id}`, payload)),
+    remove: (id: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/schools/${id}`)),
   },
   competitions: {
-    list: () => unwrap(api.get('/v2/competition')),
-    details: (id: number) => unwrap(api.get(`/v2/competition/${id}`)),
-    create: (payload) => unwrap(api.post('/v2/competition', payload)),
-    update: (id: number, payload: CompetitionUpsertRequest) => unwrap(api.put(`/v2/competition/${id}`, payload)),
-    remove: (id: number) => unwrap(api.delete(`/v2/competition/${id}`)),
-    addCompetitor: (competitionId, competitorId) => unwrap(api.post(`/v2/competition/${competitionId}/competitors/${competitorId}`)),
-    removeCompetitor: (competitionId, competitorId) => unwrap(api.delete(`/v2/competition/${competitionId}/competitors/${competitorId}`)),
-    overwriteCompetitors: (competitionId, payload) => unwrap(api.put(`/v2/competition/${competitionId}/competitors`, payload)),
+    list: (): Promise<ApiResponse<CompetitionResponse[]>> => unwrap(api.get('/v2/competition')),
+    details: (id: number): Promise<ApiResponse<CompetitionResponse>> => unwrap(api.get(`/v2/competition/${id}`)),
+    create: (payload: CompetitionUpsertRequest): Promise<ApiResponse<CompetitionResponse>> => unwrap(api.post('/v2/competition', payload)),
+    update: (id: number, payload: CompetitionUpsertRequest): Promise<ApiResponse<CompetitionResponse>> => unwrap(api.put(`/v2/competition/${id}`, payload)),
+    remove: (id: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/competition/${id}`)),
+    addCompetitor: (competitionId: number, competitorId: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.post(`/v2/competition/${competitionId}/competitors/${competitorId}`)),
+    removeCompetitor: (competitionId: number, competitorId: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/competition/${competitionId}/competitors/${competitorId}`)),
+    overwriteCompetitors: (competitionId: number, payload: CompetitionCompetitorsUpdateRequest): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.put(`/v2/competition/${competitionId}/competitors`, payload)),
   },
   competitors: {
-    list: () => unwrap(api.get('/v2/competitor')),
-    details: (id: number) => unwrap(api.get(`/v2/competitor/${id}`)),
-    byCompetition: (competitionId) => unwrap(api.get(`/v2/competitor/competition/${competitionId}`)),
-    create: (payload) => unwrap(api.post('/v2/competitor', payload)),
-    update: (id: number, payload) => unwrap(api.put(`/v2/competitor/${id}`, payload)),
+    list: (): Promise<ApiResponse<CompetitorResponse[]>> => unwrap(api.get('/v2/competitor')),
+    details: (id: number): Promise<ApiResponse<CompetitorResponse>> => unwrap(api.get(`/v2/competitor/${id}`)),
+    byCompetition: (competitionId: number): Promise<ApiResponse<CompetitorResponse[]>> => unwrap(api.get(`/v2/competitor/competition/${competitionId}`)),
+    create: (payload: CompetitorUpsertRequest): Promise<ApiResponse<CompetitorResponse>> => unwrap(api.post('/v2/competitor', payload)),
+    update: (id: number, payload: CompetitorUpsertRequest): Promise<ApiResponse<CompetitorResponse>> => unwrap(api.put(`/v2/competitor/${id}`, payload)),
   },
   scoring: {
     dashboard: {
-      history: (competitionId) => unwrap(api.get(`/v2/scoring/dashboard/competition/${competitionId}/history`)),
-      criteria: (competitionId) => unwrap(api.get(`/v2/scoring/dashboard/competition/${competitionId}/criteria`)),
-      criteriaForCompetitor: (competitionId, competitorId) =>
+      history: (competitionId: number): Promise<ApiResponse<ScoringDashboardResponse>> => unwrap(api.get(`/v2/scoring/dashboard/competition/${competitionId}/history`)),
+      criteria: (competitionId: number): Promise<ApiResponse<ScoringCriterionResponse[]>> => unwrap(api.get(`/v2/scoring/dashboard/competition/${competitionId}/criteria`)),
+      criteriaForCompetitor: (competitionId: number, competitorId: number): Promise<ApiResponse<ScoringCriterionResponse[]>> =>
         unwrap(api.get(`/v2/scoring/dashboard/competition/${competitionId}/criteria/competitor/${competitorId}`)),
     },
     criteria: {
-      list: () => unwrap(api.get('/v2/scoring/criteria')),
-      byCompetition: (competitionId: number) => unwrap(api.get(`/v2/scoring/criteria/by-competition/${competitionId}`)),
-      create: (payload) => unwrap(api.post('/v2/scoring/criteria', payload)),
-      update: (id: number, payload) => unwrap(api.put(`/v2/scoring/criteria/${id}`, payload)),
-      remove: (id: number) => unwrap(api.delete(`/v2/scoring/criteria/${id}`)),
-      linkToCompetition: (criterionId, competitionId) => unwrap(api.post(`/v2/scoring/criteria/${criterionId}/competitions/${competitionId}`)),
+      list: (): Promise<ApiResponse<ScoringCriterionResponse[]>> => unwrap(api.get('/v2/scoring/criteria')),
+      byCompetition: (competitionId: number): Promise<ApiResponse<ScoringCriterionResponse[]>> => unwrap(api.get(`/v2/scoring/criteria/by-competition/${competitionId}`)),
+      create: (payload: ScoringCriterionUpsertRequest): Promise<ApiResponse<ScoringCriterionResponse>> => unwrap(api.post('/v2/scoring/criteria', payload)),
+      update: (id: number, payload: ScoringCriterionUpsertRequest): Promise<ApiResponse<ScoringCriterionResponse>> => unwrap(api.put(`/v2/scoring/criteria/${id}`, payload)),
+      remove: (id: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/scoring/criteria/${id}`)),
+      linkToCompetition: (criterionId: number, competitionId: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.post(`/v2/scoring/criteria/${criterionId}/competitions/${competitionId}`)),
     },
   },
   roles: {
-    list: () => unwrap(api.get('/v2/roles')),
-    delete: (id: number) => unwrap(api.delete(`/v2/roles/${id}`)),
+    list: (): Promise<ApiResponse<RoleResponse[]>> => unwrap(api.get('/v2/roles')),
+    create: (payload: RoleRequest): Promise<ApiResponse<RoleResponse>> => unwrap(api.post('/v2/roles', payload)),
+    update: (id: number, payload: RoleRequest): Promise<ApiResponse<RoleResponse>> => unwrap(api.put(`/v2/roles/${id}`, payload)),
+    delete: (id: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/roles/${id}`)),
   }
 };

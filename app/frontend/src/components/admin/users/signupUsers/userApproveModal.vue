@@ -1,58 +1,72 @@
-<script setup>
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { apiClient, SignupResponse, SignupRequest, SchoolResponse } from '@/services/api'
+
 const props = defineProps({
     users: {
-        type: Object,
+        type: Array as () => SignupResponse[],
         required: true,
     },
     schools: {
-        type: Object,
+        type: Array as () => SchoolResponse[],
         required: true,
     },
 })
 
-import { ref } from 'vue';
-import { apiClient } from '@/services/api'
+const buildSignupPayload = (): SignupRequest => {
+    if (!commitedUserData.value) {
+        throw new Error('No user data to build payload');
+    }
+    return {
+        username: commitedUserData.value.username,
+        email: commitedUserData.value.email,
+        full_name: commitedUserData.value.fullName,
+        school_id: commitedUserData.value.schoolId,
+    }
+}
 
-const singupUsers = ref(props.users)
-const allSchools = ref(props.schools)
+
+
+const singupUsers = ref<SignupResponse[]>(props.users)
+const allSchools = ref<SchoolResponse[]>(props.schools)
+
+
+const selectedSchoolName = computed(() => {
+  const match = allSchools.value.find(s => s.id === commitedUserData.value.schoolId)
+  return match?.name ?? 'Select school'
+})
+
 
 // Data when commiting user
-const commitedUserData = ref([]);
+const commitedUserData = ref<SignupResponse>({} as SignupResponse);
 const commitSet = ref(false)
 
-function setCommitedUserData(user) {
+function setCommitedUserData(user: SignupResponse){
     commitSet.value = true;
     commitedUserData.value = user; 
-    if (commitedUserData.value.personal_data.school === null){
-        commitedUserData.value.personal_data.school = { id: null, name: 'Not Set' }
-    }
 }
 
 function deleteCommitedUserData(){
     commitSet.value = false;
-    commitedUserData.value = [];
-}
+    commitedUserData.value = {} as SignupResponse;
+};
 
 // Change school function.
-function changeSchool(id, name){
-    commitedUserData.value.personal_data.school = { id: id, name: name }
+function changeSchool(id?: number){
+    if(commitedUserData.value){
+        commitedUserData.value.schoolId = id
+    }
 }
 
 const emit = defineEmits(['approveSignupUser'])
 
-// Build payload for signup approval
-const buildSignupPayload = () => ({
-    username: commitedUserData.value.username,
-    password: commitedUserData.value.password,
-    email: commitedUserData.value.personal_data?.email ?? commitedUserData.value.email,
-    full_name: commitedUserData.value.personal_data?.full_name ?? commitedUserData.value.full_name,
-    school_id: commitedUserData.value.personal_data?.school?.id ?? commitedUserData.value.school_id,
-})
-
 // approve user
 const approveUser = async() => {
     try {
-         await apiClient.users.approveSignup(commitedUserData.value.id, buildSignupPayload())
+        if(commitedUserData.value.userId === undefined) {
+            throw new Error('User ID is undefined');
+        }
+        await apiClient.users.approveSignup(commitedUserData.value.userId, buildSignupPayload())
         showAlert('User ' + commitedUserData.value.username + ' has been approved.', 'success')
         await emit('approveSignupUser')
     } catch(error){
@@ -63,7 +77,10 @@ const approveUser = async() => {
 // approve user
 const deleteUser = async() => {
     try {
-         await apiClient.users.declineSignup(commitedUserData.value.id)
+        if(commitedUserData.value.userId === undefined) {
+            throw new Error('User ID is undefined');
+        }
+         await apiClient.users.declineSignup(commitedUserData.value.userId)
         showAlert('User ' + commitedUserData.value.username + ' has been deleted.', 'success')
         await emit('approveSignupUser')
     } catch(error){
@@ -78,7 +95,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message:string, type:string, timeout:number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -95,7 +112,7 @@ function showAlert(message, type, timeout){
             <h5 class="m-0">{{ user.username }}</h5>
         </div>
         <div class="col-lg-3 col-md-2 col-sm-3">
-            <p class="m-0">{{ user.personal_data.full_name }}</p>
+            <p class="m-0">{{ user.fullName }}</p>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-5 ms-auto text-center text-lg-end">
             <button @click.prevent="setCommitedUserData(user)" type="button" class="me-2 btn btn-success" data-bs-toggle="modal" data-bs-target="#ApproveModal">Accept</button>
@@ -112,8 +129,7 @@ function showAlert(message, type, timeout){
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <h5>ID: {{  commitedUserData.id }}</h5>
-                        <p class="small">Created at: {{ commitedUserData.createdAt }}</p>
+                        <h5>ID: {{  commitedUserData.userId }}</h5>
                     </div>
                     <div class="row">
                         <div class="col-4">
@@ -128,7 +144,7 @@ function showAlert(message, type, timeout){
                             E-Mail:
                         </div>
                         <div class="col">
-                            <input type="text" class="rounded p-1 form-control" v-model="commitedUserData.personal_data.email">
+                            <input type="text" class="rounded p-1 form-control" v-model="commitedUserData.email">
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -136,7 +152,7 @@ function showAlert(message, type, timeout){
                             Full name:
                         </div>
                         <div class="col">
-                            <input type="text" class="rounded p-1 form-control" v-model="commitedUserData.personal_data.full_name">
+                            <input type="text" class="rounded p-1 form-control" v-model="commitedUserData.fullName">
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -147,13 +163,13 @@ function showAlert(message, type, timeout){
                             </div>
                             <div class="col">
                                 <button type="button" class="btn btn-outline-dark dropdown-toggle ms-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{ commitedUserData.personal_data.school.name }}
+                                    {{ selectedSchoolName }}
                                 </button>
                                 <ul class="dropdown-menu">
                                     <!-- Dropdown menu links -->
                                     <li 
                                         v-for="allSchool in allSchools" 
-                                        @click="changeSchool(allSchool.id, allSchool.name)" 
+                                        @click="changeSchool(allSchool.id)" 
                                         class="dropdown-item"
                                     >
                                         {{ allSchool.name }}
@@ -180,8 +196,7 @@ function showAlert(message, type, timeout){
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <h5>ID: {{  commitedUserData.id }}</h5>
-                        <p class="small">Created at: {{ commitedUserData.createdAt }}</p>
+                        <h5>ID: {{  commitedUserData.userId }}</h5>
                     </div>
                     <div class="row">
                         <div class="col-4">
@@ -196,7 +211,7 @@ function showAlert(message, type, timeout){
                             E-Mail:
                         </div>
                         <div class="col">
-                            <p class="rounded form-control">{{ commitedUserData.personal_data.email }}</p>
+                            <p class="rounded form-control">{{ commitedUserData.email }}</p>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -204,7 +219,7 @@ function showAlert(message, type, timeout){
                             Full name:
                         </div>
                         <div class="col">
-                            <p class="rounded form-control">{{ commitedUserData.personal_data.full_name }}</p>
+                            <p class="rounded form-control">{{ commitedUserData.fullName }}</p>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -212,7 +227,7 @@ function showAlert(message, type, timeout){
                             School:
                         </div>
                         <div class="col">
-                            <p class="rounded form-control">{{ commitedUserData.personal_data.school.name }}</p>
+                            <p class="rounded form-control">{{ selectedSchoolName }}</p>
                         </div>
                     </div>
                 </div>

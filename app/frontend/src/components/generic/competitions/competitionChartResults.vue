@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, ref, toRef } from 'vue'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
@@ -12,7 +12,7 @@ import {
 import { CanvasRenderer } from 'echarts/renderers'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import displayAlert from '@/components/generic/displayAlert.vue'
-import { apiClient } from '@/services/api'
+import { apiClient, CompetitorDashboardResponse } from '@/services/api'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
 
 // Register only what's needed (tree-shakeable)
@@ -39,7 +39,7 @@ const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
 
-function showAlert(message, type, timeout = 3000) {
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -47,7 +47,7 @@ function showAlert(message, type, timeout = 3000) {
 
 // --- Data ---
 const isLoadingResults = ref(true)
-const results = ref([])
+const results = ref<CompetitorDashboardResponse[]>([])
 
 const CHART_PALETTE = [
     '#0d6efd',
@@ -61,6 +61,9 @@ const CHART_PALETTE = [
 
 // --- ECharts option (reactive) ---
 const chartOption = computed(() => {
+    if (!results.value){
+        return {}
+    }
     const maxTimestamp = Math.max(
         ...results.value.flatMap(c =>
             (c.results ?? []).map(r => new Date(r.timestamp).getTime())
@@ -77,10 +80,10 @@ const chartOption = computed(() => {
         tooltip: {
           trigger: 'axis',
           axisPointer: {type: 'cross'},
-          formatter(params) {
+          formatter(params: any) {
             const time = new Date(params[0].value[0]).toLocaleTimeString()
             const lines = params.map(
-                (p) => `<span style="color:${p.color}">●</span> ${p.seriesName}: <b>${p.value[1]}</b>`
+                (p: any) => `<span style="color:${p.color}">●</span> ${p.seriesName}: <b>${p.value[1]}</b>`
             )
             return `${time}<br/>${lines.join('<br/>')}`
           },
@@ -104,7 +107,7 @@ const chartOption = computed(() => {
         },
         series: results.value.map((competitor, index) => {
           const sorted = [...(competitor.results ?? [])]
-              .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
 
           const data = sorted.map(r => [r.timestamp, r.point_amount])
 
@@ -131,7 +134,10 @@ async function fetchResults() {
     try {
         isLoadingResults.value = true
         const response = await apiClient.scoring.dashboard.history(props.competition_id)
-        results.value = response.competitors
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error')
+        }
+        results.value = response.data.competitors ?? []
     } catch (error) {
         showAlert(`Couldn't load chart data. Error: ${error}`, 'warning')
     } finally {
@@ -159,7 +165,7 @@ onMounted(async () => {
 
         <!-- Chart -->
         <VChart
-            v-show="!isLoadingResults"
+            v-if="!isLoadingResults"
             class="w-100 h-100"
             style="min-height: 420px;"
             :option="chartOption"

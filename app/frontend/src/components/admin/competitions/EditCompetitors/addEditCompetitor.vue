@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import {computed, onMounted, ref} from 'vue';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import {apiClient} from '@/services/api';
+import {apiClient, CompetitorResponse, SchoolResponse, CompetitorUpsertRequest} from '@/services/api';
 import displayAlert from '@/components/generic/displayAlert.vue';
 
 const props = defineProps({
@@ -29,11 +29,11 @@ const props = defineProps({
         default: false
     },
     existingCompetitors: {
-        type: Array,
+        type: Array as () => Array<CompetitorResponse>,
         default: () => []
     },
     competitor: {
-        type: Object,
+        type: Object as () => CompetitorResponse,
         default: () => ({})
     },
     modalHeader: {
@@ -43,75 +43,45 @@ const props = defineProps({
 })
 
 // personal data mappings
-const personalData = ref({
-    "full_name": "",
-    "email": "",
-    "school": {
-        "id": "",
-        "name": "Chose a school"
-    }
+const competitorData = ref<CompetitorUpsertRequest>({
+    alias: '',
+    public_display_name_type: 1,
+    personal_data_id: undefined,
+    full_name: '',
+    email: '',
+    school_id: undefined,
 })
-const isLoadingMain = ref(true)
-const isLoadingSchool = ref(true)
-const isLoadingUsers = ref(true)
-const publicDisplayType = ref()
-const publicAlias = ref('')
+const isLoadingMain = ref<boolean>(true)
+const isLoadingSchool = ref<boolean>(true)
+const isLoadingUsers = ref<boolean>(true)
 const avaliableDisplayTypes = [
-    { id: "1", name: "Full Name" },
-    { id: "2", name: "School" },
-    { id: "3", name: "Alias" }
+    { id: 1, name: "Full Name" },
+    { id: 2, name: "School" },
+    { id: 3, name: "Alias" }
 ]
-const allSchools = ref([])
-const allUsers = ref([])
-const userPersonalDataId = ref()
-const userName = ref()
+const allSchools = ref<SchoolResponse[]>([])
+const allUsers = ref<CompetitorResponse[]>([])
+
+// Track selected school/user names for display in dropdowns
+const selectedSchoolName = ref<string>('')
+const userName = ref<string>('')
 
 const emit = defineEmits(['addItem', 'editCompetitor'])
 
 // Change public displayname type
-const changeType = (id) => {
-    publicDisplayType.value = id
-}
-
-const buildCompetitorPayload = (personalData, linkedPersonalDataId = null, includeId = false, id = null) => {
-    const payload = {
-        alias: publicAlias.value,
-        public_display_name_type: publicDisplayType.value ? Number(publicDisplayType.value) : null,
-        personal_data_id: linkedPersonalDataId ? Number(linkedPersonalDataId) : null,
-        full_name: personalData?.full_name || null,
-        email: personalData?.email || null,
-        school_id: personalData?.school?.id ? Number(personalData.school.id) : null,
-    }
-
-    if (!includeId) {
-        return payload
-    }
-
-    return {
-        id,
-        ...payload,
-    }
+const changeType = (id: number) => {
+    competitorData.value.public_display_name_type = id
 }
 
 // Edit a competitor
-const editCompetitor = async(id, displayTypeId, alias, personalDataId) => {
+const editCompetitor = async(id: number, editedCompetitor: CompetitorUpsertRequest) => {
     try {
-        
-        // Create edit competitor data object
-        const editedCompetitor = {
-            id,
-            alias,
-            public_display_name_type: displayTypeId ? Number(displayTypeId) : null,
-            personal_data_id: personalDataId ? Number(personalDataId) : null,
+        const response = await apiClient.competitors.update(id, editedCompetitor)
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
         }
 
-        // Edit data of competitor
-         await apiClient.competitors.update(id, editedCompetitor)
-
-        // Show success on edit
-        showAlert('Edit competitor <strong>' + alias + '</strong> was a success.', 'success')
-
-        // Emit competitor edited event
+        showAlert('Edit competitor <strong>' + competitorData.value.alias + '</strong> was a success.', 'success')
         emit('editCompetitor')
     } catch (error) {
         showAlert("An error. Couldn't update competitor. Error" + error, 'danger')
@@ -119,37 +89,24 @@ const editCompetitor = async(id, displayTypeId, alias, personalDataId) => {
 }
 
 // Create either linked competitor or a "dummy" competitor
-const createCompetitor = async(newPersonalData, linkedPersonalDataId) => {
+const createAndAddCompetitor = async(competitor: CompetitorUpsertRequest) => {
     try {
-        // Make the api call
-        if (props.isLinked) {
-            await apiClient.competitors.create(buildCompetitorPayload(null, linkedPersonalDataId))
-        } else {
-            await apiClient.competitors.create(buildCompetitorPayload(newPersonalData))
+        const response = await apiClient.competitors.create(competitor)
+
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
         }
-        
-        // show alert of success
-        showAlert(props.buttonName + ' <strong>' + newPersonalData.full_name + '</strong> was a success.', 'success')
-        
-        // emit event to parent
+
+        showAlert(props.buttonName + ' <strong>' + competitorData.value.alias + '</strong> was a success.', 'success')
         emit('addItem')
-        // empty out school on success 
-        personalData.value = {
-            "full_name": "",
-            "email": "",
-            "school": {
-                "id": "",
-                "name": "Chose a school"
-            }
-        }
     } catch(e) {
-        showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e.response.data.error, 'danger', 9000)
+        showAlert('Couldn\'t ' + props.buttonName + '. <br> Error: ' + e + '<br>' + e, 'danger', 9000)
     }
 }
 
 // Get display type
-const getDisplayTypeNameById = (id) => {
-  const displayType = avaliableDisplayTypes.find(p => p.id === id)
+const getDisplayTypeNameById = (id: number) => {
+  const displayType = avaliableDisplayTypes.find(p => p.id == id)
   return displayType ? displayType.name : 'Not Set'
 }
 
@@ -158,7 +115,7 @@ const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -168,7 +125,11 @@ function showAlert(message, type, timeout){
 const getSchools = async() => {
     try {
         isLoadingSchool.value = true
-        allSchools.value = await apiClient.schools.list()
+        const response = await apiClient.schools.list()
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        allSchools.value = response.data
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     } finally {
@@ -180,54 +141,50 @@ const getSchools = async() => {
 const getAllUsers = async() => {
     try {
         isLoadingUsers.value = true
-        allUsers.value = await apiClient.users.list()
+        const response = await apiClient.users.list()
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error');
+        }
+        allUsers.value = response.data
     } catch(error) {
-        showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
+        showAlert('Couldn\'t get data for all the users. Error:' + error, 'danger', 9000)
     } finally {
         isLoadingUsers.value = false
     }
 }
 
 // Do change the linked user displayed on the dropdown of the modal
-const changeLinkedUser = (id, name, newPersonalData) => {
-    if (id == null || !newPersonalData) {
+const changeLinkedUser = (id: number, name?: string) => {
+    if (id == null) {
         return
     }
-    userPersonalDataId.value = id
-    userName.value = name
-    personalData.value = { ...newPersonalData }
+    competitorData.value.personal_data_id = id
+    userName.value = name ?? ''
 }
 
-
 // Set the new school
-const changeSchool = async(id, name) => {
-    personalData.value.school.id = id
-    personalData.value.school.name = name
+const changeSchool = (id: number, name?: string) => {
+    competitorData.value.school_id = id
+    selectedSchoolName.value = name ?? ''
 }
 
 // On mount get certain things
 onMounted(async() => {
     try {
-
-        // Get schools and users for competitor add
         await getSchools();
         await getAllUsers();
 
         // Get competitor data for competitor edit
         if(props.isEdit) {
-            // Add values to existing competitors
-            publicDisplayType.value = ''+props.competitor.public_display_name_type // this needs to be string otherwise it breaks.
-            publicAlias.value = props.competitor.alias
+            competitorData.value.public_display_name_type = props.competitor.public_display_name_type ?? 1
+            competitorData.value.alias = props.competitor.alias
         }
 
-    // Catch error
     } catch (error) {
         showAlert("Couldn't get competitor data. Error:" + error, "danger")
     } finally {
-        // Load main body of the modal
         isLoadingMain.value = false
     }
-
 })
 
 
@@ -237,7 +194,7 @@ const searchSchools = ref('');
 const filteredSchools = computed(() => {
   const query = searchSchools.value.toLowerCase()
   return allSchools.value.filter(school =>
-    school.name.toLowerCase().includes(query)
+    school.name?.toLowerCase().includes(query)
   )
 })
 
@@ -245,12 +202,12 @@ const filteredSchools = computed(() => {
 const unLinkedUsers = computed(() => {
     const existingUserIds = new Set(
         props.existingCompetitors
-            .map(user => user?.personal_data?.id)
-            .filter(id => id != null)
+            .map(c => c.personal_data?.id)
+            .filter((id): id is number => id != null)
     )
     return allUsers.value.filter(user => {
-        const personalDataId = user?.personal_data?.id
-        return personalDataId != null && !existingUserIds.has(personalDataId)
+        const competitorDataId = user?.personal_data?.id
+        return competitorDataId != null && !existingUserIds.has(competitorDataId)
     })
 })
 
@@ -318,7 +275,7 @@ const filteredUsers = computed(() => {
                         <!-- Default dropright button -->
                         <div class="btn-group">
                             <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{ getDisplayTypeNameById(publicDisplayType) }}
+                                {{ getDisplayTypeNameById(competitorData.public_display_name_type) }}
                             </button>
                             
                             <ul class="dropdown-menu">
@@ -342,7 +299,7 @@ const filteredUsers = computed(() => {
                             Alias:
                         </div>
                         <div class="col">
-                            <input type="text" class="rounded p-1 form-control" v-model="publicAlias">
+                            <input type="text" class="rounded p-1 form-control" v-model="competitorData.alias">
                         </div>
                     </div>
 
@@ -356,7 +313,7 @@ const filteredUsers = computed(() => {
                                 <!-- Default dropright button -->
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {{ userName }}
+                                        {{ userName || 'Select User' }}
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li class="px-2 py-1">
@@ -370,7 +327,7 @@ const filteredUsers = computed(() => {
                                         <!-- Dropdown menu links -->
                                         <li 
                                             v-for="user in filteredUsers" 
-                                            @click="changeLinkedUser(user?.personal_data?.id, user?.personal_data?.full_name, user?.personal_data)"
+                                            @click="changeLinkedUser(user?.personal_data?.id!, user?.personal_data?.full_name)"
                                             class="dropdown-item"
                                         >
                                             {{ user?.personal_data?.full_name }}
@@ -387,7 +344,7 @@ const filteredUsers = computed(() => {
                                 Full Name:
                             </div>
                             <div class="col">
-                                <input type="text" class="rounded p-1 form-control" v-model="personalData.full_name">
+                                <input type="text" class="rounded p-1 form-control" v-model="competitorData.full_name">
                             </div>
                         </div>
                         <div class="row mt-2 mb-2">
@@ -395,7 +352,7 @@ const filteredUsers = computed(() => {
                                 E-Mail:
                             </div>
                             <div class="col">
-                                <input type="text" class="rounded p-1 form-control" v-model="personalData.email">
+                                <input type="text" class="rounded p-1 form-control" v-model="competitorData.email">
                             </div>
                         </div>
                         <!-- School logic -->
@@ -407,7 +364,7 @@ const filteredUsers = computed(() => {
                                 <!-- Default dropright button -->
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {{ personalData.school.name }}
+                                        {{ selectedSchoolName || 'Select School' }}
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li class="px-2 py-1">
@@ -434,7 +391,7 @@ const filteredUsers = computed(() => {
                 </div>
                 <div class="modal-footer">
                     <button
-                        @click.prevent="createCompetitor(personalData, userPersonalDataId)"
+                        @click.prevent="createAndAddCompetitor(competitorData)"
                         type="button" 
                         class="btn btn-success" 
                         data-bs-dismiss="modal"
@@ -443,7 +400,7 @@ const filteredUsers = computed(() => {
                         Add
                     </button>
                     <button 
-                        @click.prevent="editCompetitor(competitor.id, publicDisplayType, publicAlias, competitor.personal_data.id)"
+                        @click.prevent="editCompetitor(competitor.id, competitorData)"
                         type="button" 
                         class="btn btn-success" 
                         data-bs-dismiss="modal"
@@ -458,5 +415,3 @@ const filteredUsers = computed(() => {
     </div>
 
 </template>
-
-

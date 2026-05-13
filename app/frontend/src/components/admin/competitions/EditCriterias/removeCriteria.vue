@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { apiClient } from '@/services/api';
 
@@ -28,7 +28,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
@@ -37,11 +37,13 @@ function showAlert(message, type, timeout){
 // Set event to emit
 const emit = defineEmits(['removeCriteria'])
 
-const removeCompetitor = async(criteriaId, criteriaName) => {
+const removeCompetitor = async(criteriaId: number, criteriaName?: string) => {
     try {
          // Delete competitor
-        await apiClient.scoring.criteria.remove(criteriaId)
-
+        const response = await apiClient.scoring.criteria.remove(criteriaId)
+        if (!response.success) {
+            throw new Error(response.error.message || 'Unknown error')
+        }
         // emit event
         emit('removeCriteria')
 
@@ -49,7 +51,7 @@ const removeCompetitor = async(criteriaId, criteriaName) => {
         showAlert('Criteria named ' + criteriaName + ' has been removed. ID: ' + criteriaId, 'success')
     } catch (error) {
         // On error show error
-        showAlert('Criteria name ' + criteriaName + ' couldn\'t be removed. Error: ' + error + '<br>' + error.response.data.error , 'danger', 9000)
+        showAlert('Criteria name ' + criteriaName + ' couldn\'t be removed. Error: ' + error + '<br>' + error , 'danger', 9000)
     }
 }
 
@@ -97,7 +99,7 @@ const removeCompetitor = async(criteriaId, criteriaName) => {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button @click.prevent="removeCompetitor(props.criteriaId, criteriaName)" type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+                    <button @click.prevent="removeCompetitor(props.criteriaId, props.criteriaName)" type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
