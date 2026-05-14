@@ -4,6 +4,7 @@ import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entit
 import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entity.CompetitorSchoolJpaEntity;
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData;
+import com.arbitaja.refactored.backend.competition.core.domain.model.School;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,7 +44,7 @@ class CompetitorPersistenceMapperTest {
         assertEquals(1, domain.getPersonalData().getId());
         assertEquals("Jane Runner", domain.getPersonalData().getFullName());
         assertEquals("jane@example.com", domain.getPersonalData().getEmail());
-        assertEquals(5, domain.getPersonalData().getSchoolId());
+        assertEquals(5, domain.getPersonalData().getSchool().getId());
     }
 
     @Test
@@ -99,7 +100,7 @@ class CompetitorPersistenceMapperTest {
         assertEquals(2, domain.getId());
         assertEquals("John Doe", domain.getFullName());
         assertEquals("john@example.com", domain.getEmail());
-        assertEquals(8, domain.getSchoolId());
+        assertEquals(8, domain.getSchool().getId());
     }
 
     @Test
@@ -121,7 +122,7 @@ class CompetitorPersistenceMapperTest {
 
         assertEquals(3, domain.getId());
         assertEquals("No School", domain.getFullName());
-        assertNull(domain.getSchoolId());
+        assertNull(domain.getSchool());
     }
 
     @Test
@@ -129,7 +130,10 @@ class CompetitorPersistenceMapperTest {
         CompetitorPersonalData domain = CompetitorPersonalData.builder()
             .fullName("New Person")
             .email("new@example.com")
-            .schoolId(6)
+            .school(School.builder()
+                .id(6)
+                .name("School C")
+                .build())
             .build();
 
         CompetitorSchoolJpaEntity schoolEntity = new CompetitorSchoolJpaEntity(6, "School C", new Timestamp(System.currentTimeMillis()));

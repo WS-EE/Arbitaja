@@ -58,7 +58,7 @@ class SignupControllerV2IT {
         SignupRequest request = signupRequest("new-user", "pass", "New User", "new@example.com", 2);
         CreateUserUseCase.SignupCommand command = signupCommand("new-user", "pass", "New User", "new@example.com", 2);
         SignupUser signupUser = signupUser(15, "new-user", "new@example.com", 2);
-        SignupResponse response = new SignupResponse(15L, "new-user", "new@example.com", 2);
+        SignupResponse response = new SignupResponse(15L, "new-user", "new@example.com", "New User", 2);
 
         when(signupUserMapper.toSignupCommand(any(SignupRequest.class))).thenReturn(command);
         when(createUserUseCase.signupUser(command)).thenReturn(signupUser);
@@ -127,8 +127,8 @@ class SignupControllerV2IT {
         SignupUser signupUser2 = signupUser(2, "beta", "beta@example.com", 2);
 
         when(createUserUseCase.getAllSignupUsers()).thenReturn(List.of(signupUser1, signupUser2));
-        when(signupUserMapper.toSignupResponse(signupUser1)).thenReturn(new SignupResponse(1L, "alpha", "alpha@example.com", 1));
-        when(signupUserMapper.toSignupResponse(signupUser2)).thenReturn(new SignupResponse(2L, "beta", "beta@example.com", 2));
+        when(signupUserMapper.toSignupResponse(signupUser1)).thenReturn(new SignupResponse(1L, "alpha", "alpha@example.com", "New User", 1));
+        when(signupUserMapper.toSignupResponse(signupUser2)).thenReturn(new SignupResponse(2L, "beta", "beta@example.com", "New User", 2));
 
         mockMvc.perform(get("/v2/signup/signup"))
             .andExpect(status().isOk())

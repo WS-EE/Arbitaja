@@ -158,7 +158,7 @@ class CompetitionPersistenceMapperTest {
         assertEquals(50, domain.getId());
         assertEquals("Person Name", domain.getFullName());
         assertEquals("person@example.com", domain.getEmail());
-        assertEquals(5, domain.getSchoolId());
+        assertEquals(5, domain.getSchool().getId());
     }
 
     @Test
@@ -171,7 +171,7 @@ class CompetitionPersistenceMapperTest {
 
         CompetitorPersonalData domain = mapper.toDomain(entity);
 
-        assertNull(domain.getSchoolId());
+        assertNull(domain.getSchool());
     }
 }
 

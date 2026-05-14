@@ -3,7 +3,9 @@ package com.arbitaja.refactored.backend.pam.core.application.user;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
+import com.arbitaja.refactored.backend.pam.core.domain.model.UserRole;
 import com.arbitaja.refactored.backend.pam.core.port.out.role.RoleRepositoryPort;
+import com.arbitaja.refactored.backend.pam.core.port.out.role.UserRoleRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +31,9 @@ class ManageUserRolesServiceTest {
     @Mock
     private RoleRepositoryPort roleRepository;
 
+    @Mock
+    UserRoleRepositoryPort userRoleRepositoryPort;
+
     @InjectMocks
     private ManageUserRolesService manageUserRolesService;
 
@@ -39,13 +44,11 @@ class ManageUserRolesServiceTest {
 
         when(userRepository.findById(5)).thenReturn(Optional.of(user));
         when(roleRepository.findById(1)).thenReturn(Optional.of(role1));
-        when(userRepository.save(user)).thenReturn(user);
 
         User result = manageUserRolesService.overwriteUserRoles(5, List.of(1));
 
-        Set<Integer> roleIds = result.getUserRoles().stream().map(userRole -> userRole.getRole().getId()).collect(java.util.stream.Collectors.toSet());
-        assertEquals(Set.of(1), roleIds);
-        verify(userRepository).save(user);
+        verify(userRoleRepositoryPort).saveUserRole(any(UserRole.class));
+        assertEquals(user, result);
     }
 
     @Test

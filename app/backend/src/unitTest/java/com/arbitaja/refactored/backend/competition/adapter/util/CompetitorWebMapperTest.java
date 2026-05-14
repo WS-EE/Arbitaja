@@ -4,6 +4,7 @@ import com.arbitaja.refactored.backend.competition.adapter.in.web.competitor.dto
 import com.arbitaja.refactored.backend.competition.adapter.in.web.competitor.dto.response.CompetitorResponse;
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData;
+import com.arbitaja.refactored.backend.competition.core.domain.model.School;
 import com.arbitaja.refactored.backend.competition.core.port.in.competitor.ManageCompetitorUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,7 +63,10 @@ class CompetitorWebMapperTest {
             .id(10)
             .fullName("John Competitor")
             .email("john@example.com")
-            .schoolId(3)
+            .school( School.builder()
+                .id(3)
+                .name("Test School")
+                    .build())
             .build();
 
         Competitor competitor = Competitor.builder()
@@ -81,7 +85,8 @@ class CompetitorWebMapperTest {
         assertEquals(10, response.personalData().id());
         assertEquals("John Competitor", response.personalData().fullName());
         assertEquals("john@example.com", response.personalData().email());
-        assertEquals(3, response.personalData().schoolId());
+        assertEquals(3, response.personalData().school().id());
+        assertEquals("Test School", response.personalData().school().name());
     }
 
     @Test

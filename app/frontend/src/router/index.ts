@@ -29,6 +29,13 @@ import editCompetitionCompetitorView from '@/views/adminViews/competitions/editC
 import editCompetitionCriteriasView from '@/views/adminViews/competitions/editCompetitionCriteriasView.vue';
 import adminRolesView from '@/views/adminViews/roles/adminRolesView.vue';
 
+declare module 'vue-router' {
+    interface RouteMeta {
+        requiresAuth?: boolean
+        requiresPrivilege?: string
+    }
+}
+
 const router = createRouter({
     history: createWebHistory(API_BASE_URL),
     routes: [
