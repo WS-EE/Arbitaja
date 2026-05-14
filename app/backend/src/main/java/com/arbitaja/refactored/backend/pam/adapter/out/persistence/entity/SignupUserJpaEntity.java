@@ -34,7 +34,7 @@ public class SignupUserJpaEntity {
     @NonNull
     private String saltedPassword;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "personal_data_id", nullable = false)
     @NonNull
     private PersonalDataJpaEntity personalData;

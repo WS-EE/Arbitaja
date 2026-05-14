@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
 // Get user ID we are editing
 import { useRoute } from 'vue-router';
 const route = useRoute();
-const userID = route.params.id
+const userID = Number(route.params.id)
 
 // import loading
 const isLoading = ref(true)
@@ -12,13 +12,17 @@ import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
 // Get the user we want to edit
 import userProfile from '@/components/generic/userEdit/userProfile.vue';
-import { apiClient } from '@/services/api'
+import { apiClient, UserProfileResponse } from '@/services/api'
 
-const user = ref([])
+const user = ref<UserProfileResponse>({} as UserProfileResponse)
 
 onMounted(async() =>{
     try {
-        user.value = await apiClient.users.details(userID)
+        const response = await apiClient.users.details(userID)
+        if(!response.success){
+            throw new Error(response.error.message || 'Unknown error')
+        }
+        user.value = response.data
     } catch(e) {
 
     } finally {

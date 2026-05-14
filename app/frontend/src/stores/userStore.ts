@@ -18,14 +18,28 @@ export const useUserStore = defineStore('user', {
         this.permissions = data.permissions
         this.personal_data = data.personal_data
     },
+      clearUserAuthorization(): void {
+        this.id = 0;
+        this.username = undefined;
+        this.roles = [];
+        this.permissions = [];
+        this.personal_data = undefined;
+
+      }
   },
 
   getters: {
-    hasPrivilege: (state: UserProfileResponse) => (privilege: string): boolean => {
-      if (!state.permissions) {
-        return false;
+      hasPrivilege: (state: UserProfileResponse) => (privilege: string): boolean => {
+          if (!state.permissions) {
+              return false;
+          }
+          return state.permissions.some(auth => auth === privilege);
+      },
+      getUserProfile: (state: UserProfileResponse) => () => {
+        return state;
+      },
+      isAuthenticated: (state: UserProfileResponse) => () => {
+          return state.id != 0;
       }
-      return state.permissions.some(auth => auth === privilege);
-    },
   },
 })

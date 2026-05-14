@@ -21,10 +21,15 @@ const isUserAdmin = computed(() => userStore.hasPrivilege('ADMIN'))
 // User logout function
 const userLogout = async () => {
     try {
-        await apiClient.auth.logout();
-    } catch(error) {
-        // We are expecting 401 response when logging out.
+        const response = await apiClient.auth.logout();
+        if (!response.success) {
+          throw new Error(response.error.message || 'Unknown error');
+        }
+        userStore.clearUserAuthorization()
         await router.replace('/home');
+        location.reload();
+    } catch(error) {
+        console.error('Logout failed:', error);
         location.reload();
     }
 }

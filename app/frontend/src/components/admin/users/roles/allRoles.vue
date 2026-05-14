@@ -5,6 +5,7 @@ import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
 import { useUserStore } from '@/stores/userStore';
 import { apiClient, RoleResponse } from '@/services/api';
 import displayAlert from '@/components/generic/displayAlert.vue';
+import {RouterLink} from "vue-router";
 
 const allRoles = ref<RoleResponse[]>([]);
 const isLoadingRoles = ref<boolean>(true);
@@ -115,6 +116,7 @@ onMounted(async () => {
             <p class="m-0">{{ !role.permissions ? 0 : role.permissions.length }}</p>
           </div>
           <div class="col-lg-4 col-md-4 col-sm-5 ms-lg-auto text-center text-lg-end pt-2 pt-md-0">
+            <RouterLink :to="'/admin/users/role_edit/' + role.id" class="btn btn-outline-success me-2">edit</RouterLink>
             <button
                 @click.prevent="setRoleToDelete(role.id)"
                 type="button" data-bs-toggle="modal" data-bs-target="#deleteUser"

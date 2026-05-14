@@ -52,10 +52,8 @@ public class ManageRolePermissionsService implements ManageRolePermissionsUseCas
             .filter(rp -> !requestedPermissionIds.contains(rp.getPermission().getId()))
             .toList();
 
-        rolePermissionsToRemove.forEach(rolePermission -> {
-            role.getRolePermissions().remove(rolePermission);
-            rolePermissionRepository.delete(rolePermission);
-        });
+        rolePermissionsToRemove.forEach(role.getRolePermissions()::remove);
+        rolePermissionsToRemove.forEach(rolePermissionRepository::delete);
 
         for (Integer permissionId : requestedPermissionIds) {
             if (existingPermissionIds.contains(permissionId)) {
@@ -70,6 +68,6 @@ public class ManageRolePermissionsService implements ManageRolePermissionsUseCas
             role.getRolePermissions().add(rolePermission);
         }
 
-        return roleRepository.save(role);
+        return role;
     }
 }

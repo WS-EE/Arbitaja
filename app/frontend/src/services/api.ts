@@ -35,6 +35,9 @@ export type ScoringCriterionUpsertRequest = components['schemas']['ScoringCriter
 
 export type RoleRequest = components['schemas']['Role'];
 export type RoleResponse = components['schemas']['RoleResponse'];
+export type OverWriteRolePermissionsRequest = components["schemas"]["AddPermissionToRoleRequest"]
+
+export type PermissionResponse = components['schemas']["PermissionResponse"]
 
 export type GeneralMessageResponse = components['schemas']['GeneralMessageResponse'];
 export type ErrorResponse = components['schemas']['ErrorResponse']
@@ -51,13 +54,13 @@ export const apiClient = {
   health: (): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.get('/health')),
   auth: {
     currentUser: (): Promise<ApiResponse<UserProfileResponse>> => unwrap(api.get('/v2/user/auth')),
-    login: ({ username, password, rememberMe }: { username: string, password: string, rememberMe: boolean }) => {
+    login: ({ username, password, rememberMe }: { username: string, password: string, rememberMe: boolean }): Promise<ApiResponse<UserProfileResponse>> => {
       const formData = buildFormLoginPayload({ username, password, rememberMe });
-      return api.post('/login-user', formData, {
+      return unwrap(api.post('/login-user', formData, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
+      }));
     },
-    logout: () => api.post('/logout'),
+    logout: (): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.post('/logout')),
   },
   users: {
     list: (): Promise<ApiResponse<UserProfileResponse[]>> => unwrap(api.get('/v2/user')),
@@ -111,8 +114,13 @@ export const apiClient = {
   },
   roles: {
     list: (): Promise<ApiResponse<RoleResponse[]>> => unwrap(api.get('/v2/roles')),
+    byId: (id: number): Promise<ApiResponse<RoleResponse>> => unwrap(api.get(`/v2/roles/${id}`)),
     create: (payload: RoleRequest): Promise<ApiResponse<RoleResponse>> => unwrap(api.post('/v2/roles', payload)),
     update: (id: number, payload: RoleRequest): Promise<ApiResponse<RoleResponse>> => unwrap(api.put(`/v2/roles/${id}`, payload)),
     delete: (id: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/roles/${id}`)),
+    overwriteRolePermissions: (roleId: number, payload: OverWriteRolePermissionsRequest): Promise<ApiResponse<RoleResponse>> => unwrap(api.put(`/v2/roles/${roleId}/permissions`, payload)),
+  },
+  permissions: {
+    list: (): Promise<ApiResponse<PermissionResponse[]>> => unwrap(api.get('/v2/permissions')),
   }
 };

@@ -1,42 +1,36 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onBeforeMount } from 'vue';
 
 import logo from '@/assets/media/logo.svg';
 import { useRouter } from "vue-router";
 import { apiClient } from '@/services/api';
 
-// import cookie handler
-import { useCookies } from '@/assets/js/useCookies';
-const $cookies = useCookies(); 
 import { useAuthRehydrate } from '@/composables/useAuthRehydrate'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStore } from '@/stores/userStore';
 
 const router = useRouter();
 const username = ref("");
 const password = ref("");
-const getLogonError = ref('');
+const getLogonError = ref<boolean>(false);
 const rememberMe = ref(false);
 
 const { loadAuth } = useAuthRehydrate()
 
-const userLogin = () => {
-  getLogonError.value = false
-
-  apiClient.auth.login({
+const userLogin = async () => {
+  try {
+    const response = await apiClient.auth.login({
       username: username.value,
       password: password.value,
       rememberMe: rememberMe.value,
     })
-    .then(async function (response) {
-      if(response.status === 200){
-        // Set user to be logged in
-        $cookies.set('isLoggedIn', true, 0);
-        $cookies.set('userParameters', response.data, 0);
-        await loadAuth({ force: true })
-        router.back()
-      }
-    })
-    .catch(function (error) {
+
+    if (!response.success) {
+      throw new Error(response.error.message || 'Unknown error');
+    }
+    await loadAuth({force: true})
+    router.back();
+  }
+    catch (error) {
       // Log error to console
       console.log(error);
 
@@ -47,7 +41,7 @@ const userLogin = () => {
       setTimeout(() => {
         getLogonError.value = false
       }, 3000);
-    });
+    }
 }
 
 // Redirect back to previos page when user is logged in.

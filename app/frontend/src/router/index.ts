@@ -27,7 +27,9 @@ import addCompetitionView from '@/views/adminViews/competitions/addCompetitionVi
 import editCompetitionView from '@/views/adminViews/competitions/editCompetitionView.vue';
 import editCompetitionCompetitorView from '@/views/adminViews/competitions/editCompetitionCompetitorView.vue';
 import editCompetitionCriteriasView from '@/views/adminViews/competitions/editCompetitionCriteriasView.vue';
+
 import adminRolesView from '@/views/adminViews/roles/adminRolesView.vue';
+import editRolesView from '@/views/adminViews/roles/editRolesView.vue';
 
 declare module 'vue-router' {
     interface RouteMeta {
@@ -147,6 +149,11 @@ const router = createRouter({
                             path: 'role',
                             name: 'adminUsersRole',
                             component: adminRolesView
+                        },
+                        {
+                            path: 'role_edit/:id',
+                            name: 'adminUsersRoleEdit',
+                            component: editRolesView
                         },
                         {
                             path: 'singup',

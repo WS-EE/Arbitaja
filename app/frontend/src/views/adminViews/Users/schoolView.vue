@@ -1,13 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import AddSchool from '@/components/admin/users/school/addSchool.vue';
 import allSchools from '@/components/admin/users/school/allSchools.vue';
 
 import { onMounted,ref } from 'vue';
-import { apiClient } from '@/services/api'
+import { apiClient, SchoolResponse } from '@/services/api'
 
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 const isLoadingSchools = ref(true)
-const schools = ref([]);
+const schools = ref<SchoolResponse[]>([]);
 
 const onAddSchool = async() => {
     isLoadingSchools.value = true
@@ -45,7 +45,7 @@ const alertType = ref('')
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
-function showAlert(message, type, timeout){
+function showAlert(message: string, type: string, timeout: number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout

@@ -44,9 +44,9 @@ logging:
     org.hibernate.SQL: info
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.security:
-      web.authentication: DEBUG
-      web.access: DEBUG
-      core.Authentication: DEBUG
+      web.authentication: WARN
+      web.access: WARN
+      core.Authentication: WARN
 
 app:
   API_KEY: ${API_KEY:default_api_key}
@@ -60,6 +60,7 @@ app:
     /v2/signup,
     /v2/scoring/history,
     /v2/scoring/dashboard/**,
+    /v2/competition/**,
     /swagger-ui/**,
     /swagger/**,
     /api-docs/**,

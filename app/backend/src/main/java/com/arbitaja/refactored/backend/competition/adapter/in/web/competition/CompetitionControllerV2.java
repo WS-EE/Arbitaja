@@ -33,7 +33,6 @@ public class CompetitionControllerV2 {
     private final CompetitionWebMapper mapper;
 
     @GetMapping
-    @RequiresCompetitionPermission(CompetitionPermissionCode.VIEW_COMPETITIONS)
     public ResponseEntity<List<CompetitionResponse>> getAllCompetitions() {
         log.info("Getting all competitions");
         List<CompetitionResponse> competitions = getCompetitionUseCase.getAllCompetitions().stream()
@@ -43,7 +42,6 @@ public class CompetitionControllerV2 {
     }
 
     @GetMapping("/{id}")
-    @RequiresCompetitionPermission(CompetitionPermissionCode.VIEW_COMPETITIONS)
     public ResponseEntity<CompetitionResponse> getCompetitionById(@PathVariable Integer id) {
         log.info("Getting competition by id: {}", id);
         return ResponseEntity.ok(mapper.toResponse(getCompetitionUseCase.getCompetitionById(id)));

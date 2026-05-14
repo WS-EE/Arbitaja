@@ -944,7 +944,7 @@ export interface components {
             /** Format: int32 */
             id: number;
             name?: string;
-            permissions?: ("ADMIN" | "BASIC" | "VIEW_DASHBOARD" | "VIEW_USERS" | "EDIT_USERS" | "VIEW_SIGNUPS" | "ACCEPT_SIGNUPS" | "VIEW_ROLES" | "CREATE_UPDATE_ROLES" | "VIEW_PERMISSIONS" | "CREATE_UPDATE_PERMISSIONS" | "VIEW_COMPETITIONS" | "CREATE_UPDATE_COMPETITIONS" | "VIEW_COMPETITORS" | "CREATE_UPDATE_COMPETITORS" | "VIEW_SCHOOLS" | "CREATE_UPDATE_SCHOOLS" | "VIEW_SCORING_DASHBOARD" | "MANAGE_SCORING_CRITERIA" | "RECORD_SCORING_RESULTS")[];
+            permissions: ("ADMIN" | "BASIC" | "VIEW_DASHBOARD" | "VIEW_USERS" | "EDIT_USERS" | "VIEW_SIGNUPS" | "ACCEPT_SIGNUPS" | "VIEW_ROLES" | "CREATE_UPDATE_ROLES" | "VIEW_PERMISSIONS" | "CREATE_UPDATE_PERMISSIONS" | "VIEW_COMPETITIONS" | "CREATE_UPDATE_COMPETITIONS" | "VIEW_COMPETITORS" | "CREATE_UPDATE_COMPETITORS" | "VIEW_SCHOOLS" | "CREATE_UPDATE_SCHOOLS" | "VIEW_SCORING_DASHBOARD" | "MANAGE_SCORING_CRITERIA" | "RECORD_SCORING_RESULTS")[];
         };
         SchoolResponse: {
             /**
@@ -1041,8 +1041,8 @@ export interface components {
         PermissionResponse: {
             /** Format: int32 */
             id: number;
-            name?: string;
-            key?: string;
+            name: string;
+            key: string;
         };
         CompetitorUpsertRequest: {
             alias?: string;

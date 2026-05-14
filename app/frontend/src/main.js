@@ -11,6 +11,7 @@ import router from "./router";
 import VueCookies from 'vue-cookies'
 import axios from "axios";
 import PrimeVue from 'primevue/config';
+import Aura from '@primevue/themes/aura'
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate'
 import { API_BASE_URL } from '@/services/http'
 
@@ -24,6 +25,14 @@ axios.defaults.headers.put['Content-Type'] = 'application/json';
 const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);
+app.use(PrimeVue, {
+  theme: {
+    preset: Aura,
+    options: {
+      darkModeSelector: '.dark'
+    }
+  }
+})
 app.use(VueCookies, { expires: '7d'}, PrimeVue);
 
 // Set arbitaja version

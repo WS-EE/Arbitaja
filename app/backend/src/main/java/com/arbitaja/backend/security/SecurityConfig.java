@@ -4,6 +4,7 @@ package com.arbitaja.backend.security;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -79,12 +80,26 @@ public class SecurityConfig{
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
-                        .loginPage("/login")
+                        .loginProcessingUrl("/login-user")
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        .loginProcessingUrl("/login-user")
-                        .defaultSuccessUrl("/login?error=false", true)
-                        .failureUrl("/login?error=true")
+                        .successHandler((request, response, authentication) -> {
+                            response.setStatus(HttpStatus.OK.value());
+                            response.setContentType("application/json");
+                            // delegate to your existing logic or return minimal JSON
+                            response.getWriter().write("{\"success\":true}");
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Invalid username or password\"}");
+                        })
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpStatus.OK.value());
+                        })
                 )
                 .rememberMe(rememberMe -> rememberMe
                         .userDetailsService(userDetailsService())

@@ -25,12 +25,12 @@ public class RolePermissionJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "permission_id", nullable = false)
     @NonNull
     private PermissionJpaEntity permission;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     @NonNull
     private RoleJpaEntity role;

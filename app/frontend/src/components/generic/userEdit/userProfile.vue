@@ -1,40 +1,42 @@
-<script setup>
-import { useUserStore} from "@/stores/userStore";
+<script setup lang="ts">
 
-const store = useUserStore()
+// import ref and onmount
+import { onMounted, ref, computed } from 'vue';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+import { useUserStore } from "@/stores/userStore";
+import {apiClient, UserProfileResponse, SchoolResponse, UpdateUserRequest} from '@/services/api'
+
+const store = useUserStore();
+
+const userEditRequest = ref<UpdateUserRequest>({} as UpdateUserRequest)
 
 // Use props to get user profile
 const props = defineProps({
     user: {
-        type: Object,
+        type: Object as () => UserProfileResponse,
         required: true
     }
 })
 
 const emit = defineEmits(['userUpdate'])
 
-// import ref and onmount
-import { onMounted, ref, computed } from 'vue';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+const user = ref<UserProfileResponse>(props.user)
+
 
 // Get school list
-import { apiClient } from '@/services/api'
-
-const allSchools = ref('');
+const allSchools = ref<SchoolResponse[]>([]);
 
 // Set user parameters to empty
 const isAdmin = computed(() => store.hasPrivilege('EDIT_USERS'))
-const userid = ref('')
-const fullName = ref('')
-const email = ref('')
-const username = ref('')
-const roles = ref([])
-const school = ref(null)
 const isLoading = ref(true)
 
 const getSchools = async() => {
     try {
-        allSchools.value = await apiClient.schools.list()
+        const response = await apiClient.schools.list();
+        if(!response.success){
+          throw new Error(response.error.message || 'Unknown error')
+        }
+        allSchools.value = response.data;
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     }
@@ -42,26 +44,9 @@ const getSchools = async() => {
 
 
 onMounted(async () => {
-    // Try getting school data
-    await getSchools();
-
-    // Try getting user data
-    try {
-        // Get user parameters from cookies
-        const userParameters = props.user;
-
-        // Map out cookie parameters
-        userid.value = userParameters.id
-        fullName.value = userParameters.personal_data.full_name
-        email.value = userParameters.personal_data.email
-        username.value = userParameters.username
-        roles.value = userParameters.roles
-        school.value = userParameters.personal_data.school
-    } catch(error) {
-        showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p>Couldn\'t get user data! </p class=mb-0><p>Error:' + error + '</p>', 'danger', 4500);
-    } finally {
-        isLoading.value = false
-    }
+  // Try getting school data
+  await getSchools();
+  isLoading.value = false;
 });
 
 // Filter schools based on search
@@ -71,55 +56,31 @@ const searchSchools = ref('');
 const filteredSchools = computed(() => {
   const query = searchSchools.value.toLowerCase()
   return allSchools.value.filter(school =>
-    school.name.toLowerCase().includes(query)
+    school.name?.toLowerCase().includes(query)
   )
 })
 
 // Save and discard functions
 const saveProfile = (async () =>{
     try {
-        // Update data with PUT request
-        const response = await apiClient.users.update(userid.value, {
-          username: username.value,
-          full_name: fullName.value,
-          email: email.value,
-          school_id: school.value.id
-        })
+      const response = await apiClient.users.update(props.user?.id, getEditRequestFromProfile());
 
-        // On positive response load new data.
-        if (response){
+      if(!response.success){
+        throw new Error(response.error.message || 'Unknown error')
+      }
 
-            // Set new parameters from reponse.data
-            const newUserParameters = response
+      user.value = response.data
 
-            // Map out parameters
-            fullName.value = newUserParameters.personal_data.full_name
-            email.value = newUserParameters.personal_data.email
-            username.value = newUserParameters.username
-            roles.value = newUserParameters.roles
-            school.value = newUserParameters.personal_data.school
+      // Display a success message to user
+      showAlert('<h4 class=alert-heading>Success!</h4><hr><p class=mb-0>Changes have been saved.</p>', 'success')
 
-            // Display a success message to user
-            showAlert('<h4 class=alert-heading>Success!</h4><hr><p class=mb-0>Changes have been saved.</p>', 'success')
-
-            // emit pack the changes to the profile
-            emit('userUpdate', newUserParameters)
-        }
     } catch (error) {
         showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i><strong>Failed to save changes!</strong></h4><hr><p class=mb-0>Error: ' + error + '</p><p class=mb-0>For more information check console log.</p>', 'danger', 6000)
     }
 });
 function discardChanges(){
     try {
-        // Get current values in cookies
-        const prevParameters = props.user;
 
-        // Set the old values
-        fullName.value = prevParameters.personal_data.full_name
-        email.value = prevParameters.personal_data.email
-        username.value = prevParameters.username
-        roles.value = prevParameters.roles
-        school.value = prevParameters.personal_data.school
 
         // Tell user that changes were discarded
         showAlert('<i class="me-2 bi bi-trash"></i><strong>Changes were discarded</strong>', 'warning', 3000)
@@ -129,8 +90,11 @@ function discardChanges(){
 }
 
 // Change school function.
-function changeSchool(id, name){
-    school.value = { id: id, name: name }
+function changeSchool(id: number, name?: string){
+  if(!user.value.personal_data) {
+    throw new Error('User personal data is undefined')
+  }
+    user.value.personal_data.school = { id: id, name: name }
 }
 
 // Alert function
@@ -141,10 +105,20 @@ const alertType = ref('')
 import displayAlert from '@/components/generic/displayAlert.vue';
 import router from '@/router';
 
-function showAlert(message, type, timeout){
-    alertMessage.value = message
-    alertType.value = type
-    alertTimeout.value = timeout
+function showAlert(message: string, type: string, timeout: number = 3000){
+  alertMessage.value = message
+  alertType.value = type
+  alertTimeout.value = timeout
+}
+
+function getEditRequestFromProfile() {
+  userEditRequest.value = {
+    full_name: user.value.personal_data?.full_name || '',
+    email: user.value.personal_data?.email || '',
+    school_id: user.value.personal_data?.school?.id || undefined,
+    username: user.value.username,
+  }
+  return userEditRequest.value
 }
 
 // Import password reset
@@ -175,7 +149,7 @@ import changePassword from './changePassword.vue';
                         class="form-control"
                         name=""
                         id="fullName"
-                        v-model="fullName"
+                        v-model="user.personal_data!.full_name"
                     />
                 </div>
             </div>
@@ -187,7 +161,7 @@ import changePassword from './changePassword.vue';
                     <input
                         type="email"
                         class="form-control"
-                        v-model="email"
+                        v-model="user.personal_data!.email"
                         id="email"
                     />
                 </div>
@@ -201,7 +175,7 @@ import changePassword from './changePassword.vue';
                     <!-- Default dropright button -->
                     <div class="btn-group">
                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ school.name }}
+                            {{ user.personal_data!.school!.name }}
                         </button>
                         <ul class="dropdown-menu">
                             <!-- Search bar for schools -->
@@ -231,7 +205,7 @@ import changePassword from './changePassword.vue';
                     <p>Password</p>
                 </div>
                 <div class="col">
-                    <changePassword :isAdmin="isAdmin" :userId="userid"/>
+                    <changePassword :isAdmin="isAdmin" :userId="user.id"/>
                 </div>
             </div>
 
@@ -245,7 +219,7 @@ import changePassword from './changePassword.vue';
                     <input
                         type="text"
                         class="form-control"
-                        v-model="username"
+                        v-model="user.username"
                         id="username"
                     />
                 </div>
@@ -259,7 +233,7 @@ import changePassword from './changePassword.vue';
                 <div class="col">
                     <!-- Horizontal under breakpoint -->
                     <ul class="list-group list-group-horizontal">
-                        <li v-for="role in roles" class="list-group-item disabled">{{ role.name }}</li>
+                        <li v-for="role in user.roles" class="list-group-item disabled">{{ role.name }}</li>
                     </ul>          
                 </div>
             </div>

@@ -1,23 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import userProfile from '@/components/generic/userEdit/userProfile.vue';
 
 import { onMounted, ref } from 'vue';
+import { UserProfileResponse } from "@/services/api";
+import { useUserStore } from '@/stores/userStore';
+const store = useUserStore()
 
-// import cookie handling
-import { useCookies } from '@/assets/js/useCookies';
 
-const $cookies = useCookies();
+
+const alertTimeout = ref(3000)
+const alertMessage = ref('')
+const alertType = ref('')
 
 // User paramters ref
-const userParameters = ref([])
+const userParameters = ref<UserProfileResponse>({} as UserProfileResponse)
 const isLoading = ref(true)
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+
 
 onMounted(async () => {
     // Try getting user data
     try {
         // Get user parameters from cookies
-        userParameters.value = $cookies.get('userParameters');
+        userParameters.value = store.getUserProfile();
     } catch(error) {
         showAlert('<h4 class=alert-heading><i class="me-2 bi bi-exclamation-triangle"></i>Error!</h4><hr><p>Couldn\'t get user data! </p class=mb-0><p>Error:' + error + '</p>', 'danger', 4500);
     } finally {
@@ -25,10 +30,15 @@ onMounted(async () => {
     }
 });
 
+function showAlert(message: string, type: string, timeout: number = 3000){
+  alertMessage.value = message
+  alertType.value = type
+  alertTimeout.value = timeout
+}
+
 // Update user cookies when profile is updated
-const onUpdateUserProfile = async(userData) => {
-    await $cookies.set('userParameters', userData, 0);
-    userParameters.value = $cookies.get('userParameters');
+const onUpdateUserProfile = async(userData: UserProfileResponse) => {
+    store.setUserAuthorization(userData)
 }
 </script>
 

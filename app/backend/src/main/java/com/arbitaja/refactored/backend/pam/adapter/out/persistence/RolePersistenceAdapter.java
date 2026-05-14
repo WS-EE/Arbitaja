@@ -1,5 +1,6 @@
 package com.arbitaja.refactored.backend.pam.adapter.out.persistence;
 
+import com.arbitaja.refactored.backend.pam.adapter.out.persistence.entity.RoleJpaEntity;
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.mapper.PersistenceMapper;
 import com.arbitaja.refactored.backend.pam.adapter.out.persistence.repository.RoleJpaRepository;
 import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
@@ -52,8 +53,8 @@ public class RolePersistenceAdapter implements RoleRepositoryPort {
 
     @Override
     public Role save(@NonNull Role role) {
-        var entity = mapper.toEntity(role);
-        var savedEntity = roleJpaRepository.save(entity);
+        RoleJpaEntity entity = mapper.toEntity(role);
+        RoleJpaEntity savedEntity = roleJpaRepository.save(entity);
         return mapper.toDomain(savedEntity);
     }
 

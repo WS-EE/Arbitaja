@@ -12,6 +12,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "@primeuix/themes": "^1.2.5",
+    "@primevue/themes": "^4.5.4",
     "@vueuse/core": "^12.0.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
