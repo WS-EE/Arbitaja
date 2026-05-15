@@ -30,11 +30,13 @@ const props = defineProps({
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
+const alertTrigger = ref(0)
 
 function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
+    alertTrigger.value++
 }
 
 // --- Data ---
@@ -81,7 +83,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" :trigger="alertTrigger" />
 
     <div v-if="isLoadingResults" class="position-absolute top-50 start-50">
         <PulseLoader />

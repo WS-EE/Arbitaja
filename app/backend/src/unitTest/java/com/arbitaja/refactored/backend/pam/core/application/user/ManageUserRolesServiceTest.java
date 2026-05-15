@@ -44,6 +44,7 @@ class ManageUserRolesServiceTest {
 
         when(userRepository.findById(5)).thenReturn(Optional.of(user));
         when(roleRepository.findById(1)).thenReturn(Optional.of(role1));
+        when(userRepository.save(user)).thenReturn(user);
 
         User result = manageUserRolesService.overwriteUserRoles(5, List.of(1));
 

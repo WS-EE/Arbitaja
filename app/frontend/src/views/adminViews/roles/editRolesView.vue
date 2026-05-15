@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { apiClient, PermissionResponse, CreateRoleRequest } from "@/services/api";
+import { apiClient } from "@/services/api";
+import type { PermissionResponse } from "@/services/api";
 import { useRoute, useRouter } from "vue-router";
-import Listbox from 'primevue/listbox';
-import Button from 'primevue/button';
 import displayAlert from '@/components/generic/displayAlert.vue';
 
 const route = useRoute();
@@ -12,17 +11,31 @@ const roleId = Number(route.params.id);
 
 const roleName = ref('');
 const allPermissions = ref<PermissionResponse[]>([]);
-const rolePermissions = ref<PermissionResponse[]>([]);
+const selectedPermissionIds = ref<number[]>([]);
 
 const alertTimeout = ref<number>(3000);
 const alertMessage = ref<string>('');
 const alertType = ref<string>('');
+const alertTrigger = ref(0);
 
 function showAlert(message: string, type: string, timeout: number = 3000) {
   alertMessage.value = message;
   alertType.value = type;
   alertTimeout.value = timeout;
+  alertTrigger.value++;
 }
+
+const isSelected = (id?: number) => id !== undefined && selectedPermissionIds.value.includes(id);
+
+const togglePermission = (id?: number) => {
+  if (id === undefined) return;
+  const idx = selectedPermissionIds.value.indexOf(id);
+  if (idx >= 0) {
+    selectedPermissionIds.value.splice(idx, 1);
+  } else {
+    selectedPermissionIds.value.push(id);
+  }
+};
 
 onMounted(async () => {
   try {
@@ -33,9 +46,10 @@ onMounted(async () => {
     const roleResponse = await apiClient.roles.byId(roleId);
     if (!roleResponse.success) throw new Error(roleResponse.error.message || 'Unknown error');
     roleName.value = roleResponse.data.name ?? '';
-    rolePermissions.value = roleResponse.data.permissions
-      .map(p => allPermissions.value.find(ap => ap.key === p)!)
-      .filter(p => p !== undefined);
+
+    selectedPermissionIds.value = roleResponse.data.permissions
+      .map(permKey => allPermissions.value.find(ap => ap.key === permKey)?.id)
+      .filter((id): id is number => id !== undefined);
   } catch (error) {
     showAlert(`Couldn't get data. Error: ${error}`, 'danger', 9000);
   }
@@ -51,10 +65,9 @@ const saveRoleName = async () => {
   }
 };
 
-const overWriteRolePermissions = async () => {
+const savePermissions = async () => {
   try {
-    const payload: CreateRoleRequest = { permissionIds: rolePermissions.value.map(p => p.id) };
-    const response = await apiClient.roles.overwriteRolePermissions(roleId, { permissionIds: payload.permissionIds });
+    const response = await apiClient.roles.overwriteRolePermissions(roleId, { permissionIds: selectedPermissionIds.value });
     if (!response.success) throw new Error(response.error.message || 'Unknown error');
     showAlert('Permissions updated successfully.', 'success', 3000);
   } catch (error) {
@@ -64,7 +77,7 @@ const overWriteRolePermissions = async () => {
 </script>
 
 <template>
-  <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+  <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" :trigger="alertTrigger" />
   <div class="container mt-3">
     <h3>Edit Role</h3>
 
@@ -72,19 +85,44 @@ const overWriteRolePermissions = async () => {
       <label class="form-label fw-semibold">Role Name</label>
       <div class="d-flex gap-2">
         <input v-model="roleName" type="text" class="form-control" placeholder="Role name" />
-        <Button label="Save Name" @click.prevent="saveRoleName" />
+        <button class="btn btn-primary" @click.prevent="saveRoleName">Save Name</button>
       </div>
     </div>
 
     <div class="mb-4">
-      <label class="form-label fw-semibold">Permissions</label>
-      <Listbox v-model="rolePermissions" :options="allPermissions" checkmark multiple optionLabel="name" class="w-full md:w-56" />
-      <div class="mt-2">
-        <Button label="Save Permissions" @click.prevent="overWriteRolePermissions" />
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <label class="form-label fw-semibold mb-0">Permissions</label>
+        <span class="text-muted small">{{ selectedPermissionIds.length }} / {{ allPermissions.length }} selected</span>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-2">
+        <div v-for="permission in allPermissions" :key="permission.id" class="col">
+          <div
+            class="d-flex align-items-center gap-2 p-2 border rounded"
+            :class="isSelected(permission.id) ? 'border-success bg-success-subtle' : 'border-secondary-subtle'"
+            style="cursor: pointer"
+            @click="togglePermission(permission.id)"
+          >
+            <input
+              type="checkbox"
+              class="form-check-input flex-shrink-0 mt-0"
+              :checked="isSelected(permission.id)"
+              @click.prevent
+            />
+            <div class="lh-sm" style="word-break: break-word">
+              <span class="d-block fw-medium small">{{ permission.name }}</span>
+              <span class="d-block text-muted" style="font-size: 0.7rem">{{ permission.key }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <button class="btn btn-success" @click.prevent="savePermissions">Save Permissions</button>
       </div>
     </div>
 
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-end mt-3 mb-4">
       <button class="btn btn-outline-dark" @click="router.back()">Go Back</button>
     </div>
   </div>

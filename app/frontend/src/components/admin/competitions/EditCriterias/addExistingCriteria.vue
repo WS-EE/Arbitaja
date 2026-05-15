@@ -3,6 +3,7 @@
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
+const alertTrigger = ref(0)
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
@@ -10,6 +11,7 @@ function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
+    alertTrigger.value++
 }
 
 // Import pulseloader
@@ -135,7 +137,7 @@ onMounted(async() => {
 
 <template>
     <!-- Alert when needed -->
-    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" :trigger="alertTrigger" />
 
     <!-- Button trigger modal -->
     <button 

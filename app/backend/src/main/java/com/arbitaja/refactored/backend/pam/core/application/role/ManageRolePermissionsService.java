@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Application service implementing role permission management use cases.
@@ -40,36 +37,34 @@ public class ManageRolePermissionsService implements ManageRolePermissionsUseCas
         Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
 
-        List<RolePermission> rolePermissionsToRemove = role.getRolePermissions().stream()
-            .filter(rp -> !permissionIds.contains(rp.getPermission().getId()))
+        // Use only direct permissions (not inherited from child roles) as the baseline
+        List<RolePermission> directPermissions = rolePermissionRepository.findByRoleId(roleId);
+        List<Integer> uniquePermissionIds = permissionIds.stream().distinct().toList();
+
+        List<RolePermission> rolePermissionsToRemove = directPermissions.stream()
+            .filter(rp -> !uniquePermissionIds.contains(rp.getPermission().getId()))
             .toList();
 
-        List<Integer> rolesToAdd = permissionIds.stream()
-            .filter(pid -> role.getRolePermissions().stream().noneMatch(rp -> rp.getPermission().getId().equals(pid)))
+        List<Integer> rolesToAdd = uniquePermissionIds.stream()
+            .filter(pid -> directPermissions.stream().noneMatch(rp -> rp.getPermission().getId().equals(pid)))
             .toList();
 
         log.info("Permissions to remove: {}", rolePermissionsToRemove);
 
-        rolePermissionsToRemove.forEach(rolePermissionRepository::delete);
-        rolePermissionsToRemove.forEach(r -> role.getRolePermissions().remove(r));
-
-        log.info("Current permissions: {}", role.getRolePermissions().stream()
-            .map(rp -> rp.getPermission().getId())
-            .collect(Collectors.toSet()));
+        List<Integer> idsToRemove = rolePermissionsToRemove.stream()
+            .map(RolePermission::getId)
+            .toList();
+        rolePermissionRepository.deleteByIds(idsToRemove);
 
         for (Integer permissionId : rolesToAdd) {
             Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new EntityNotFoundException("Permission not found with id: " + permissionId));
 
             RolePermission rolePermission = RolePermission.createNew(permission, role);
-            rolePermission = rolePermissionRepository.save(rolePermission);
-            role.getRolePermissions().add(rolePermission);
+            rolePermissionRepository.save(rolePermission);
         }
 
-        log.info("Permissions before saving: {}", role.getRolePermissions().stream()
-            .map(rp -> rp.getPermission().getId())
-            .collect(Collectors.toSet()));
-
-        return roleRepository.save(role);
+        return roleRepository.findById(roleId)
+            .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
     }
 }

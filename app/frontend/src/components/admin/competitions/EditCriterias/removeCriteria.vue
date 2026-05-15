@@ -27,6 +27,7 @@ const props = defineProps({
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
+const alertTrigger = ref(0)
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
@@ -34,6 +35,7 @@ function showAlert(message: string, type: string, timeout: number = 3000) {
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
+    alertTrigger.value++
 }
 
 const emit = defineEmits(['removeCriteria'])
@@ -54,7 +56,7 @@ const removeCriteria = async(criteriaId: number, criteriaName?: string) => {
 </script>
 
 <template>
-    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" :trigger="alertTrigger" />
     <button
         type="button"
         :class="props.addButtonDivClass"

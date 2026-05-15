@@ -13,15 +13,15 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+  <div class="pagination-controls border-top mt-4 pt-3 pb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div class="text-muted small">
-      {{ totalElements }} total
+      <span class="fw-semibold text-body">{{ totalElements }}</span> total results
     </div>
 
-    <nav v-if="totalPages > 1">
+    <nav v-if="totalPages > 1" aria-label="Page navigation">
       <ul class="pagination pagination-sm mb-0">
         <li class="page-item" :class="{ disabled: page === 0 }">
-          <button class="page-link" @click="emit('go-to-page', page - 1)" :disabled="page === 0">
+          <button class="page-link" @click="emit('go-to-page', page - 1)" :disabled="page === 0" aria-label="Previous">
             &laquo;
           </button>
         </li>
@@ -40,18 +40,19 @@ const emit = defineEmits<{
         </template>
 
         <li class="page-item" :class="{ disabled: page >= totalPages - 1 }">
-          <button class="page-link" @click="emit('go-to-page', page + 1)" :disabled="page >= totalPages - 1">
+          <button class="page-link" @click="emit('go-to-page', page + 1)" :disabled="page >= totalPages - 1" aria-label="Next">
             &raquo;
           </button>
         </li>
       </ul>
     </nav>
+    <div v-else class="text-muted small">Page 1 of 1</div>
 
-    <div class="d-flex align-items-center gap-1">
-      <label class="text-muted small mb-0">Per page:</label>
+    <div class="d-flex align-items-center gap-2">
+      <label class="text-muted small mb-0 text-nowrap">Per page:</label>
       <select
         class="form-select form-select-sm"
-        style="width: auto"
+        style="width: 75px"
         :value="pageSize"
         @change="emit('update:pageSize', Number(($event.target as HTMLSelectElement).value))"
       >

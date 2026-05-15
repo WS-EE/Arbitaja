@@ -14,11 +14,13 @@ const rePassword = ref('')
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
+const alertTrigger = ref(0)
 
 function showAlert(message: string, type: string, timeout = 3000) {
   alertMessage.value = message
   alertType.value = type
   alertTimeout.value = timeout
+  alertTrigger.value++
 }
 
 const userSignup = async () => {
@@ -56,7 +58,7 @@ const userSignup = async () => {
 </script>
 
 <template>
-  <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+  <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" :trigger="alertTrigger" />
   <div class="container text-center pt-5">
     <div class="row justify-content-center align-items-center align-self-center">
       <div class="col-lg-4 col-sm-7 col-11">

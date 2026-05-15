@@ -63,5 +63,12 @@ public class RolePermissionPersistenceAdapter implements RolePermissionRepositor
     public void deleteById(@NonNull Integer id) {
         rolePermissionJpaRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteByIds(@NonNull List<Integer> ids) {
+        if (!ids.isEmpty()) {
+            rolePermissionJpaRepository.deleteByIdIn(ids);
+        }
+    }
 }
 

@@ -55,5 +55,12 @@ public interface RolePermissionRepositoryPort {
      * @param id RolePermission ID
      */
     void deleteById(@NonNull Integer id);
+
+    /**
+     * Bulk delete role permissions by IDs using a direct query (bypasses entity lifecycle).
+     *
+     * @param ids List of RolePermission IDs to delete
+     */
+    void deleteByIds(@NonNull List<Integer> ids);
 }
 

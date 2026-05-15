@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 import { ensureAuthRehydrated } from '@/composables/useAuthRehydrate';
-import { API_BASE_URL } from '@/services/http'
 
 import loginView from '@/views/loginView.vue';
 import notFoundView from '@/views/notFoundView.vue';
@@ -47,7 +46,7 @@ declare module 'vue-router' {
 }
 
 const router = createRouter({
-    history: createWebHistory(API_BASE_URL),
+    history: createWebHistory(),
     routes: [
         {
             path: '/login',

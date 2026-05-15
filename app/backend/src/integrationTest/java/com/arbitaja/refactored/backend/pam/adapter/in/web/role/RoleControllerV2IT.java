@@ -16,6 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,6 +27,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,20 +55,36 @@ class RoleControllerV2IT {
     void setUp() {
         RoleControllerV2 controller = new RoleControllerV2(getRoleUseCase, createRoleUseCase, manageRolePermissionsUseCase);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .setControllerAdvice(new PamExceptionHandler())
             .build();
         objectMapper = new ObjectMapper();
     }
 
     @Test
-    void getAllRolesReturnsMappedCollection() throws Exception {
-        when(getRoleUseCase.getAllRoles()).thenReturn(List.of(role(1, "admin", "VIEW_USERS"), role(2, "user", "VIEW_ROLES")));
+    void getAllRolesReturnsPagedContent() throws Exception {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(getRoleUseCase.getRolesPaged(eq(""), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(role(1, "admin", "VIEW_USERS"), role(2, "user", "VIEW_ROLES")), pageable, 2));
 
         mockMvc.perform(get("/v2/roles"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[0].permissions[0]").value("VIEW_USERS"))
-            .andExpect(jsonPath("$[1].id").value(2));
+            .andExpect(jsonPath("$.content[0].id").value(1))
+            .andExpect(jsonPath("$.content[0].permissions[0]").value("VIEW_USERS"))
+            .andExpect(jsonPath("$.content[1].id").value(2))
+            .andExpect(jsonPath("$.totalElements").value(2));
+    }
+
+    @Test
+    void getAllRolesPagedWithSearchFiltersResults() throws Exception {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(getRoleUseCase.getRolesPaged(eq("admin"), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(role(1, "admin", "VIEW_USERS")), pageable, 1));
+
+        mockMvc.perform(get("/v2/roles").param("search", "admin"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].name").value("admin"))
+            .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test

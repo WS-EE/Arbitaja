@@ -12,6 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,7 +44,9 @@ class HexagonalSignupContractTest extends AbstractSignupContractTest {
     void setUp() {
         objectMapper = new ObjectMapper();
         SignupControllerV2 controller = new SignupControllerV2(createUserUseCase, signupUserMapper);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+            .build();
     }
 
     @Override
@@ -48,8 +54,10 @@ class HexagonalSignupContractTest extends AbstractSignupContractTest {
         return () -> {
             SignupUser bob = signupUser(2, "bob");
             SignupUser alice = signupUser(1, "alice");
+            Pageable pageable = PageRequest.of(0, 20);
 
-            when(createUserUseCase.getAllSignupUsers()).thenReturn(List.of(bob, alice));
+            when(createUserUseCase.getAllSignupUsersPaged(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(bob, alice), pageable, 2));
             when(signupUserMapper.toSignupResponse(bob)).thenReturn(signupResponse(2L, "bob"));
             when(signupUserMapper.toSignupResponse(alice)).thenReturn(signupResponse(1L, "alice"));
 
@@ -58,7 +66,7 @@ class HexagonalSignupContractTest extends AbstractSignupContractTest {
                 .andReturn();
 
             JsonNode root = objectMapper.readTree(result.getResponse().getContentAsString());
-            return StreamSupport.stream(root.spliterator(), false)
+            return StreamSupport.stream(root.get("content").spliterator(), false)
                 .map(node -> node.path("username").asText())
                 .sorted(Comparator.naturalOrder())
                 .toList();

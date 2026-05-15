@@ -20,11 +20,13 @@ const commitSet = ref(false)
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
+const alertTrigger = ref(0)
 
 function showAlert(message: string, type: string, timeout = 3000) {
   alertMessage.value = message
   alertType.value = type
   alertTimeout.value = timeout
+  alertTrigger.value++
 }
 
 const selectedSchoolName = computed(() => {
@@ -93,7 +95,7 @@ const deleteUser = async () => {
 </script>
 
 <template>
-  <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+  <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" :trigger="alertTrigger" />
   <div v-for="user in signupUsers" :key="user.userId" class="row border rounded m-2 p-1 p-md-2 text-center justify-content-center align-items-center">
     <div class="col-lg-3 col-sm-4">
       <strong>{{ user.username }}</strong>

@@ -190,19 +190,12 @@ public class PersistenceMapper {
     }
 
     public RoleJpaEntity toEntity(@NonNull Role domain) {
-        RoleJpaEntity roleEntity = RoleJpaEntity.builder()
+        return RoleJpaEntity.builder()
             .id(domain.getId())
             .name(domain.getName())
             .createdAt(domain.getCreatedAt())
             .changedAt(domain.getChangedAt())
             .build();
-        if (domain.getRolePermissions() != null) {
-            roleEntity.setRolePermissions(domain.getRolePermissions().stream()
-                .map(this::toEntity)
-                .collect(Collectors.toCollection(LinkedHashSet::new)));
-        }
-
-        return roleEntity;
     }
 
     // Permission mappings

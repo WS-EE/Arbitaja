@@ -14,6 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,6 +26,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,6 +59,7 @@ class ScoringCriterionControllerV2IT {
         );
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .setControllerAdvice(new ScoringExceptionHandler())
             .build();
 
@@ -61,19 +67,46 @@ class ScoringCriterionControllerV2IT {
     }
 
     @Test
-    void getAllReturnsMappedCollection() throws Exception {
+    void getAllReturnsPagedContent() throws Exception {
+        ScoringCriterion criterion1 = ScoringCriterion.builder().id(1).name("speed").totalPoints(10.0).build();
+        ScoringCriterion criterion2 = ScoringCriterion.builder().id(2).name("accuracy").totalPoints(5.0).build();
+        ScoringCriterionResponse response1 = new ScoringCriterionResponse(
+            1, "speed", null, null, 10.0, null, null, null, null, null, null
+        );
+        ScoringCriterionResponse response2 = new ScoringCriterionResponse(
+            2, "accuracy", null, null, 5.0, null, null, null, null, null, null
+        );
+        Pageable pageable = PageRequest.of(0, 20);
+
+        when(getScoringCriterionUseCase.getScoringCriteriaPaged(eq(""), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(criterion1, criterion2), pageable, 2));
+        when(mapper.toResponse(criterion1)).thenReturn(response1);
+        when(mapper.toResponse(criterion2)).thenReturn(response2);
+
+        mockMvc.perform(get("/v2/scoring/criteria"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].id").value(1))
+            .andExpect(jsonPath("$.content[0].name").value("speed"))
+            .andExpect(jsonPath("$.content[0].total_points").value(10.0))
+            .andExpect(jsonPath("$.totalElements").value(2));
+    }
+
+    @Test
+    void getAllPagedWithSearchFiltersResults() throws Exception {
         ScoringCriterion criterion = ScoringCriterion.builder().id(1).name("speed").totalPoints(10.0).build();
         ScoringCriterionResponse response = new ScoringCriterionResponse(
             1, "speed", null, null, 10.0, null, null, null, null, null, null
         );
-        when(getScoringCriterionUseCase.getAllScoringCriteria()).thenReturn(List.of(criterion));
+        Pageable pageable = PageRequest.of(0, 20);
+
+        when(getScoringCriterionUseCase.getScoringCriteriaPaged(eq("speed"), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(criterion), pageable, 1));
         when(mapper.toResponse(criterion)).thenReturn(response);
 
-        mockMvc.perform(get("/v2/scoring/criteria"))
+        mockMvc.perform(get("/v2/scoring/criteria").param("search", "speed"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[0].name").value("speed"))
-            .andExpect(jsonPath("$[0].total_points").value(10.0));
+            .andExpect(jsonPath("$.content[0].name").value("speed"))
+            .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test

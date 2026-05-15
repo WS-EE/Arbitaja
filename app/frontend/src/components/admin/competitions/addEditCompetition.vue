@@ -12,6 +12,7 @@ import { apiClient, CompetitionResponse, CompetitionUpsertRequest, CompetitorRes
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
+const alertTrigger = ref(0)
 
 import displayAlert from '@/components/generic/displayAlert.vue';
 import CriteriaTabel from './EditCriterias/CriteriaTabel.vue';
@@ -21,6 +22,7 @@ function showAlert(message: string, type: string, timeout: number = 3000){
     alertMessage.value = message
     alertType.value = type
     alertTimeout.value = timeout
+    alertTrigger.value++
 }
 
 // Main content
@@ -250,7 +252,7 @@ const saveComp = async() => {
 
 <template>
     <!-- Alert when needed -->
-    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout"/>
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" :trigger="alertTrigger"/>
     <div v-if="isLoading" class="position-absolute top-50 start-50">
         <PulseLoader/>
     </div>
@@ -383,7 +385,7 @@ const saveComp = async() => {
 
     </div>
     <!-- Action Buttons -->
-    <div class="container d-flex justify-content-end align-items-end pt-3 pb-3">
+    <div class="container d-flex justify-content-end align-items-end pt-3 pb-4 mb-3">
         <button @click.prevent="saveComp()" class="btn btn-success me-3">Save<i class="ms-1 bi bi-floppy"></i></button>
         <button @click="discardChanges()" class="btn btn-outline-danger me-3">Discard<i class="ms-1 bi bi-trash"></i></button>
         <button @click="router.back()" class="btn btn-outline-dark me-3">Go Back</button>

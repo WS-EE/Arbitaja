@@ -27,7 +27,8 @@ class CompetitorWebMapperTest {
             null,
             "Runner Name",
             "runner@example.com",
-            5
+            5,
+            1
         );
 
         ManageCompetitorUseCase.UpsertCompetitorCommand command = mapper.toCommand(request);
@@ -38,6 +39,7 @@ class CompetitorWebMapperTest {
         assertEquals("Runner Name", command.getFullName());
         assertEquals("runner@example.com", command.getEmail());
         assertEquals(5, command.getSchoolId());
+        assertEquals(1, command.getCompetitionId());
     }
 
     @Test
@@ -97,6 +99,7 @@ class CompetitorWebMapperTest {
             null,
             null,
             null,
+            null,
             null
         );
 
@@ -108,6 +111,7 @@ class CompetitorWebMapperTest {
         assertNull(command.getFullName());
         assertNull(command.getEmail());
         assertNull(command.getSchoolId());
+        assertNull(command.getCompetitionId());
     }
 }
 

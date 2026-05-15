@@ -13,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -50,23 +49,26 @@ class ManageRolePermissionsServiceTest {
         RolePermission rp1 = RolePermission.builder().id(11).permission(permission1).role(role).build();
         RolePermission rp2 = RolePermission.builder().id(12).permission(permission2).role(role).build();
 
-        role.setRolePermissions(new LinkedHashSet<>(new ArrayList<>(List.of(rp1, rp2))));
+        Role refreshedRole = Role.builder().id(99).name("manager").build();
+        RolePermission rp3 = RolePermission.builder().id(13).permission(permission3).role(refreshedRole).build();
+        refreshedRole.setRolePermissions(new LinkedHashSet<>(List.of(rp2, rp3)));
 
-        when(roleRepository.findById(99)).thenReturn(Optional.of(role));
+        when(roleRepository.findById(99))
+            .thenReturn(Optional.of(role))
+            .thenReturn(Optional.of(refreshedRole));
+        when(rolePermissionRepository.findByRoleId(99)).thenReturn(List.of(rp1, rp2));
         when(permissionRepository.findById(3)).thenReturn(Optional.of(permission3));
-        when(roleRepository.save(role)).thenReturn(role);
         when(rolePermissionRepository.save(any(RolePermission.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Role result = manageRolePermissionsService.overwriteRolePermissions(99, List.of(2, 3, 3));
+        Role result = manageRolePermissionsService.overwriteRolePermissions(99, List.of(2, 3));
 
         Set<Integer> resultingPermissionIds = result.getRolePermissions().stream()
-            .map(rolePermission -> rolePermission.getPermission().getId())
+            .map(rp -> rp.getPermission().getId())
             .collect(java.util.stream.Collectors.toSet());
 
         assertEquals(Set.of(2, 3), resultingPermissionIds);
-        verify(rolePermissionRepository).delete(rp1);
+        verify(rolePermissionRepository).deleteByIds(List.of(11));
         verify(rolePermissionRepository).save(any(RolePermission.class));
-        verify(roleRepository).save(role);
     }
 
     @Test

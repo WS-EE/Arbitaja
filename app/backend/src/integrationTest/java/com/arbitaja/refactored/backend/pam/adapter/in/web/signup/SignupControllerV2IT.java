@@ -15,6 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -48,6 +52,7 @@ class SignupControllerV2IT {
     void setUp() {
         SignupControllerV2 controller = new SignupControllerV2(createUserUseCase, signupUserMapper);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .setControllerAdvice(new PamExceptionHandler())
             .build();
         objectMapper = new ObjectMapper();
@@ -58,7 +63,7 @@ class SignupControllerV2IT {
         SignupRequest request = signupRequest("new-user", "pass", "New User", "new@example.com", 2);
         CreateUserUseCase.SignupCommand command = signupCommand("new-user", "pass", "New User", "new@example.com", 2);
         SignupUser signupUser = signupUser(15, "new-user", "new@example.com", 2);
-        SignupResponse response = new SignupResponse(15L, "new-user", "new@example.com", "New User", 2);
+        SignupResponse response = new SignupResponse(15L, "new-user", "new@example.com", "New User", 2, null);
 
         when(signupUserMapper.toSignupCommand(any(SignupRequest.class))).thenReturn(command);
         when(createUserUseCase.signupUser(command)).thenReturn(signupUser);
@@ -122,18 +127,40 @@ class SignupControllerV2IT {
     }
 
     @Test
-    void getAllSignupUsersReturnsMappedCollection() throws Exception {
+    void getAllSignupUsersReturnsPagedContent() throws Exception {
         SignupUser signupUser1 = signupUser(1, "alpha", "alpha@example.com", 1);
         SignupUser signupUser2 = signupUser(2, "beta", "beta@example.com", 2);
+        Pageable pageable = PageRequest.of(0, 20);
 
-        when(createUserUseCase.getAllSignupUsers()).thenReturn(List.of(signupUser1, signupUser2));
-        when(signupUserMapper.toSignupResponse(signupUser1)).thenReturn(new SignupResponse(1L, "alpha", "alpha@example.com", "New User", 1));
-        when(signupUserMapper.toSignupResponse(signupUser2)).thenReturn(new SignupResponse(2L, "beta", "beta@example.com", "New User", 2));
+        when(createUserUseCase.getAllSignupUsersPaged(eq(""), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(signupUser1, signupUser2), pageable, 2));
+        when(signupUserMapper.toSignupResponse(signupUser1))
+            .thenReturn(new SignupResponse(1L, "alpha", "alpha@example.com", "Alpha User", 1, null));
+        when(signupUserMapper.toSignupResponse(signupUser2))
+            .thenReturn(new SignupResponse(2L, "beta", "beta@example.com", "Beta User", 2, null));
 
         mockMvc.perform(get("/v2/signup/signup"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].username").value("alpha"))
-            .andExpect(jsonPath("$[1].schoolId").value(2));
+            .andExpect(jsonPath("$.content[0].username").value("alpha"))
+            .andExpect(jsonPath("$.content[1].schoolId").value(2))
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.totalPages").value(1));
+    }
+
+    @Test
+    void getAllSignupUsersPagedWithSearchFiltersResults() throws Exception {
+        SignupUser signupUser = signupUser(3, "charlie", "charlie@example.com", 1);
+        Pageable pageable = PageRequest.of(0, 20);
+
+        when(createUserUseCase.getAllSignupUsersPaged(eq("charlie"), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(signupUser), pageable, 1));
+        when(signupUserMapper.toSignupResponse(signupUser))
+            .thenReturn(new SignupResponse(3L, "charlie", "charlie@example.com", "Charlie", 1, null));
+
+        mockMvc.perform(get("/v2/signup/signup").param("search", "charlie"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].username").value("charlie"))
+            .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     private SignupRequest signupRequest(String username, String password, String fullName, String email, Integer schoolId) {

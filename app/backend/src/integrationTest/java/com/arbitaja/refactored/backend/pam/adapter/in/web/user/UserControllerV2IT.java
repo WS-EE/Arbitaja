@@ -23,6 +23,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -84,6 +88,7 @@ class UserControllerV2IT {
         );
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .setControllerAdvice(new PamExceptionHandler())
             .build();
         objectMapper = new ObjectMapper();
@@ -123,13 +128,29 @@ class UserControllerV2IT {
     }
 
     @Test
-    void getAllUsersReturnsMappedCollection() throws Exception {
-        when(getUserUseCase.getAllUsers()).thenReturn(List.of(user(1, "a"), user(2, "b")));
+    void getAllUsersReturnsPagedContent() throws Exception {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(getUserUseCase.getUsersPaged(eq(""), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(user(1, "a"), user(2, "b")), pageable, 2));
 
         mockMvc.perform(get("/v2/user"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[1].username").value("b"));
+            .andExpect(jsonPath("$.content[0].id").value(1))
+            .andExpect(jsonPath("$.content[1].username").value("b"))
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.totalPages").value(1));
+    }
+
+    @Test
+    void getAllUsersPagedWithSearchFiltersResults() throws Exception {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(getUserUseCase.getUsersPaged(eq("alice"), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(user(5, "alice")), pageable, 1));
+
+        mockMvc.perform(get("/v2/user").param("search", "alice"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].username").value("alice"))
+            .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test

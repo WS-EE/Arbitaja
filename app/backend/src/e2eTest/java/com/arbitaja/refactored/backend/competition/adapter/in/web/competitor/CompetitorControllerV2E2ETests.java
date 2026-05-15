@@ -58,7 +58,8 @@ class CompetitorControllerV2E2ETests extends CompetitionWebE2EBase {
             null,
             "New Competitor",
             "competitor@example.com",
-            firstSchoolId()
+            firstSchoolId(),
+            1
         );
 
         mockMvc.perform(post("/v2/competitor")
@@ -81,7 +82,8 @@ class CompetitorControllerV2E2ETests extends CompetitionWebE2EBase {
             null,
             "Edited Competitor",
             "edited@example.com",
-            firstSchoolId()
+            firstSchoolId(),
+            1
         );
 
         mockMvc.perform(put("/v2/competitor/{id}", competitorId)
@@ -111,7 +113,8 @@ class CompetitorControllerV2E2ETests extends CompetitionWebE2EBase {
             null,
             "Unauthorized",
             "unauth@example.com",
-            firstSchoolId()
+            firstSchoolId(),
+            1
         );
 
         mockMvc.perform(post("/v2/competitor")
@@ -134,7 +137,7 @@ class CompetitorControllerV2E2ETests extends CompetitionWebE2EBase {
 
         // First create
         CompetitorUpsertRequest request1 = new CompetitorUpsertRequest(
-            alias, 1, null, "First", "first@example.com", firstSchoolId()
+            alias, 1, null, "First", "first@example.com", firstSchoolId(), 1
         );
 
         mockMvc.perform(post("/v2/competitor")
@@ -144,7 +147,7 @@ class CompetitorControllerV2E2ETests extends CompetitionWebE2EBase {
 
         // Try duplicate
         CompetitorUpsertRequest request2 = new CompetitorUpsertRequest(
-            alias, 1, null, "Second", "second@example.com", firstSchoolId()
+            alias, 1, null, "Second", "second@example.com", firstSchoolId(), 1
         );
 
         mockMvc.perform(post("/v2/competitor")

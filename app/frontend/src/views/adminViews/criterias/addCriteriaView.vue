@@ -15,11 +15,13 @@ const form = ref<ScoringCriterionUpsertRequest>({
 const alertTimeout = ref(3000);
 const alertMessage = ref('');
 const alertType = ref('');
+const alertTrigger = ref(0);
 
 function showAlert(message: string, type: string, timeout = 3000) {
     alertMessage.value = message;
     alertType.value = type;
     alertTimeout.value = timeout;
+    alertTrigger.value++;
 }
 
 const submit = async () => {
@@ -35,7 +37,7 @@ const submit = async () => {
 </script>
 
 <template>
-    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
+    <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" :trigger="alertTrigger" />
     <div class="container mt-3">
         <h3>Add Scoring Criteria</h3>
         <form @submit.prevent="submit" class="mt-3">
@@ -57,7 +59,7 @@ const submit = async () => {
                     <textarea v-model="form.description" class="form-control" rows="3" placeholder="Optional description"></textarea>
                 </div>
             </div>
-            <div class="d-flex justify-content-end gap-2">
+            <div class="d-flex justify-content-end gap-2 mb-4">
                 <button type="button" class="btn btn-outline-dark" @click="router.back()">Cancel</button>
                 <button type="submit" class="btn btn-success">Create</button>
             </div>
