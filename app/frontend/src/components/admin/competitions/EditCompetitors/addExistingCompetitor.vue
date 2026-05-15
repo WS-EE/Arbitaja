@@ -67,11 +67,11 @@ const getAllCompetitors = async () => {
         isLoadingCompetirors.value = true
 
         // Get competitors
-        const response = await apiClient.competitors.list()
+        const response = await apiClient.competitors.list({ size: 500 })
         if (!response.success) {
             throw new Error(response.error.message || 'Unknown error');
         }
-        allCompetitors.value = response.data
+        allCompetitors.value = response.data.content
 
     } catch (error) {
         showAlert('Couldn\'t get all the competitors for adding existing competitors. Error: ' + error, 'danger')

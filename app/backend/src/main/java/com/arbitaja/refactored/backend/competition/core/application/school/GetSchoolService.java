@@ -6,6 +6,8 @@ import com.arbitaja.refactored.backend.competition.core.port.in.school.GetSchool
 import com.arbitaja.refactored.backend.competition.core.port.out.school.SchoolRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -30,6 +32,11 @@ public class GetSchoolService implements GetSchoolUseCase {
     public School getSchoolById(@NonNull Integer id) {
         return schoolRepository.findById(id)
             .orElseThrow(() -> EntityNotFoundException.school(id));
+    }
+
+    @Override
+    public Page<School> getSchoolsPaged(String search, Pageable pageable) {
+        return schoolRepository.findPaged(search, pageable);
     }
 }
 

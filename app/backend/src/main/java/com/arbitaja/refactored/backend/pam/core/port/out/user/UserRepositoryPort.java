@@ -2,6 +2,8 @@ package com.arbitaja.refactored.backend.pam.core.port.out.user;
 
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,5 +59,7 @@ public interface UserRepositoryPort {
      * @return true if user exists
      */
     boolean existsByUsername(@NonNull String username);
+
+    Page<User> findPaged(String search, Pageable pageable);
 }
 

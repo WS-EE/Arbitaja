@@ -7,6 +7,8 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.SignupUser;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.SignupUserRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -59,6 +61,12 @@ public class SignupUserPersistenceAdapter implements SignupUserRepositoryPort {
     @Override
     public boolean existsByUsername(@NonNull String username) {
         return signupUserJpaRepository.existsByUsername(username);
+    }
+
+    @Override
+    public Page<SignupUser> findPaged(String search, Pageable pageable) {
+        return signupUserJpaRepository.findBySearchTerm(search == null ? "" : search, pageable)
+            .map(mapper::toDomain);
     }
 }
 

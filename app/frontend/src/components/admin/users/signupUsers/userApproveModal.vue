@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { DateTime } from 'luxon'
 import { apiClient, SignupResponse, SignupRequest, SchoolResponse } from '@/services/api'
 import displayAlert from '@/components/generic/displayAlert.vue'
 
@@ -47,6 +48,11 @@ function changeSchool(id?: number) {
   }
 }
 
+const formatDate = (iso?: string) => {
+  if (!iso) return '—'
+  return DateTime.fromISO(iso).toFormat('dd MMM yyyy HH:mm')
+}
+
 const buildSignupPayload = (): SignupRequest => {
   if (!commitedUserData.value) {
     throw new Error('No user data to build payload')
@@ -88,16 +94,19 @@ const deleteUser = async () => {
 
 <template>
   <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
-  <div v-for="user in signupUsers" class="row border rounded m-2 p-1 p-md-2 p-lg-3 text-center justify-content-center align-items-center text-center">
-    <div class="col-lg-2 col-md-3 col-sm-4">
-      <h5 class="m-0">{{ user.username }}</h5>
+  <div v-for="user in signupUsers" :key="user.userId" class="row border rounded m-2 p-1 p-md-2 text-center justify-content-center align-items-center">
+    <div class="col-lg-3 col-sm-4">
+      <strong>{{ user.username }}</strong>
     </div>
-    <div class="col-lg-3 col-md-2 col-sm-3">
-      <p class="m-0">{{ user.fullName }}</p>
+    <div class="col-lg-3 col-sm-3">
+      {{ user.fullName }}
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-5 ms-auto text-center text-lg-end">
-      <button @click.prevent="setCommitedUserData(user)" type="button" class="me-2 btn btn-success" data-bs-toggle="modal" data-bs-target="#ApproveModal">Accept</button>
-      <button @click.prevent="setCommitedUserData(user)" type="button" data-bs-toggle="modal" data-bs-target="#DeleteModal" class="btn btn-danger">Delete</button>
+    <div class="col-lg-2 d-none d-lg-block small text-muted">
+      {{ formatDate(user.createdAt as unknown as string) }}
+    </div>
+    <div class="col-lg-4 col-sm-5 text-end">
+      <button @click.prevent="setCommitedUserData(user)" type="button" class="me-2 btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#ApproveModal">Accept</button>
+      <button @click.prevent="setCommitedUserData(user)" type="button" data-bs-toggle="modal" data-bs-target="#DeleteModal" class="btn btn-danger btn-sm">Decline</button>
     </div>
   </div>
   <!-- Modal for accept -->

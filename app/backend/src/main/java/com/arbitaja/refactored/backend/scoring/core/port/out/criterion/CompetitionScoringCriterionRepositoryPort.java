@@ -13,4 +13,6 @@ public interface CompetitionScoringCriterionRepositoryPort {
     List<ScoringCriterion> findCriteriaForCompetition(@NonNull Integer competitionId);
 
     void linkCriterionToCompetition(@NonNull Integer competitionId, @NonNull Integer criterionId);
+
+    void unlinkCriterionFromCompetition(@NonNull Integer competitionId, @NonNull Integer criterionId);
 }

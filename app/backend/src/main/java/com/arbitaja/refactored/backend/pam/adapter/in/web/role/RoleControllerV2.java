@@ -4,6 +4,7 @@ import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPe
 import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.request.AddPermissionToRoleRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.request.CreateRoleRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.response.RoleResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.shared.dto.response.GeneralMessageResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
@@ -11,6 +12,7 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
 import com.arbitaja.refactored.backend.pam.core.port.in.role.CreateRoleUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.role.GetRoleUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.role.ManageRolePermissionsUseCase;
+import com.arbitaja.refactored.backend.common.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +23,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,12 +59,15 @@ public class RoleControllerV2 {
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
     @RequiresPermission(VIEW_ROLES)
-    public ResponseEntity<List<RoleResponse>> getAllRoles() {
-        log.info("Getting all roles");
-        List<RoleResponse> roles = getRoleUseCase.getAllRoles().stream()
-            .map(this::toRoleResponse)
-            .toList();
-        return ResponseEntity.ok(roles);
+    public ResponseEntity<PagedResponse<RoleResponse>> getAllRoles(
+        @RequestParam(required = false, defaultValue = "") String search,
+        @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        log.info("Getting roles paged, search={}", search);
+        return ResponseEntity.ok(PagedResponse.from(
+            getRoleUseCase.getRolesPaged(search, pageable)
+                .map(this::toRoleResponse)
+        ));
     }
 
     @Operation(summary = "Get role by ID", description = "Retrieve a specific role by ID")
@@ -164,6 +172,21 @@ public class RoleControllerV2 {
         ));
     }
 
+
+    @Operation(summary = "Delete role")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully deleted role"),
+        @ApiResponse(responseCode = "404", description = "Role not found", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = EntityNotFoundException.class))})
+    })
+    @SecurityRequirement(name = "basicAuth")
+    @DeleteMapping("/{id}")
+    @RequiresPermission(CREATE_UPDATE_ROLES)
+    public ResponseEntity<GeneralMessageResponse> deleteRole(@PathVariable Integer id) {
+        log.info("Deleting role: {}", id);
+        createRoleUseCase.deleteRole(id);
+        return ResponseEntity.ok(new GeneralMessageResponse("Role deleted successfully"));
+    }
 
     private RoleResponse toRoleResponse(Role role) {
         List<PermissionCode> permissions = role.getRolePermissions() == null

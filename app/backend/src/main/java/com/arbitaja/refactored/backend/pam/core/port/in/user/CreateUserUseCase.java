@@ -3,6 +3,8 @@ package com.arbitaja.refactored.backend.pam.core.port.in.user;
 import com.arbitaja.refactored.backend.pam.core.domain.model.SignupUser;
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import lombok.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -36,6 +38,8 @@ public interface CreateUserUseCase {
     void declineSignupUser(@NonNull Integer signupUserId);
 
     List<SignupUser> getAllSignupUsers();
+
+    Page<SignupUser> getAllSignupUsersPaged(String search, Pageable pageable);
 
     @Transactional
     User createUser(@NonNull SignupCommand command);

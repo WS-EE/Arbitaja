@@ -11,8 +11,12 @@ import com.arbitaja.refactored.backend.competition.core.port.out.competition.Com
 import com.arbitaja.refactored.backend.competition.core.port.out.competition.CompetitionRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
+import java.sql.Timestamp;
 
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +74,20 @@ public class CompetitionPersistenceAdapter implements CompetitionRepositoryPort 
     @Override
     public void deleteById(@NonNull Integer id) {
         competitionRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<Competition> findPaged(String search, Pageable pageable) {
+        return findPaged(search, null, pageable);
+    }
+
+    @Override
+    public Page<Competition> findPaged(String search, String status, Pageable pageable) {
+        String s = search == null ? "" : search;
+        String st = (status == null || status.isBlank()) ? "ALL" : status.toUpperCase();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        return competitionRepository.findBySearchAndStatus(s, st, now, pageable)
+            .map(mapper::toDomain);
     }
 
     private CompetitionOrganizerJpaEntity resolveOrganizer(Competition competition) {

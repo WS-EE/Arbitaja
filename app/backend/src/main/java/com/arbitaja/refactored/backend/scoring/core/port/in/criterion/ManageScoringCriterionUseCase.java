@@ -21,6 +21,8 @@ public interface ManageScoringCriterionUseCase {
 
     void addScoringCriterionToCompetition(@NonNull Integer competitionId, @NonNull Integer criterionId);
 
+    void removeScoringCriterionFromCompetition(@NonNull Integer competitionId, @NonNull Integer criterionId);
+
     @Getter
     @Setter
     @Builder

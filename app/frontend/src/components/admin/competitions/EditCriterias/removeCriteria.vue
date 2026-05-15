@@ -18,10 +18,12 @@ const props = defineProps({
     criteriaName: {
         type: String,
     },
+    competition_id: {
+        type: Number,
+        required: true
+    },
 })
 
-// Import displayalert
-// Alert function
 const alertTimeout = ref(3000)
 const alertMessage = ref('')
 const alertType = ref('')
@@ -34,33 +36,25 @@ function showAlert(message: string, type: string, timeout: number = 3000) {
     alertTimeout.value = timeout
 }
 
-// Set event to emit
 const emit = defineEmits(['removeCriteria'])
 
-const removeCompetitor = async(criteriaId: number, criteriaName?: string) => {
+const removeCriteria = async(criteriaId: number, criteriaName?: string) => {
     try {
-         // Delete competitor
-        const response = await apiClient.scoring.criteria.remove(criteriaId)
+        const response = await apiClient.scoring.criteria.removeFromCompetition(criteriaId, props.competition_id)
         if (!response.success) {
             throw new Error(response.error.message || 'Unknown error')
         }
-        // emit event
         emit('removeCriteria')
-
-        // Show alert
-        showAlert('Criteria named ' + criteriaName + ' has been removed. ID: ' + criteriaId, 'success')
+        showAlert('Criteria named ' + criteriaName + ' has been removed from competition.', 'success')
     } catch (error) {
-        // On error show error
-        showAlert('Criteria name ' + criteriaName + ' couldn\'t be removed. Error: ' + error + '<br>' + error , 'danger', 9000)
+        showAlert('Criteria ' + criteriaName + ' couldn\'t be removed. Error: ' + error, 'danger', 9000)
     }
 }
 
 </script>
 
 <template>
-    <!-- Alert when needed -->
     <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
-    <!-- Button trigger modal -->
     <button
         type="button"
         :class="props.addButtonDivClass"
@@ -68,8 +62,7 @@ const removeCompetitor = async(criteriaId: number, criteriaName?: string) => {
         :data-bs-target="'#' + props.modalId"
     >
     </button>
-    <!-- Modal -->
-    <div 
+    <div
         class="modal fade"
         :id="props.modalId"
         tabindex="-1"
@@ -81,7 +74,7 @@ const removeCompetitor = async(criteriaId: number, criteriaName?: string) => {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Delete: <b>{{ props.criteriaName }}</b>
+                        Remove from competition: <b>{{ props.criteriaName }}</b>
                     </h5>
                     <button
                         type="button"
@@ -91,15 +84,12 @@ const removeCompetitor = async(criteriaId: number, criteriaName?: string) => {
                     ></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Normal block -->
                     <div class="row mt-2 mb-2">
-                        <div class="">
-                            <p>You are about delete the competitor <b>{{ props.criteriaName }}</b> with the ID of <b>{{ props.criteriaId }}</b></p>
-                        </div>
+                        <p>You are about to remove <b>{{ props.criteriaName }}</b> (ID: <b>{{ props.criteriaId }}</b>) from this competition. The criteria itself will not be deleted.</p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button @click.prevent="removeCompetitor(props.criteriaId, props.criteriaName)" type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+                    <button @click.prevent="removeCriteria(props.criteriaId, props.criteriaName)" type="button" class="btn btn-danger" data-bs-dismiss="modal">Remove</button>
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>

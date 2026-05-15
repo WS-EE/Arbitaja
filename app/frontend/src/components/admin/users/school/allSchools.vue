@@ -48,11 +48,11 @@ onMounted(async () => {
     try {
         // If prop schools is not defined try to get them ourselves
         if (props.schools === undefined){
-            const response = await apiClient.schools.list()
+            const response = await apiClient.schools.list({ size: 500 })
             if(!response.success) {
                 throw new Error(response.error.message || 'Unknown error');
             }
-            schools.value = response.data
+            schools.value = response.data.content
 
         // else get the variables from props
         } else {

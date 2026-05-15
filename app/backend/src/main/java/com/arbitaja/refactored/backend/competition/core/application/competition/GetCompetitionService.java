@@ -7,6 +7,8 @@ import com.arbitaja.refactored.backend.competition.core.port.out.competition.Com
 import com.arbitaja.refactored.backend.competition.core.port.out.competition.CompetitionRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -40,6 +42,18 @@ public class GetCompetitionService implements GetCompetitionUseCase {
         Competition competition = competitionRepository.findByName(name)
             .orElseThrow(() -> EntityNotFoundException.competitionByName(name));
         return enrichWithCompetitors(competition);
+    }
+
+    @Override
+    public Page<Competition> getCompetitionsPaged(String search, Pageable pageable) {
+        return competitionRepository.findPaged(search, pageable)
+            .map(this::enrichWithCompetitors);
+    }
+
+    @Override
+    public Page<Competition> getCompetitionsPaged(String search, String status, Pageable pageable) {
+        return competitionRepository.findPaged(search, status, pageable)
+            .map(this::enrichWithCompetitors);
     }
 
     private Competition enrichWithCompetitors(Competition competition) {

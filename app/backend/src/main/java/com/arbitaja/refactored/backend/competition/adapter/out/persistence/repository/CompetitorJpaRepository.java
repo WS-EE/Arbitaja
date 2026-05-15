@@ -1,8 +1,11 @@
 package com.arbitaja.refactored.backend.competition.adapter.out.persistence.repository;
 
 import com.arbitaja.refactored.backend.competition.adapter.out.persistence.entity.CompetitorJpaEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Set;
 
@@ -18,5 +21,11 @@ public interface CompetitorJpaRepository extends JpaRepository<CompetitorJpaEnti
     Set<CompetitorJpaEntity> findByCompetitionId(Integer competitionId);
 
     CompetitorJpaEntity findByAlias(String alias);
+
+    @Query("SELECT c FROM CompetitorJpaEntity c LEFT JOIN c.personalData pd " +
+           "WHERE (:search IS NULL OR :search = '' " +
+           "OR LOWER(c.alias) LIKE LOWER(CONCAT('%', :search, '%')) " +
+           "OR LOWER(pd.fullName) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<CompetitorJpaEntity> findBySearchTerm(@Param("search") String search, Pageable pageable);
 }
 

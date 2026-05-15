@@ -125,11 +125,11 @@ function showAlert(message: string, type: string, timeout: number = 3000) {
 const getSchools = async() => {
     try {
         isLoadingSchool.value = true
-        const response = await apiClient.schools.list()
+        const response = await apiClient.schools.list({ size: 500 })
         if (!response.success) {
             throw new Error(response.error.message || 'Unknown error');
         }
-        allSchools.value = response.data
+        allSchools.value = response.data.content
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     } finally {
@@ -141,11 +141,11 @@ const getSchools = async() => {
 const getAllUsers = async() => {
     try {
         isLoadingUsers.value = true
-        const response = await apiClient.users.list()
+        const response = await apiClient.users.list({ size: 500 })
         if (!response.success) {
             throw new Error(response.error.message || 'Unknown error');
         }
-        allUsers.value = response.data
+        allUsers.value = response.data.content
     } catch(error) {
         showAlert('Couldn\'t get data for all the users. Error:' + error, 'danger', 9000)
     } finally {

@@ -7,6 +7,8 @@ import com.arbitaja.refactored.backend.scoring.core.domain.model.ScoringCriterio
 import com.arbitaja.refactored.backend.scoring.core.port.out.criterion.ScoringCriterionRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -44,5 +46,12 @@ public class ScoringCriterionPersistenceAdapter implements ScoringCriterionRepos
     @Override
     public void deleteById(@NonNull Integer id) {
         scoringCriterionRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<ScoringCriterion> findPaged(String search, Pageable pageable) {
+        String s = search == null ? "" : search;
+        return scoringCriterionRepository.findByNameContainingIgnoreCase(s, pageable)
+            .map(mapper::toDomain);
     }
 }

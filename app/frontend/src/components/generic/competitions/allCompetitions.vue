@@ -17,23 +17,36 @@ const competitions = ref<CompetitionResponse[]>([]);
 const isLoading = ref(true)
 const setCompetitionName = ref();
 const setCompetitionId = ref();
+const searchQuery = ref('');
 
 // Competition types
 const finishedCompetitions = ref<CompetitionResponse[]>([]);
 const ongoingCompetitions = ref<CompetitionResponse[]>([]);
 const upcomingCompetitions = ref<CompetitionResponse[]>([]);
 
+const matchesSearch = (competition: CompetitionResponse): boolean => {
+    if (!searchQuery.value.trim()) return true;
+    const q = searchQuery.value.toLowerCase();
+    return competition.name?.toLowerCase().includes(q) ?? false;
+};
+
 // Sort competitions
 const sortedFinishedCompetitions = computed(() => {
-    return [...finishedCompetitions.value].sort((a, b) => a.name.localeCompare(b.name));
+    return [...finishedCompetitions.value]
+        .filter(matchesSearch)
+        .sort((a, b) => a.name.localeCompare(b.name));
 });
 
 const sortedOngoingCompetitions = computed(() => {
-    return [...ongoingCompetitions.value].sort((a, b) => a.name.localeCompare(b.name));
+    return [...ongoingCompetitions.value]
+        .filter(matchesSearch)
+        .sort((a, b) => a.name.localeCompare(b.name));
 });
 
 const sortedUpcomingCompetitions = computed(() => {
-    return [...upcomingCompetitions.value].sort((a, b) => a.name.localeCompare(b.name));
+    return [...upcomingCompetitions.value]
+        .filter(matchesSearch)
+        .sort((a, b) => a.name.localeCompare(b.name));
 });
 
 // Get all competitions
@@ -42,11 +55,11 @@ const getAllCompetition = async() => {
     // Try getting all competitions
     try{
         // Try getting all competitions
-        const response = await apiClient.competitions.list()
+        const response = await apiClient.competitions.list({ size: 500 })
         if (!response.success) {
             throw new Error(response.error.message || 'Unknown error');
         }
-        competitions.value = response.data
+        competitions.value = response.data.content
 
         // sort competitions based on type
         await sortCompetitionsByTime(competitions.value)
@@ -159,6 +172,14 @@ function showAlert(message: string, type: string, timeout: number = 3000) {
 
     <!-- Main content-->
     <div class="container" v-else>
+        <div class="mb-3 mt-2">
+            <input
+                v-model="searchQuery"
+                type="text"
+                class="form-control"
+                placeholder="Search competitions..."
+            />
+        </div>
         <div class="row pt-3" v-if="!isArrayEmpty(sortedOngoingCompetitions)">
             <h3>Ongoing Competitions</h3>
             <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-3 mb-sm-0" v-for="competition in sortedOngoingCompetitions">

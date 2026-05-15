@@ -3,12 +3,12 @@ import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { apiClient } from '@/services/api';
 import { usePagedList } from '@/composables/usePagedList';
-import type { RoleResponse } from '@/services/api';
+import type { ScoringCriterionResponse } from '@/services/api';
 import displayAlert from '@/components/generic/displayAlert.vue';
 import PaginationControls from '@/components/generic/PaginationControls.vue';
 
-const deleteRoleId = ref<number | undefined>();
-const deleteRoleName = ref<string | undefined>();
+const deleteId = ref<number | undefined>();
+const deleteName = ref<string | undefined>();
 
 const alertTimeout = ref(3000);
 const alertMessage = ref('');
@@ -20,48 +20,42 @@ function showAlert(message: string, type: string, timeout = 3000) {
     alertTimeout.value = timeout;
 }
 
-const { items: roles, search, page, pageSize, totalElements, totalPages, isLoading, error,
+const { items: criterias, search, page, pageSize, totalElements, totalPages, isLoading, error,
         sortField, sortDir, load, onSearchInput, goToPage, setSort } =
-    usePagedList<RoleResponse>((params) => apiClient.roles.list(params), 'name,asc');
+    usePagedList<ScoringCriterionResponse>((params) => apiClient.scoring.criteria.list(params), 'name,asc');
 
-const setRoleToDelete = (id?: number, name?: string) => {
-    deleteRoleId.value = id;
-    deleteRoleName.value = name;
+const setToDelete = (id?: number, name?: string) => {
+    deleteId.value = id;
+    deleteName.value = name;
 };
 
-const deleteRole = async () => {
+const deleteCriteria = async () => {
     try {
-        if (deleteRoleId.value === undefined) throw new Error('Role ID is undefined');
-        await apiClient.roles.delete(deleteRoleId.value);
-        showAlert(`Role "${deleteRoleName.value}" deleted successfully.`, 'success');
+        if (deleteId.value === undefined) throw new Error('No criteria selected');
+        const response = await apiClient.scoring.criteria.remove(deleteId.value);
+        if (!response.success) throw new Error(response.error.message || 'Unknown error');
+        showAlert('Criteria "' + deleteName.value + '" deleted.', 'success');
         await load();
-    } catch (err) {
-        showAlert('Couldn\'t delete role. Error: ' + err, 'danger', 9000);
+    } catch (e) {
+        showAlert('Could not delete criteria. Error: ' + e, 'danger', 9000);
     } finally {
-        deleteRoleId.value = undefined;
-        deleteRoleName.value = undefined;
+        deleteId.value = undefined;
+        deleteName.value = undefined;
     }
 };
 
-onMounted(async () => {
-    try {
-        await load();
-    } catch (err) {
-        showAlert('Something went wrong. Error: ' + err, 'danger', 9000);
-    }
-});
+onMounted(() => load());
 </script>
 
 <template>
     <displayAlert :message="alertMessage" :type="alertType" :timeout="alertTimeout" />
-
     <div class="container">
-        <div class="row mb-2 mt-2">
+        <div class="row mb-3 mt-2">
             <div class="col">
-                <h3>Roles</h3>
+                <h3>Scoring Criteria</h3>
             </div>
             <div class="col-auto">
-                <RouterLink to="/admin/users/role_new" class="btn btn-success">Add Role</RouterLink>
+                <RouterLink to="/admin/criteria/new" class="btn btn-success">Add Criteria</RouterLink>
             </div>
         </div>
 
@@ -71,7 +65,7 @@ onMounted(async () => {
                 @input="onSearchInput"
                 type="text"
                 class="form-control"
-                placeholder="Search roles..."
+                placeholder="Search criteria..."
             />
         </div>
 
@@ -79,29 +73,32 @@ onMounted(async () => {
         <div v-if="isLoading" class="text-center p-4">Loading...</div>
         <div v-else>
             <div class="row border-5 border rounded m-2 p-2 justify-content-center align-items-center text-center fw-bold user-select-none">
-                <div class="col-2">ID</div>
-                <div class="col-4" style="cursor:pointer" @click="setSort('name')">
+                <div class="col-1">ID</div>
+                <div class="col-3" style="cursor:pointer" @click="setSort('name')">
                     Name <span v-if="sortField === 'name'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
                 </div>
-                <div class="col-3">Permissions</div>
-                <div class="col-3"></div>
+                <div class="col-2" style="cursor:pointer" @click="setSort('totalPoints')">
+                    Max Points <span v-if="sortField === 'totalPoints'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+                </div>
+                <div class="col-4 d-none d-md-block">Description</div>
+                <div class="col-2"></div>
             </div>
-
             <div
-                v-for="role in roles"
-                :key="role.id"
+                v-for="criteria in criterias"
+                :key="criteria.id"
                 class="row border-2 border rounded m-2 p-2 justify-content-center align-items-center text-center"
             >
-                <div class="col-2">{{ role.id }}</div>
-                <div class="col-4">{{ role.name }}</div>
-                <div class="col-3">{{ role.permissions?.length ?? 0 }}</div>
-                <div class="col-3 text-end">
-                    <RouterLink :to="'/admin/users/role_edit/' + role.id" class="btn btn-outline-success btn-sm me-1">Edit</RouterLink>
+                <div class="col-1">{{ criteria.id }}</div>
+                <div class="col-3">{{ criteria.name }}</div>
+                <div class="col-2">{{ criteria.total_points }}</div>
+                <div class="col-4 d-none d-md-block text-truncate">{{ criteria.description }}</div>
+                <div class="col-2 d-flex justify-content-end gap-1">
+                    <RouterLink :to="'/admin/criteria/edit/' + criteria.id" class="btn btn-outline-success btn-sm">Edit</RouterLink>
                     <button
-                        @click.prevent="setRoleToDelete(role.id, role.name)"
+                        @click.prevent="setToDelete(criteria.id, criteria.name)"
                         type="button"
                         data-bs-toggle="modal"
-                        data-bs-target="#deleteRoleModal"
+                        data-bs-target="#deleteCriteriaModal"
                         class="btn btn-danger btn-sm"
                     >Delete</button>
                 </div>
@@ -118,18 +115,19 @@ onMounted(async () => {
         </div>
     </div>
 
-    <div class="modal fade" id="deleteRoleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="deleteCriteriaModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Are you sure?</h5>
+                    <h5 class="modal-title">Delete criteria?</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    You are about to delete <strong>{{ deleteRoleName }}</strong> (ID: {{ deleteRoleId }}).
+                    You are about to permanently delete <strong>{{ deleteName }}</strong> (ID: {{ deleteId }}).
+                    This will remove it from all competitions it is linked to.
                 </div>
                 <div class="modal-footer">
-                    <button @click.prevent="deleteRole()" type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+                    <button @click.prevent="deleteCriteria()" type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>

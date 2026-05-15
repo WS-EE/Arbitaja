@@ -10,14 +10,16 @@ import com.arbitaja.refactored.backend.competition.adapter.out.persistence.repos
 import com.arbitaja.refactored.backend.competition.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.port.out.competitor.CompetitorRepositoryPort;
-import java.util.Set;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Persistence adapter for competitor management.
@@ -61,6 +63,13 @@ public class CompetitorPersistenceAdapter implements CompetitorRepositoryPort {
         CompetitorJpaEntity entity = mapper.toEntity(competitor);
         entity.setPersonalData(resolvePersonalData(competitor.getPersonalData()));
         return mapper.toDomain(competitorRepository.save(entity));
+    }
+
+    @Override
+    public Page<Competitor> findPaged(String search, Pageable pageable) {
+        String s = search == null ? "" : search;
+        return competitorRepository.findBySearchTerm(s, pageable)
+            .map(mapper::toDomain);
     }
 
     private CompetitorPersonalDataJpaEntity resolvePersonalData(com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData personalData) {

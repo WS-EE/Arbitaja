@@ -37,6 +37,16 @@ import logo from '@/assets/media/logo.svg'
                             ]" 
                             >Competitions</RouterLink>
                         </li>
+                        <li class="nav-item rounded m-1">
+                            <RouterLink
+                            to="/admin/criteria"
+                            :class="[
+                                isLinkActive('/admin/criteria')
+                                    ? 'active-item' : '',
+                                'nav-link rounded text-center',
+                            ]"
+                            >Criteria</RouterLink>
+                        </li>
                         <li class="nav-item rounded m-1 dropdown text-center">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Users

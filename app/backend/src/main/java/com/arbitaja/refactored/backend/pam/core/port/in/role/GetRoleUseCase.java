@@ -2,6 +2,8 @@ package com.arbitaja.refactored.backend.pam.core.port.in.role;
 
 import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,5 +43,7 @@ public interface GetRoleUseCase {
      * @return List of roles assigned to the user
      */
     List<Role> getRolesByUserId(@NonNull Integer userId);
+
+    Page<Role> getRolesPaged(String search, Pageable pageable);
 }
 

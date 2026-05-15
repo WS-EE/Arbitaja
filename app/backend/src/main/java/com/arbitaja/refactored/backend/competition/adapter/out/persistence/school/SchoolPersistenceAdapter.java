@@ -7,6 +7,8 @@ import com.arbitaja.refactored.backend.competition.core.domain.model.School;
 import com.arbitaja.refactored.backend.competition.core.port.out.school.SchoolRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -56,6 +58,13 @@ public class SchoolPersistenceAdapter implements SchoolRepositoryPort {
     @Override
     public void deleteById(@NonNull Integer id) {
         schoolRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<School> findPaged(String search, Pageable pageable) {
+        String s = search == null ? "" : search;
+        return schoolRepository.findByNameContainingIgnoreCase(s, pageable)
+            .map(mapper::toDomain);
     }
 }
 

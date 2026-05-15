@@ -8,10 +8,14 @@ import com.arbitaja.refactored.backend.scoring.adapter.util.ScoringCriterionWebM
 import com.arbitaja.refactored.backend.scoring.core.domain.enums.ScoringPermissionCode;
 import com.arbitaja.refactored.backend.scoring.core.port.in.criterion.GetScoringCriterionUseCase;
 import com.arbitaja.refactored.backend.scoring.core.port.in.criterion.ManageScoringCriterionUseCase;
+import com.arbitaja.refactored.backend.common.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,11 +37,15 @@ public class ScoringCriterionControllerV2 {
 
     @GetMapping
     @RequiresScoringPermission(ScoringPermissionCode.MANAGE_SCORING_CRITERIA)
-    public ResponseEntity<List<ScoringCriterionResponse>> getAll() {
-        log.info("Getting all scoring criteria");
-        return ResponseEntity.ok(getScoringCriterionUseCase.getAllScoringCriteria().stream()
-            .map(mapper::toResponse)
-            .toList());
+    public ResponseEntity<PagedResponse<ScoringCriterionResponse>> getAll(
+        @RequestParam(required = false, defaultValue = "") String search,
+        @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        log.info("Getting scoring criteria paged, search={}", search);
+        return ResponseEntity.ok(PagedResponse.from(
+            getScoringCriterionUseCase.getScoringCriteriaPaged(search, pageable)
+                .map(mapper::toResponse)
+        ));
     }
 
     @GetMapping("/{id}")
@@ -94,5 +102,16 @@ public class ScoringCriterionControllerV2 {
         log.info("Linking scoring criterion {} to competition {}", criterionId, competitionId);
         manageScoringCriterionUseCase.addScoringCriterionToCompetition(competitionId, criterionId);
         return ResponseEntity.ok(new GeneralMessageResponse("Scoring criterion added to competition successfully"));
+    }
+
+    @DeleteMapping("/{criterionId}/competitions/{competitionId}")
+    @RequiresScoringPermission(ScoringPermissionCode.MANAGE_SCORING_CRITERIA)
+    public ResponseEntity<GeneralMessageResponse> unlinkFromCompetition(
+        @PathVariable Integer criterionId,
+        @PathVariable Integer competitionId
+    ) {
+        log.info("Unlinking scoring criterion {} from competition {}", criterionId, competitionId);
+        manageScoringCriterionUseCase.removeScoringCriterionFromCompetition(competitionId, criterionId);
+        return ResponseEntity.ok(new GeneralMessageResponse("Scoring criterion removed from competition successfully"));
     }
 }

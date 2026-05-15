@@ -29,6 +29,9 @@ public interface CreateRoleUseCase {
     @Transactional
     Role updateRole(Integer id, RoleCommand command);
 
+    @Transactional
+    void deleteRole(Integer id);
+
     record RoleCommand(
         String name,
         List<Integer> permissionIds

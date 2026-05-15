@@ -6,6 +6,8 @@ import com.arbitaja.refactored.backend.pam.core.port.in.user.GetUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +40,11 @@ public class GetUserService implements GetUserUseCase {
     public User getUserProfile(@NonNull Integer userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> EntityNotFoundException.user(userId));
+    }
 
+    @Override
+    public Page<User> getUsersPaged(String search, Pageable pageable) {
+        return userRepository.findPaged(search, pageable);
     }
 }
 

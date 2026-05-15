@@ -68,4 +68,14 @@ public class CreateRoleService implements CreateRoleUseCase {
 
         return roleRepository.save(role);
     }
+
+    @Override
+    public void deleteRole(Integer id) {
+        log.info("Deleting role with id: {}", id);
+
+        Role role = roleRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + id));
+
+        roleRepository.delete(role);
+    }
 }

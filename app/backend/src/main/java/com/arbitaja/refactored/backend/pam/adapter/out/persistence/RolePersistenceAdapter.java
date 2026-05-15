@@ -7,6 +7,8 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.Role;
 import com.arbitaja.refactored.backend.pam.core.port.out.role.RoleRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -61,6 +63,13 @@ public class RolePersistenceAdapter implements RoleRepositoryPort {
     @Override
     public void delete(@NonNull Role role) {
         roleJpaRepository.deleteById(role.getId());
+    }
+
+    @Override
+    public Page<Role> findPaged(String search, Pageable pageable) {
+        String s = search == null ? "" : search;
+        return roleJpaRepository.findByNameContainingIgnoreCase(s, pageable)
+            .map(mapper::toDomain);
     }
 }
 

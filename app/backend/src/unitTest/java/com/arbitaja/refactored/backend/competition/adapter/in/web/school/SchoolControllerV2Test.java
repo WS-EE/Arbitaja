@@ -1,5 +1,6 @@
 package com.arbitaja.refactored.backend.competition.adapter.in.web.school;
 
+import com.arbitaja.refactored.backend.common.PagedResponse;
 import com.arbitaja.refactored.backend.competition.adapter.in.web.school.dto.request.SchoolUpsertRequest;
 import com.arbitaja.refactored.backend.competition.adapter.in.web.school.dto.response.SchoolResponse;
 import com.arbitaja.refactored.backend.competition.adapter.util.SchoolWebMapper;
@@ -11,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -43,15 +47,18 @@ class SchoolControllerV2Test {
     void getAllSchoolsReturnsMappedResponseList() {
         School first = School.builder().id(1).name("School A").build();
         School second = School.builder().id(2).name("School B").build();
+        Pageable pageable = PageRequest.of(0, 20);
 
-        when(getSchoolUseCase.getAllSchools()).thenReturn(List.of(first, second));
-        ResponseEntity<List<SchoolResponse>> response = controller.getAllSchools();
+        when(getSchoolUseCase.getSchoolsPaged(eq(""), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(first, second), pageable, 2));
+
+        ResponseEntity<PagedResponse<SchoolResponse>> response = controller.getAllSchools("", pageable);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().size());
-        assertEquals("School A", response.getBody().get(0).name());
-        assertEquals("School B", response.getBody().get(1).name());
+        assertEquals(2, response.getBody().content().size());
+        assertEquals("School A", response.getBody().content().get(0).name());
+        assertEquals("School B", response.getBody().content().get(1).name());
     }
 
     @Test
@@ -108,4 +115,3 @@ class SchoolControllerV2Test {
         verify(manageSchoolUseCase).deleteSchool(3);
     }
 }
-

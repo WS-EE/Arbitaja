@@ -4,7 +4,7 @@
 import { onMounted, ref, computed } from 'vue';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import { useUserStore } from "@/stores/userStore";
-import {apiClient, UserProfileResponse, SchoolResponse, UpdateUserRequest} from '@/services/api'
+import {apiClient, UserProfileResponse, SchoolResponse, UpdateUserRequest, RoleResponse} from '@/services/api'
 
 const store = useUserStore();
 
@@ -25,6 +25,8 @@ const user = ref<UserProfileResponse>(props.user)
 
 // Get school list
 const allSchools = ref<SchoolResponse[]>([]);
+const allRoles = ref<RoleResponse[]>([]);
+const selectedRoleIds = ref<number[]>([]);
 
 // Set user parameters to empty
 const isAdmin = computed(() => store.hasPrivilege('EDIT_USERS'))
@@ -32,20 +34,42 @@ const isLoading = ref(true)
 
 const getSchools = async() => {
     try {
-        const response = await apiClient.schools.list();
+        const response = await apiClient.schools.list({ size: 500 });
         if(!response.success){
           throw new Error(response.error.message || 'Unknown error')
         }
-        allSchools.value = response.data;
+        allSchools.value = response.data.content;
     } catch(error) {
         showAlert('Couldn\'t get data for all the schools. Error:' + error, 'danger', 9000)
     }
 }
 
 
+const getRoles = async () => {
+    try {
+        const response = await apiClient.roles.list({ size: 500 });
+        if (!response.success) throw new Error(response.error.message || 'Unknown error');
+        allRoles.value = response.data.content;
+        selectedRoleIds.value = (props.user.roles ?? []).map(r => r.id).filter((id): id is number => id !== undefined);
+    } catch (error) {
+        showAlert('Couldn\'t load roles. Error: ' + error, 'danger', 9000);
+    }
+};
+
+const saveRoles = async () => {
+    try {
+        const response = await apiClient.users.overwriteUserRoles(props.user.id, selectedRoleIds.value);
+        if (!response.success) throw new Error(response.error.message || 'Unknown error');
+        showAlert('Roles updated successfully.', 'success');
+    } catch (error) {
+        showAlert('Couldn\'t update roles. Error: ' + error, 'danger', 9000);
+    }
+};
+
 onMounted(async () => {
   // Try getting school data
   await getSchools();
+  if (isAdmin.value) await getRoles();
   isLoading.value = false;
 });
 
@@ -228,13 +252,31 @@ import changePassword from './changePassword.vue';
             <!-- List roles given to the user -->
             <div class="row pt-3">
                 <div class="col">
-                    <label for="">System Roles</label>
+                    <label>System Roles</label>
                 </div>
                 <div class="col">
-                    <!-- Horizontal under breakpoint -->
-                    <ul class="list-group list-group-horizontal">
+                    <div v-if="isAdmin">
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <div
+                                v-for="role in allRoles"
+                                :key="role.id"
+                                class="form-check"
+                            >
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    :id="'role-' + role.id"
+                                    :value="role.id"
+                                    v-model="selectedRoleIds"
+                                />
+                                <label class="form-check-label" :for="'role-' + role.id">{{ role.name }}</label>
+                            </div>
+                        </div>
+                        <button @click.prevent="saveRoles" class="btn btn-sm btn-outline-primary">Save Roles</button>
+                    </div>
+                    <ul v-else class="list-group list-group-horizontal">
                         <li v-for="role in user.roles" class="list-group-item disabled">{{ role.name }}</li>
-                    </ul>          
+                    </ul>
                 </div>
             </div>
         </div>

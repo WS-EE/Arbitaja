@@ -2,6 +2,8 @@ package com.arbitaja.refactored.backend.pam.core.port.out.user;
 
 import com.arbitaja.refactored.backend.pam.core.domain.model.SignupUser;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,8 @@ public interface SignupUserRepositoryPort {
      * @return List of all signup users
      */
     List<SignupUser> findAll();
+
+    Page<SignupUser> findPaged(String search, Pageable pageable);
 
     /**
      * Save a signup user

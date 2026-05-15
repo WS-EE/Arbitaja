@@ -8,6 +8,8 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.UserRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -68,6 +70,12 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
     @Override
     public boolean existsByUsername(@NonNull String username) {
         return userJpaRepository.existsByUsername(username);
+    }
+
+    @Override
+    public Page<User> findPaged(String search, Pageable pageable) {
+        return userJpaRepository.findBySearchTerm(search == null ? "" : search, pageable)
+            .map(mapper::toDomain);
     }
 }
 

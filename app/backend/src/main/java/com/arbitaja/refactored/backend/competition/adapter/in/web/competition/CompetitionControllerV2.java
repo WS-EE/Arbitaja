@@ -9,14 +9,16 @@ import com.arbitaja.refactored.backend.competition.adapter.util.CompetitionWebMa
 import com.arbitaja.refactored.backend.competition.core.domain.enums.CompetitionPermissionCode;
 import com.arbitaja.refactored.backend.competition.core.port.in.competition.GetCompetitionUseCase;
 import com.arbitaja.refactored.backend.competition.core.port.in.competition.ManageCompetitionUseCase;
+import com.arbitaja.refactored.backend.common.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Inbound REST adapter for competition management use cases.
@@ -33,12 +35,16 @@ public class CompetitionControllerV2 {
     private final CompetitionWebMapper mapper;
 
     @GetMapping
-    public ResponseEntity<List<CompetitionResponse>> getAllCompetitions() {
-        log.info("Getting all competitions");
-        List<CompetitionResponse> competitions = getCompetitionUseCase.getAllCompetitions().stream()
-            .map(mapper::toResponse)
-            .toList();
-        return ResponseEntity.ok(competitions);
+    public ResponseEntity<PagedResponse<CompetitionResponse>> getAllCompetitions(
+        @RequestParam(required = false, defaultValue = "") String search,
+        @RequestParam(required = false, defaultValue = "") String status,
+        @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        log.info("Getting competitions paged, search={}, status={}", search, status);
+        return ResponseEntity.ok(PagedResponse.from(
+            getCompetitionUseCase.getCompetitionsPaged(search, status, pageable)
+                .map(mapper::toResponse)
+        ));
     }
 
     @GetMapping("/{id}")

@@ -38,4 +38,9 @@ public class CompetitionScoringCriterionPersistenceAdapter implements Competitio
             .build();
         repository.save(link);
     }
+
+    @Override
+    public void unlinkCriterionFromCompetition(@NonNull Integer competitionId, @NonNull Integer criterionId) {
+        repository.deleteByCompetitionIdAndCriteriaId(competitionId, criterionId);
+    }
 }

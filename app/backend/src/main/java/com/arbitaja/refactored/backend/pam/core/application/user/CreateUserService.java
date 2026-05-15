@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -183,6 +186,11 @@ public class CreateUserService implements CreateUserUseCase {
     @Override
     public List<SignupUser> getAllSignupUsers() {
         return signupUserRepository.findAll();
+    }
+
+    @Override
+    public Page<SignupUser> getAllSignupUsersPaged(String search, Pageable pageable) {
+        return signupUserRepository.findPaged(search, pageable);
     }
 
 

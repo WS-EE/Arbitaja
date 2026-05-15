@@ -1,5 +1,6 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web.signup;
 
+import com.arbitaja.refactored.backend.common.PagedResponse;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.shared.dto.response.GeneralMessageResponse;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.SignupRequest;
@@ -10,6 +11,9 @@ import com.arbitaja.refactored.backend.pam.core.domain.exception.DuplicateEntity
 import com.arbitaja.refactored.backend.pam.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.pam.core.domain.exception.ForbiddenException;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.CreateUserUseCase;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,8 +28,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode.ACCEPT_SIGNUPS;
 
@@ -100,13 +102,15 @@ public class SignupControllerV2 {
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/signup")
     @RequiresPermission(PermissionCode.VIEW_SIGNUPS)
-    public ResponseEntity<List<SignupResponse>> getAllSignupUsers() {
-        log.info("Get All Signup Users");
-        return ResponseEntity.ok(
-            createUserUseCase.getAllSignupUsers()
-                .stream()
+    public ResponseEntity<PagedResponse<SignupResponse>> getAllSignupUsers(
+        @RequestParam(required = false, defaultValue = "") String search,
+        @PageableDefault(size = 20, sort = "username", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        log.info("Get All Signup Users paged, search={}", search);
+        return ResponseEntity.ok(PagedResponse.from(
+            createUserUseCase.getAllSignupUsersPaged(search, pageable)
                 .map(signupUserMapper::toSignupResponse)
-                .toList());
+        ));
     }
 }
 

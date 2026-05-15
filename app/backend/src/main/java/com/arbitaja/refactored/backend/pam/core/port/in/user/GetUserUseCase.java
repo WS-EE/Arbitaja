@@ -2,6 +2,8 @@ package com.arbitaja.refactored.backend.pam.core.port.in.user;
 
 import com.arbitaja.refactored.backend.pam.core.domain.model.User;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,5 +36,7 @@ public interface GetUserUseCase {
      * @return UserProfileResponse containing full profile data
      */
     User getUserProfile(@NonNull Integer userId);
+
+    Page<User> getUsersPaged(String search, Pageable pageable);
 }
 

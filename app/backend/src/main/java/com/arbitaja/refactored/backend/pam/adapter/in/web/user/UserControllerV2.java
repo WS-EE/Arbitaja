@@ -20,6 +20,7 @@ import com.arbitaja.refactored.backend.pam.core.port.in.user.CreateUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.GetUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.ManageUserRolesUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.UpdateUserUseCase;
+import com.arbitaja.refactored.backend.common.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,12 +33,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode.*;
 
@@ -81,6 +83,26 @@ public class UserControllerV2 {
             ));
     }
 
+    @Operation(summary = "Admin direct user creation", description = "Create a new user directly as an admin")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "User created"),
+        @ApiResponse(responseCode = "409", description = "User with username already exists", content = {@Content(mediaType = "application/json", schema =
+        @Schema(implementation = DuplicateEntityException.class))})
+    })
+    @PostMapping("/admin-create")
+    @SecurityRequirement(name = "basicAuth")
+    @RequiresPermission(EDIT_USERS)
+    public ResponseEntity<UserProfileResponse> adminCreateUser(@RequestBody @Valid SignupRequest request) {
+        log.info("Admin creating user: {}", request);
+
+        return ResponseEntity.ok(
+            DtoMapper.toUserProfileResponse(
+                createUserUseCase.createUser(
+                    signupUserMapper.toSignupCommand(request)
+                )
+            ));
+    }
+
     @Operation(summary = "Get all users", description = "Retrieve all users in the system")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved users"),
@@ -90,12 +112,15 @@ public class UserControllerV2 {
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
     @RequiresPermission(VIEW_USERS)
-    public ResponseEntity<List<UserProfileResponse>> getAllUsers() {
-        log.info("Getting all users");
-        List<User> users = getUserUseCase.getAllUsers();
-        List<UserProfileResponse> responses = users.stream()
-            .map(DtoMapper::toUserProfileResponse).toList();
-        return ResponseEntity.ok(responses);
+    public ResponseEntity<PagedResponse<UserProfileResponse>> getAllUsers(
+        @RequestParam(required = false, defaultValue = "") String search,
+        @PageableDefault(size = 20, sort = "username", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        log.info("Getting users paged, search={}", search);
+        return ResponseEntity.ok(PagedResponse.from(
+            getUserUseCase.getUsersPaged(search, pageable)
+                .map(DtoMapper::toUserProfileResponse)
+        ));
     }
 
     @Operation(summary = "Get user by ID", description = "Retrieve a specific user by their ID")

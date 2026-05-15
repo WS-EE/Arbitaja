@@ -2,6 +2,8 @@ package com.arbitaja.refactored.backend.competition.core.port.in.school;
 
 import com.arbitaja.refactored.backend.competition.core.domain.model.School;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -13,5 +15,7 @@ public interface GetSchoolUseCase {
     List<School> getAllSchools();
 
     School getSchoolById(@NonNull Integer id);
+
+    Page<School> getSchoolsPaged(String search, Pageable pageable);
 }
 

@@ -8,6 +8,8 @@ import com.arbitaja.refactored.backend.scoring.core.port.out.criterion.ScoringCr
 import com.arbitaja.refactored.backend.scoring.core.port.out.lookup.ScoringCompetitionLookupPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -42,5 +44,10 @@ public class GetScoringCriterionService implements GetScoringCriterionUseCase {
             throw EntityNotFoundException.competition(competitionId);
         }
         return competitionCriterionRepository.findCriteriaForCompetition(competitionId);
+    }
+
+    @Override
+    public Page<ScoringCriterion> getScoringCriteriaPaged(String search, Pageable pageable) {
+        return scoringCriterionRepository.findPaged(search, pageable);
     }
 }

@@ -8,15 +8,17 @@ import com.arbitaja.refactored.backend.competition.adapter.util.SchoolWebMapper;
 import com.arbitaja.refactored.backend.competition.core.domain.enums.CompetitionPermissionCode;
 import com.arbitaja.refactored.backend.competition.core.port.in.school.GetSchoolUseCase;
 import com.arbitaja.refactored.backend.competition.core.port.in.school.ManageSchoolUseCase;
+import com.arbitaja.refactored.backend.common.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Inbound REST adapter for school management use cases.
@@ -34,9 +36,15 @@ public class SchoolControllerV2 {
 
     @GetMapping
     @RequiresCompetitionPermission(CompetitionPermissionCode.VIEW_SCHOOLS)
-    public ResponseEntity<List<SchoolResponse>> getAllSchools() {
-        log.info("Getting all schools");
-        return ResponseEntity.ok(getSchoolUseCase.getAllSchools().stream().map(mapper::toResponse).toList());
+    public ResponseEntity<PagedResponse<SchoolResponse>> getAllSchools(
+        @RequestParam(required = false, defaultValue = "") String search,
+        @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        log.info("Getting schools paged, search={}", search);
+        return ResponseEntity.ok(PagedResponse.from(
+            getSchoolUseCase.getSchoolsPaged(search, pageable)
+                .map(mapper::toResponse)
+        ));
     }
 
     @GetMapping("/{id}")

@@ -5,14 +5,16 @@ import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.port.in.competitor.GetCompetitorUseCase;
 import com.arbitaja.refactored.backend.competition.core.port.out.competition.CompetitionCompetitorQueryPort;
 import com.arbitaja.refactored.backend.competition.core.port.out.competitor.CompetitorRepositoryPort;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +50,8 @@ public class GetCompetitorService implements GetCompetitorUseCase {
             .collect(Collectors.toSet());
     }
 
-
-
+    @Override
+    public Page<Competitor> getCompetitorsPaged(String search, Pageable pageable) {
+        return competitorRepositoryPort.findPaged(search, pageable);
+    }
 }

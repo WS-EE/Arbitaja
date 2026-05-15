@@ -88,6 +88,18 @@ public class ManageScoringCriterionService implements ManageScoringCriterionUseC
         competitionCriterionRepository.linkCriterionToCompetition(competitionId, criterionId);
     }
 
+    @Override
+    @Transactional
+    public void removeScoringCriterionFromCompetition(@NonNull Integer competitionId, @NonNull Integer criterionId) {
+        if (!competitionLookup.existsById(competitionId)) {
+            throw EntityNotFoundException.competition(competitionId);
+        }
+        if (scoringCriterionRepository.findById(criterionId).isEmpty()) {
+            throw EntityNotFoundException.scoringCriterion(criterionId);
+        }
+        competitionCriterionRepository.unlinkCriterionFromCompetition(competitionId, criterionId);
+    }
+
     private ScoringCriterion toDomain(Integer id, UpsertScoringCriterionCommand command) {
         return ScoringCriterion.builder()
             .id(id)

@@ -13,6 +13,7 @@ public interface SignupUserMapper {
     @Mapping(target = "email", source = "personalData.email")
     @Mapping(target = "schoolId", source = "personalData.school.id")
     @Mapping(target = "fullName", source = "personalData.fullName")
+    @Mapping(target = "createdAt", source = "createdAt")
     SignupResponse toSignupResponse(SignupUser signupUser);
 
     CreateUserUseCase.SignupCommand toSignupCommand(SignupRequest signupRequest);

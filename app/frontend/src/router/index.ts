@@ -21,7 +21,7 @@ import schoolView from '@/views/adminViews/Users/schoolView.vue';
 import AdminUsersView from '@/views/adminViews/Users/adminUsersView.vue';
 import editUserProfile from '@/views/adminViews/Users/editUserProfile.vue';
 
-import allCompetitions from '@/views/competitionViews/allCompetitions.vue';
+import adminCompetitionsView from '@/views/adminViews/competitions/adminCompetitionsView.vue';
 import competitionShow from '@/views/competitionViews/competitionShow.vue';
 
 import addCompetitionView from '@/views/adminViews/competitions/addCompetitionView.vue';
@@ -31,6 +31,13 @@ import editCompetitionCriteriasView from '@/views/adminViews/competitions/editCo
 
 import adminRolesView from '@/views/adminViews/roles/adminRolesView.vue';
 import editRolesView from '@/views/adminViews/roles/editRolesView.vue';
+import addRoleView from '@/views/adminViews/roles/addRoleView.vue';
+
+import adminCriteriasView from '@/views/adminViews/criterias/adminCriteriasView.vue';
+import addCriteriaView from '@/views/adminViews/criterias/addCriteriaView.vue';
+import editCriteriaView from '@/views/adminViews/criterias/editCriteriaView.vue';
+
+import addUserView from '@/views/adminViews/Users/addUserView.vue';
 
 declare module 'vue-router' {
     interface RouteMeta {
@@ -93,7 +100,7 @@ const router = createRouter({
                 {
                     path: 'competitions/',
                     name: 'adminCompetiton',
-                    component: allCompetitions 
+                    component: adminCompetitionsView
                 },
                 {
                     path: 'competition/',
@@ -132,6 +139,27 @@ const router = createRouter({
                     component: schoolView
                 },
                 {
+                    path: 'criteria/',
+                    name: 'adminCriteria',
+                    children: [
+                        {
+                            path: '',
+                            name: 'adminCriteriaList',
+                            component: adminCriteriasView
+                        },
+                        {
+                            path: 'new',
+                            name: 'addCriteria',
+                            component: addCriteriaView
+                        },
+                        {
+                            path: 'edit/:id',
+                            name: 'editCriteria',
+                            component: editCriteriaView
+                        },
+                    ]
+                },
+                {
                     path: 'users/',
                     name: 'adminUsers',
                     redirect: 'signup',
@@ -142,6 +170,11 @@ const router = createRouter({
                             component: AdminUsersView,
                         },
                         {
+                            path: 'user_new',
+                            name: 'adminUsersUserNew',
+                            component: addUserView
+                        },
+                        {
                             path: 'user_edit/:id',
                             name: 'adminUsersUserEdit',
                             component: editUserProfile
@@ -150,6 +183,11 @@ const router = createRouter({
                             path: 'role',
                             name: 'adminUsersRole',
                             component: adminRolesView
+                        },
+                        {
+                            path: 'role_new',
+                            name: 'adminUsersRoleNew',
+                            component: addRoleView
                         },
                         {
                             path: 'role_edit/:id',

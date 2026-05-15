@@ -5,6 +5,8 @@ import com.arbitaja.refactored.backend.pam.core.port.in.role.GetRoleUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.out.role.RoleRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,11 @@ public class GetRoleService implements GetRoleUseCase {
     @Override
     public List<Role> getRolesByUserId(@NonNull Integer userId) {
         return roleRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Page<Role> getRolesPaged(String search, Pageable pageable) {
+        return roleRepository.findPaged(search, pageable);
     }
 }
 

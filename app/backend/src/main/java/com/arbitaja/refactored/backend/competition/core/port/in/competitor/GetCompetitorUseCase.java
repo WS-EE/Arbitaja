@@ -3,6 +3,9 @@ package com.arbitaja.refactored.backend.competition.core.port.in.competitor;
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.domain.exception.EntityNotFoundException;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Set;
 
 /**
@@ -34,4 +37,6 @@ public interface GetCompetitorUseCase {
    * @return a set of all competitors in the system (may be empty)
    */
   Set<Competitor> getAllCompetitors();
+
+  Page<Competitor> getCompetitorsPaged(String search, Pageable pageable);
 }

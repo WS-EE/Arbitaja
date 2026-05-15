@@ -60,11 +60,11 @@ const getAllCriterias = async () => {
         isLoadingCompetirors.value = true
 
         // Get Criterias
-        const response = await apiClient.scoring.criteria.list()
+        const response = await apiClient.scoring.criteria.list({ size: 500 })
         if (!response.success) {
             throw new Error(response.error.message || 'Unknown error');
         }
-        allCriterias.value = response.data
+        allCriterias.value = response.data.content
 
     } catch (error) {
         showAlert('Couldn\'t get all the Criterias for adding existing Criterias. Error: ' + error, 'danger')

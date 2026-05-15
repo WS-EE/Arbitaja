@@ -73,9 +73,10 @@ const onRemoveCriteria = () => {
                     />
                     <removeCriteria
                         addButtonDivClass="btn btn-danger bi bi-trash"
-                        modalId="DeleteModal"
+                        :modalId="'deleteCriteria' + criteria.id"
                         :criteriaId="criteria.id"
                         :criteriaName="criteria.name"
+                        :competition_id="competition_id"
                         @removeCriteria="onRemoveCriteria()"
                     />
                 </td>

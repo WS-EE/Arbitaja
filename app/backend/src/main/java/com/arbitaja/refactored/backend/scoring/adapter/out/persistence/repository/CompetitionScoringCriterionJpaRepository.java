@@ -3,6 +3,7 @@ package com.arbitaja.refactored.backend.scoring.adapter.out.persistence.reposito
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.CompetitionScoringCriterionJpaEntity;
 import com.arbitaja.refactored.backend.scoring.adapter.out.persistence.entity.ScoringCriterionJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -17,4 +18,8 @@ public interface CompetitionScoringCriterionJpaRepository extends JpaRepository<
         )
     """)
     List<ScoringCriterionJpaEntity> findCriteriaByCompetitionId(Integer competitionId);
+
+    @Modifying
+    @Query("DELETE FROM CompetitionScoringCriterionJpaEntity csc WHERE csc.competitionId = :competitionId AND csc.criteriaId = :criteriaId")
+    void deleteByCompetitionIdAndCriteriaId(Integer competitionId, Integer criteriaId);
 }

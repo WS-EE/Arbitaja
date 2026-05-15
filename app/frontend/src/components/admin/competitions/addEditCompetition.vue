@@ -74,7 +74,7 @@ const getCompetitionById = async(id?: number) => {
         // set loading to be true
         isLoading.value = true;
         // check the active link
-        if (props.isEdit === true){
+        if (props.isEdit){
             if(id === undefined) {
                 throw new Error('Competition ID is undefined');
             }
@@ -106,18 +106,18 @@ const getCompetitionById = async(id?: number) => {
             await getCompetitorsByCompetition(competition_id);
         }
 
-        if (props.isEdit === false){
+        if (!props.isEdit){
             // set empty values for displayed items
             competition.value = {} as CompetitionResponse;
         }
 
         // Get all users
         // Try getting the Users
-        const response = await apiClient.users.list()
+        const response = await apiClient.users.list({ size: 500 })
         if (!response.success) {
             throw new Error(response.error.message || 'Unknown error');
         }
-        const allUsers = response.data
+        const allUsers = response.data.content
 
         // Get all the admin users
         allUsers.forEach((user) => {
@@ -226,7 +226,7 @@ const saveComp = async() => {
           }
 
          // Try to edit or add competition
-      if (props.isEdit === true) {
+      if (props.isEdit) {
           const response = await apiClient.competitions.update(competition.value.id, payload)
             if (!response.success) {
                 throw new Error(response.error.message || 'Unknown error');
