@@ -20,6 +20,7 @@ public class CompetitorWebMapper {
             .fullName(request.fullName())
             .email(request.email())
             .schoolId(request.schoolId())
+            .competitionId(request.competitionId())
             .build();
     }
 

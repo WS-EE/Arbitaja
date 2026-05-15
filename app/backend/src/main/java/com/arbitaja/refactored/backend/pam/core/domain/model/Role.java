@@ -15,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"userRoles"})
+@ToString(exclude = {"userRoles", "rolePermissions", "parentRoleRelations", "childRoleRelations"})
 public class Role {
 
     private Integer id;

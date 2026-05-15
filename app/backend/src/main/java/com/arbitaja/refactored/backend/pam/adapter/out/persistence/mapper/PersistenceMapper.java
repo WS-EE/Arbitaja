@@ -190,12 +190,19 @@ public class PersistenceMapper {
     }
 
     public RoleJpaEntity toEntity(@NonNull Role domain) {
-        return RoleJpaEntity.builder()
+        RoleJpaEntity roleEntity = RoleJpaEntity.builder()
             .id(domain.getId())
             .name(domain.getName())
             .createdAt(domain.getCreatedAt())
             .changedAt(domain.getChangedAt())
             .build();
+        if (domain.getRolePermissions() != null) {
+            roleEntity.setRolePermissions(domain.getRolePermissions().stream()
+                .map(this::toEntity)
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
+        }
+
+        return roleEntity;
     }
 
     // Permission mappings
@@ -257,11 +264,20 @@ public class PersistenceMapper {
             .build();
     }
 
-    public UserRoleJpaEntity toEntity(@NonNull UserRole domain){
+    public UserRoleJpaEntity toEntity(@NonNull UserRole domain) {
         return UserRoleJpaEntity.builder()
-                .id(domain.getId())
-                .user(toEntity(domain.getUser()))
-                .role(toEntity(domain.getRole()))
-                .build();
+            .id(domain.getId())
+            .user(toEntity(domain.getUser()))
+            .role(toEntity(domain.getRole()))
+            .build();
+    }
+
+    public UserRole toDomain(@NonNull UserRoleJpaEntity entity) {
+        return UserRole.builder()
+            .id(entity.getId())
+            .user(toDomain(entity.getUser()))
+            .role(toDomain(entity.getRole()))
+            .createdAt(entity.getCreatedAt())
+            .build();
     }
 }

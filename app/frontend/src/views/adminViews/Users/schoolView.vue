@@ -18,7 +18,7 @@ function showAlert(message: string, type: string, timeout = 3000) {
 
 const { items: schools, search, page, pageSize, totalElements, totalPages, isLoading, error,
         sortField, sortDir, load, onSearchInput, goToPage, setSort } =
-    usePagedList<SchoolResponse>((params) => apiClient.schools.list(params), 'name,asc');
+    usePagedList<SchoolResponse>((params) => apiClient.schools.list(params), 'id,asc');
 
 // Add school modal state
 const newSchoolName = ref('');
@@ -118,7 +118,9 @@ onMounted(() => load());
         <div v-if="isLoading" class="text-center p-4">Loading...</div>
         <div v-else>
             <div class="row border-5 border rounded m-2 p-2 justify-content-center align-items-center text-center fw-bold user-select-none">
-                <div class="col-2">ID</div>
+                <div class="col-2" style="cursor:pointer" @click="setSort('id')">
+                    ID <span v-if="sortField === 'id'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+                </div>
                 <div class="col-6" style="cursor:pointer" @click="setSort('name')">
                     Name <span v-if="sortField === 'name'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
                 </div>

@@ -14,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id")
-@ToString
+@ToString(exclude = {"rolePermissions"})
 public class Permission {
 
     private Integer id;

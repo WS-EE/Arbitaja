@@ -4,5 +4,7 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.UserRole;
 
 public interface UserRoleRepositoryPort {
 
-    void saveUserRole(UserRole userRole);
+    UserRole saveUserRole(UserRole userRole);
+
+    void deleteUserRole(UserRole userRole);
 }

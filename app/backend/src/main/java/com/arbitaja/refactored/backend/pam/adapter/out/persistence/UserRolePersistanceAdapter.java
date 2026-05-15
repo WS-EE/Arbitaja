@@ -17,8 +17,11 @@ public class UserRolePersistanceAdapter implements UserRoleRepositoryPort {
     private final PersistenceMapper mapper;
 
 
-    public void saveUserRole(UserRole userRole) {
+    public UserRole saveUserRole(UserRole userRole) {
+        return mapper.toDomain(userRoleJpaRepository.save(mapper.toEntity(userRole)));
+    }
 
-        userRoleJpaRepository.save(mapper.toEntity(userRole));
+    public void deleteUserRole(UserRole userRole) {
+        userRoleJpaRepository.delete(mapper.toEntity(userRole));
     }
 }

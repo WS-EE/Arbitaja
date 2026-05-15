@@ -47,7 +47,7 @@ public class RoleJpaEntity {
     private Set<RoleRelationJpaEntity> childRoleRelations = new LinkedHashSet<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "role", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<RolePermissionJpaEntity> rolePermissions = new LinkedHashSet<>();
 
     @Builder.Default

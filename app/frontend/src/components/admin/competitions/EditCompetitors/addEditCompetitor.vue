@@ -5,6 +5,10 @@ import {apiClient, CompetitorResponse, SchoolResponse, CompetitorUpsertRequest} 
 import displayAlert from '@/components/generic/displayAlert.vue';
 
 const props = defineProps({
+    competition_id: {
+        type: Number,
+        required: true
+    },
     modalId: {
         type: String,
         default: "modelId"
@@ -50,6 +54,7 @@ const competitorData = ref<CompetitorUpsertRequest>({
     full_name: '',
     email: '',
     school_id: undefined,
+    competition_id: props.competition_id,
 })
 const isLoadingMain = ref<boolean>(true)
 const isLoadingSchool = ref<boolean>(true)

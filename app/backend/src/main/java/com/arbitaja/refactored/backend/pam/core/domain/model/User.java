@@ -15,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"saltedPassword", "apiTokens"})
+@ToString(exclude = {"saltedPassword", "apiTokens", "userRoles"})
 public class User {
 
     private Integer id;

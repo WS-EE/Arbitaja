@@ -22,7 +22,7 @@ function showAlert(message: string, type: string, timeout = 3000) {
 
 const { items: criterias, search, page, pageSize, totalElements, totalPages, isLoading, error,
         sortField, sortDir, load, onSearchInput, goToPage, setSort } =
-    usePagedList<ScoringCriterionResponse>((params) => apiClient.scoring.criteria.list(params), 'name,asc');
+    usePagedList<ScoringCriterionResponse>((params) => apiClient.scoring.criteria.list(params), 'id,asc');
 
 const setToDelete = (id?: number, name?: string) => {
     deleteId.value = id;
@@ -73,7 +73,9 @@ onMounted(() => load());
         <div v-if="isLoading" class="text-center p-4">Loading...</div>
         <div v-else>
             <div class="row border-5 border rounded m-2 p-2 justify-content-center align-items-center text-center fw-bold user-select-none">
-                <div class="col-1">ID</div>
+                <div class="col-1" style="cursor:pointer" @click="setSort('id')">
+                    ID <span v-if="sortField === 'id'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+                </div>
                 <div class="col-3" style="cursor:pointer" @click="setSort('name')">
                     Name <span v-if="sortField === 'name'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
                 </div>

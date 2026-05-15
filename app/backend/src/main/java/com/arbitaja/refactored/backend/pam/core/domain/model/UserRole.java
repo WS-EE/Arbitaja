@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 @RequiredArgsConstructor
 @Builder
 @EqualsAndHashCode(of = {"user", "role"})
-@ToString(exclude = {"user"})
+@ToString
 public class UserRole {
 
     private Integer id;

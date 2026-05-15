@@ -64,6 +64,7 @@ const onEditCompetitor = () => {
                         :modalHeader="'Edit Competitor \'' + competitor.personal_data?.full_name + '\''"
                         :isEdit="true"
                         :competitor="competitor"
+                        :competition_id="props.competition_id"
                         @editCompetitor="onEditCompetitor()"
                     />
                     <removeCompetitor 

@@ -16,7 +16,9 @@ public record CompetitorUpsertRequest(
     String fullName,
     String email,
     @JsonProperty("school_id")
-    Integer schoolId
+    Integer schoolId,
+    @JsonProperty("competition_id")
+    Integer competitionId
 ) {
 }
 

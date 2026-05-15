@@ -155,7 +155,7 @@ public class CreateUserService implements CreateUserUseCase {
         if(userRepository.existsByUsername(command.getUsername())) {
             throw DuplicateEntityException.userWithUsername(command.getUsername());
         }
-        School school = schoolRepository.findById(command.getSchoolId()).orElse(null);
+        School school = command.getSchoolId() == null ? null : schoolRepository.findById(command.getSchoolId()).orElse(null);
         PersonalData personalData = personalDataRepository.save(PersonalData.builder()
             .fullName(command.getFullName())
             .email(command.getEmail())
@@ -170,6 +170,7 @@ public class CreateUserService implements CreateUserUseCase {
                 .build();
 
         User savedUser = userRepository.save(user);
+        System.out.println("User created with id: " + savedUser.getId());
 
         Role userRole = roleRepository.findByName(DEFAULT_USER_ROLE)
             .orElseThrow(() -> EntityNotFoundException.roleByName(DEFAULT_USER_ROLE));

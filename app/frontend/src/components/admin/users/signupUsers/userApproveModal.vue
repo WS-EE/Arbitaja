@@ -12,7 +12,7 @@ const props = defineProps<{
 const emit = defineEmits(['approveSignupUser'])
 
 const signupUsers = ref<SignupResponse[]>(props.users)
-const allSchools = ref<SchoolResponse[]>(props.schools)
+const allSchools = computed(() => props.schools)
 
 const commitedUserData = ref<SignupResponse>({} as SignupResponse)
 const commitSet = ref(false)
@@ -101,9 +101,6 @@ const deleteUser = async () => {
     <div class="col-lg-3 col-sm-3">
       {{ user.fullName }}
     </div>
-    <div class="col-lg-2 d-none d-lg-block small text-muted">
-      {{ formatDate(user.createdAt as unknown as string) }}
-    </div>
     <div class="col-lg-4 col-sm-5 text-end">
       <button @click.prevent="setCommitedUserData(user)" type="button" class="me-2 btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#ApproveModal">Accept</button>
       <button @click.prevent="setCommitedUserData(user)" type="button" data-bs-toggle="modal" data-bs-target="#DeleteModal" class="btn btn-danger btn-sm">Decline</button>
@@ -140,19 +137,17 @@ const deleteUser = async () => {
             </div>
           </div>
           <div class="row mt-2">
-            <div class="btn-group">
-              <div class="col-4">School:</div>
-              <div class="col">
-                <button type="button" class="btn btn-outline-dark dropdown-toggle ms-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div class="col-4">School:</div>
+            <div class="col">
+              <div class="dropdown">
+                <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {{ selectedSchoolName }}
                 </button>
                 <ul class="dropdown-menu">
-                  <li
-                    v-for="school in allSchools"
-                    @click="changeSchool(school.id)"
-                    class="dropdown-item"
-                  >
-                    {{ school.name }}
+                  <li v-for="school in allSchools" :key="school.id">
+                    <button class="dropdown-item" type="button" @click="changeSchool(school.id)">
+                      {{ school.name }}
+                    </button>
                   </li>
                 </ul>
               </div>

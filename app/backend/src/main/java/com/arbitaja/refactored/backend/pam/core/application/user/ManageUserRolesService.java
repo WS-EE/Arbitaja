@@ -37,15 +37,25 @@ public class ManageUserRolesService implements ManageUserRolesUseCase {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
+        List<UserRole> rolesToRemove = user.getUserRoles().stream()
+            .filter(userRole -> !roleIds.contains(userRole.getRole().getId()))
+            .toList();
+
+        rolesToRemove.forEach(userRoleRepositoryPort::deleteUserRole);
+        rolesToRemove.forEach(user.getUserRoles()::remove);
+
         roleIds.forEach(roleId -> {
                     Role role = roleRepository.findById(roleId)
                             .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
-                    userRoleRepositoryPort.saveUserRole(UserRole.createNew(user, role));
+                    if(role.getUserRoles().stream().anyMatch(ur -> ur.getUser().getId().equals(userId))) {
+                        return;
+                    }
+                    UserRole userRole = UserRole.createNew(user, role);
+                    userRole = userRoleRepositoryPort.saveUserRole(userRole);
+                    user.addRole(userRole);
                 });
 
-
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        return userRepository.save(user);
     }
 }
 

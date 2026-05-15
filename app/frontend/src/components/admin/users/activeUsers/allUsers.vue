@@ -25,7 +25,7 @@ function showAlert(message: string, type: string, timeout = 3000) {
 
 const { items: users, search, page, pageSize, totalElements, totalPages, isLoading, error,
         sortField, sortDir, load, onSearchInput, goToPage, setSort } =
-    usePagedList<UserProfileResponse>((params) => apiClient.users.list(params), 'username,asc');
+    usePagedList<UserProfileResponse>((params) => apiClient.users.list(params), 'id,asc');
 
 const currentUser = (id?: number) => id === curUserId.value;
 
@@ -88,41 +88,41 @@ onMounted(async () => {
         <div v-if="error" class="alert alert-danger">{{ error }}</div>
         <div v-if="isLoading" class="text-center p-4">Loading...</div>
         <div v-else>
-            <div class="row border-5 border rounded m-2 p-1 p-md-2 justify-content-center align-items-center text-center fw-bold user-select-none">
-                <div class="col-lg-3 col-md-3 col-sm-4" style="cursor:pointer" @click="setSort('username')">
-                    Username <span v-if="sortField === 'username'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-4" style="cursor:pointer" @click="setSort('personalData.fullName')">
-                    Full Name <span v-if="sortField === 'personalData.fullName'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3">Roles</div>
-                <div class="col-lg-3 col-md-3 col-sm-1"></div>
+            <div class="row border-5 border rounded m-2 p-1 p-md-2 align-items-center fw-bold user-select-none">
+                <div class="col" style="cursor:pointer" @click="setSort('id')">Id <span v-if="sortField === 'id'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span></div>
+                <div class="col" style="cursor:pointer" @click="setSort('username')">Username <span v-if="sortField === 'username'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span></div>
+                <div class="col" style="cursor:pointer" @click="setSort('personalData.fullName')">Full Name <span v-if="sortField === 'personalData.fullName'">{{ sortDir === 'asc' ? '↑' : '↓' }}</span></div>
+                <div class="col">Roles</div>
+                <div class="col-2 text-end"></div>
             </div>
-
-            <div
-                v-for="user in users"
-                :key="user.id"
-                class="row border-2 border rounded m-2 p-1 p-md-2 justify-content-center align-items-center text-center"
+        <div v-for="user in users" :key="user.id" class="row border-2 border rounded m-2 p-1 p-md-3 align-items-center">
+        <div class="col"><strong>{{ user.id }}</strong></div>
+        <div class="col"><strong>{{ user.username }}</strong></div>
+        <div class="col">{{ user.personal_data?.full_name }}</div>
+        <div class="col">
+            <span
+                v-for="role in user.roles"
+                :key="role.id"
+                class="badge bg-secondary me-1"
             >
-                <div class="col-lg-3 col-md-3 col-sm-4">
-                    <strong>{{ user.username }}</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-4">{{ user.personal_data?.full_name }}</div>
-                <div class="col-lg-3 col-md-3 col-sm-3">
-                    <span v-for="role in user.roles" :key="role.id" class="badge bg-secondary me-1">{{ role.name }}</span>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-1 text-end">
-                    <RouterLink :to="'/admin/users/user_edit/' + user.id" class="btn btn-outline-success btn-sm me-1">Edit</RouterLink>
-                    <button
-                        @click.prevent="setUserToDelete(user.id, user.username)"
-                        type="button"
-                        data-bs-toggle="modal"
-                        data-bs-target="#deleteUserModal"
-                        class="btn btn-danger btn-sm"
-                        :class="{ disabled: currentUser(user.id) }"
-                    >Delete</button>
-                </div>
-            </div>
+                {{ role.name }}
+            </span>
+        </div>
+
+    <div class="col-2 text-end">
+        <RouterLink :to="'/admin/users/user_edit/' + user.id" class="btn btn-outline-success btn-sm me-1">Edit</RouterLink>
+        <button
+            @click.prevent="setUserToDelete(user.id, user.username)"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteUserModal"
+            class="btn btn-danger btn-sm"
+            :class="{ disabled: currentUser(user.id) }"
+        >
+            Delete
+        </button>
+    </div>
+</div>
 
             <PaginationControls
                 :page="page"

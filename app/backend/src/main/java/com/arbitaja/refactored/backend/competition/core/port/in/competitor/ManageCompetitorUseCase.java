@@ -26,6 +26,7 @@ public interface ManageCompetitorUseCase {
         private String fullName;
         private String email;
         private Integer schoolId;
+        private Integer competitionId;
     }
 }
 

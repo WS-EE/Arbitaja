@@ -1,11 +1,13 @@
 package com.arbitaja.refactored.backend.competition.core.application.competitor;
 
+import com.arbitaja.refactored.backend.competition.adapter.out.persistence.CompetitionMembershipPersistenceAdapter;
 import com.arbitaja.refactored.backend.competition.core.domain.exception.DuplicateEntityException;
 import com.arbitaja.refactored.backend.competition.core.domain.exception.EntityNotFoundException;
 import com.arbitaja.refactored.backend.competition.core.domain.model.Competitor;
 import com.arbitaja.refactored.backend.competition.core.domain.model.CompetitorPersonalData;
 import com.arbitaja.refactored.backend.competition.core.domain.model.School;
 import com.arbitaja.refactored.backend.competition.core.port.in.competitor.ManageCompetitorUseCase;
+import com.arbitaja.refactored.backend.competition.core.port.out.competition.CompetitionMembershipPort;
 import com.arbitaja.refactored.backend.competition.core.port.out.competitor.CompetitorRepositoryPort;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ManageCompetitorService implements ManageCompetitorUseCase {
 
     private final CompetitorRepositoryPort competitorRepository;
+    private final CompetitionMembershipPort competitionMembershipPort;
 
     @Override
     @Transactional
@@ -29,7 +32,13 @@ public class ManageCompetitorService implements ManageCompetitorUseCase {
         if (competitorRepository.existsByAlias(command.getAlias())) {
             throw DuplicateEntityException.competitorByAlias(command.getAlias());
         }
-        return competitorRepository.save(toDomain(null, command));
+        Competitor competitor = competitorRepository.save(toDomain(null, command));
+
+        if (command.getCompetitionId() != null) {
+            competitionMembershipPort.addCompetitorToCompetition(command.getCompetitionId(), competitor.getId());
+        }
+
+        return competitor;
     }
 
     @Override

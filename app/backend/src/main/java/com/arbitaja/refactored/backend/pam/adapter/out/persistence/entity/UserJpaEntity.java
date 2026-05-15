@@ -47,7 +47,7 @@ public class UserJpaEntity {
     private Set<ApiTokenJpaEntity> apiTokens = new LinkedHashSet<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.PERSIST)
     private Set<UserRoleJpaEntity> userRoles = new LinkedHashSet<>();
 }
 

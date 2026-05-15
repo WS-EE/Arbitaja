@@ -199,7 +199,7 @@ import changePassword from './changePassword.vue';
                     <!-- Default dropright button -->
                     <div class="btn-group">
                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ user.personal_data!.school!.name }}
+                            {{ user.personal_data!.school?.name || '' }}
                         </button>
                         <ul class="dropdown-menu">
                             <!-- Search bar for schools -->

@@ -1054,6 +1054,8 @@ export interface components {
             email?: string;
             /** Format: int32 */
             school_id?: number;
+            /** Format: int32 */
+            competition_id?: number;
         };
         CompetitorResponse: {
             /** Format: int32 */

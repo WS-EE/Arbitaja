@@ -40,34 +40,36 @@ public class ManageRolePermissionsService implements ManageRolePermissionsUseCas
         Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
 
-        Set<Integer> requestedPermissionIds = permissionIds == null
-            ? Set.of()
-            : new LinkedHashSet<>(permissionIds);
-
-        Set<Integer> existingPermissionIds = role.getRolePermissions().stream()
-            .map(rp -> rp.getPermission().getId())
-            .collect(Collectors.toSet());
-
         List<RolePermission> rolePermissionsToRemove = role.getRolePermissions().stream()
-            .filter(rp -> !requestedPermissionIds.contains(rp.getPermission().getId()))
+            .filter(rp -> !permissionIds.contains(rp.getPermission().getId()))
             .toList();
 
-        rolePermissionsToRemove.forEach(role.getRolePermissions()::remove);
+        List<Integer> rolesToAdd = permissionIds.stream()
+            .filter(pid -> role.getRolePermissions().stream().noneMatch(rp -> rp.getPermission().getId().equals(pid)))
+            .toList();
+
+        log.info("Permissions to remove: {}", rolePermissionsToRemove);
+
         rolePermissionsToRemove.forEach(rolePermissionRepository::delete);
+        rolePermissionsToRemove.forEach(r -> role.getRolePermissions().remove(r));
 
-        for (Integer permissionId : requestedPermissionIds) {
-            if (existingPermissionIds.contains(permissionId)) {
-                continue;
-            }
+        log.info("Current permissions: {}", role.getRolePermissions().stream()
+            .map(rp -> rp.getPermission().getId())
+            .collect(Collectors.toSet()));
 
+        for (Integer permissionId : rolesToAdd) {
             Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new EntityNotFoundException("Permission not found with id: " + permissionId));
 
             RolePermission rolePermission = RolePermission.createNew(permission, role);
-            rolePermissionRepository.save(rolePermission);
+            rolePermission = rolePermissionRepository.save(rolePermission);
             role.getRolePermissions().add(rolePermission);
         }
 
-        return role;
+        log.info("Permissions before saving: {}", role.getRolePermissions().stream()
+            .map(rp -> rp.getPermission().getId())
+            .collect(Collectors.toSet()));
+
+        return roleRepository.save(role);
     }
 }

@@ -113,6 +113,7 @@ const onTableChanged = () => {
                     buttonName="Add Competitor"
                     modalId="addCompetitor"
                     :isLinked=false
+                    :competition_id="competition_id"
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1"
                     @addItem="onAddCompetitor()"
                  />
@@ -121,6 +122,7 @@ const onTableChanged = () => {
                     modalId="addLinkedCompetitor"
                     :isLinked=true
                     :existingCompetitors="competitors"
+                    :competition_id="competition_id"
                     addButtonDivClass="btn btn-success col-lg-2 col-md-3 col-sm-5 ms-2 me-2 mt-1"
                     @addItem="onAddCompetitor()"
                  />

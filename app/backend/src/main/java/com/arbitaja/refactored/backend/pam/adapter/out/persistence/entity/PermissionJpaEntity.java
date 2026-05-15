@@ -37,7 +37,7 @@ public class PermissionJpaEntity {
     private String keyObject;
 
     @Builder.Default
-    @OneToMany(mappedBy = "permission", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "permission", orphanRemoval = true, cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Set<RolePermissionJpaEntity> rolePermissions = new LinkedHashSet<>();
 }
 

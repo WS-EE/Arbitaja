@@ -16,7 +16,7 @@ export function usePagedList<T>(
 
   const parts = defaultSort.split(',');
   const sortField = ref(parts[0] || '');
-  const sortDir = ref<'asc' | 'desc'>((parts[1] as 'asc' | 'desc') || 'asc');
+  const sortDir = ref<'asc' | 'desc'>((parts[0] as 'asc' | 'desc') || 'asc');
 
   let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
