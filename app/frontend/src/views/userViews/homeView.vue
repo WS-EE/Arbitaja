@@ -13,11 +13,11 @@ import allcompetition from '@/components/generic/competitions/allCompetitions.vu
     <!-- Alert message when conecting to site -->
     <div class="container p-3">
         <!-- When user is logged out -->
-        <div v-if="!store.isAuthenticated()">
+        <div v-if="!store.isAuthenticated">
             <h1>Welcome to Arbitaja</h1>
         </div>
         <!-- When user is logged in -->
-        <div v-if="store.isAuthenticated()">
+        <div v-if="store.isAuthenticated">
             <h1>Welcome Arbitaja!</h1>
             <p>Hello {{ store.username }}!</p>
             <p>You have logged in!</p>

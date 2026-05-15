@@ -23,6 +23,7 @@
     "types": ["vite/client"]
   },
   "include": [
+    "vite.config.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",

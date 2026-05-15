@@ -1,67 +1,43 @@
-<script setup>
-const props = defineProps({
-    message: {
-        type: String,
-        default: "Error"
-    },
-    type: {
-      type: String,
-      default: "primary",
-    },
-    timeout: {
-      type: Number,
-    },
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+
+const props = withDefaults(defineProps<{
+  message?: string
+  type?: string
+  timeout?: number
+}>(), {
+  message: 'Error',
+  type: 'primary',
 })
-import { ref, watch } from 'vue';
 
-// Alert function
-const showAlert = ref(false)
+const visible = ref(false)
 const alertMessage = ref('')
-const alertType = ref('')
+const alertClass = ref('')
 
-watch(() => ({ type: props.type, message: props.message, timeout: props.timeout }),
-  (val) => {
-    // display alert
-    displayAlert(val.message, val.type, val.timeout)
+watch(
+  () => [props.type, props.message, props.timeout] as const,
+  ([type, message, timeout]) => {
+    alertClass.value = 'alert-' + (type ?? 'primary')
+    alertMessage.value = message ?? ''
+    visible.value = true
+
+    const ms = timeout ?? 3000
+    if (ms !== 0) {
+      setTimeout(() => { visible.value = false }, ms)
+    }
   }
-);
-
-
-function displayAlert(message, type, timeout){
-    // Set default type to primary(info)
-    if (timeout === undefined){
-        timeout = 3000;
-    }
-    if (type === undefined){
-        type = 'primary';
-    }
-
-    // Set the alert type
-    alertType.value = 'alert-' + type
-
-    // Tell user that changes were discarded
-    showAlert.value = true
-
-    alertMessage.value = message
-    // Fade out alert after 3000ms
-    if (timeout !== 0) {
-        setTimeout(() => {
-            showAlert.value = false
-        }, timeout);
-    }
-}
+)
 </script>
 
 <template>
-    <!-- Alert when needed -->
   <div class="container text-center fixed-bottom">
     <div class="row justify-content-center align-items-center align-self-center">
       <Transition class="m-2 col-10 col-md-8 col-lg-6" name="alert">
         <div
-            v-if="showAlert"
-            class="alert alert-sizes align-self-center"
-            :class="alertType"
-            role="alert"
+          v-if="visible"
+          class="alert alert-sizes align-self-center"
+          :class="alertClass"
+          role="alert"
         >
           <span v-html="alertMessage"></span>
         </div>

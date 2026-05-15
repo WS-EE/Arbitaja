@@ -1,43 +1,33 @@
-<script setup>
-import { computed, getCurrentInstance } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
-import logo from '@/assets/media/logo.svg';
-import router from '@/router';
-import { useUserStore } from '@/stores/userStore';
+<script setup lang="ts">
+import { computed } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import logo from '@/assets/media/logo.svg'
+import router from '@/router'
+import { useUserStore } from '@/stores/userStore'
 import { apiClient } from '@/services/api'
+import { COPYRIGHT_HEADER } from '@/config'
 
-const userStore = useUserStore();
+const userStore = useUserStore()
+const route = useRoute()
 
-// Check the active link
-const isLinkActive = (routePath) => {
-    const route = useRoute();
-    return route.path === routePath;
-}
+const isLinkActive = (routePath: string) => route.path === routePath
 
-// Reactive auth state derived from the store
 const isLoggedIn = computed(() => !!userStore.username && userStore.username !== 'anonymousUser')
 const isUserAdmin = computed(() => userStore.hasPrivilege('ADMIN'))
 
-// User logout function
 const userLogout = async () => {
     try {
-        const response = await apiClient.auth.logout();
+        const response = await apiClient.auth.logout()
         if (!response.success) {
-          throw new Error(response.error.message || 'Unknown error');
+            throw new Error(response.error.message || 'Unknown error')
         }
         userStore.clearUserAuthorization()
-        await router.replace('/home');
-        location.reload();
-    } catch(error) {
-        console.error('Logout failed:', error);
-        location.reload();
+        await router.replace('/home')
+        location.reload()
+    } catch {
+        location.reload()
     }
 }
-
-// Get copyright header
-const { appContext } = getCurrentInstance()
-const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
-
 </script>
 
 <template>
@@ -53,7 +43,7 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
                 <div class="modal-body">
                     <p>MIT License</p>
 
-                    <p>{{ copyrightHeader }}</p>
+                    <p>{{ COPYRIGHT_HEADER }}</p>
 
                     <p>
                         Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -94,8 +84,8 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>You are going to be redirected to the source code of this project.</p> 
-                    <p>Which is held on Github<i class="bi bi-github"></i></p> 
+                    <p>You are going to be redirected to the source code of this project.</p>
+                    <p>Which is held on Github<i class="bi bi-github"></i></p>
                     <p><strong>Yes. The entire source code.</strong> No ifs or buts.</p>
                 </div>
                 <div class="modal-footer">
@@ -119,23 +109,23 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
                 <div class="offcanvas-body">
                     <ul class="navbar-nav">
                         <li class="nav-item rounded m-1">
-                        <RouterLink 
-                        to="/home" 
+                        <RouterLink
+                        to="/home"
                         :class="[
-                            isLinkActive('/home') 
+                            isLinkActive('/home')
                                 ? 'active-item' : '',
                             'nav-link rounded text-center',
-                        ]" 
+                        ]"
                         >Home</RouterLink>
                         </li>
                         <li class="nav-item rounded m-1" v-if="isUserAdmin">
                             <RouterLink
                                 to="/admin"
                                 :class="[
-                                    isLinkActive('/admin') 
+                                    isLinkActive('/admin')
                                         ? 'active-item' : '',
                                     'nav-link rounded text-center',
-                                ]" 
+                                ]"
                             >Admin</RouterLink>
                         </li>
                     </ul>
@@ -156,15 +146,15 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
                         <div class="col-2 col-sm-2 d-flex justify-content-center nav-item rounded align-items-center m-1">
                             <button type="button" class="btn rounded nav-link align-content-center github" data-bs-toggle="modal" data-bs-target="#github-modal">
                                 <i class="bi bi-github"></i>
-                            </button>             
+                            </button>
                         </div>
                         <div class="col-2 col-sm-2 d-flex rounded justify-content-center align-items-center m-1"
                             v-if="isLoggedIn"
-                            :class="[ 
+                            :class="[
                                 (isLoggedIn) ? 'nav-item' : '',
-                                isLinkActive('/userProfile') 
+                                isLinkActive('/userProfile')
                                 ? 'active-item' : '',
-                            ]" 
+                            ]"
                         >
                             <RouterLink class="github rounded nav-link align-content-center" to="/userProfile"><i class="bi bi-person-gear"></i></RouterLink>
                         </div>
@@ -176,7 +166,6 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
 </template>
 
 <style scoped>
-
 
 .nav-item:hover {
     background-color: var(--button-dark) !important;
@@ -191,6 +180,5 @@ const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
     font-weight: 600;
     scale: 1.65;
 }
-
 
 </style>

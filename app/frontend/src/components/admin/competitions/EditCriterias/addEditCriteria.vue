@@ -207,7 +207,7 @@ function showAlert(message: string, type: string, timeout: number = 3000){
                 </div>
                 <div class="modal-footer">
                     <button v-if="isAdd" @click.prevent="addEditCriteria(modalCriteria, props.competition_id)" type="button" class="btn btn-success" data-bs-dismiss="modal">Add</button>
-                    <button v-else @click.prevent="addEditCriteria(modalCriteria, props.competition_id)" type="button" class="btn btn-success" data-bs-dismiss="modal">Edit</button>
+                    <button v-else @click.prevent="addEditCriteria(modalCriteria, props.competition_id, modalCriteria.id)" type="button" class="btn btn-success" data-bs-dismiss="modal">Edit</button>
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>

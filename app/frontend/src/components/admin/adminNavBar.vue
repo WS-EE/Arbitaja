@@ -46,7 +46,7 @@ import logo from '@/assets/media/logo.svg'
                                 <li><RouterLink class="dropdown-item" to="/admin/users/role">Roles</RouterLink></li>
                                 <li><RouterLink class="dropdown-item" to="/admin/schools">Schools</RouterLink></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><RouterLink class="dropdown-item" to="/admin/users/singup">Signup Approve</RouterLink></li>
+                                <li><RouterLink class="dropdown-item" to="/admin/users/signup">Signup Approve</RouterLink></li>
                             </ul>
                         </li>
                     </ul>

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import EditCompCriterias from '@/components/admin/competitions/EditCriterias/editCriteriasMain.vue';
 </script>
 

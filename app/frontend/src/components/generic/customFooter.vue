@@ -1,20 +1,15 @@
-<script setup>
-import { getCurrentInstance } from 'vue'
-
-const { appContext } = getCurrentInstance()
-const appVersion = appContext.config.globalProperties.$arbitajaVersion
-const copyrightHeader = appContext.config.globalProperties.$copyrightHeader
-
+<script setup lang="ts">
+import { APP_VERSION, COPYRIGHT_HEADER } from '@/config'
 </script>
 
 <template>
     <footer>
         <div class="text-body" id="footer-text">
             <p class="footer-center">
-                {{ copyrightHeader }}
+                {{ COPYRIGHT_HEADER }}
             </p>
             <p class="footer-version">
-                {{ appVersion }}
+                {{ APP_VERSION }}
             </p>
         </div>
     </footer>
