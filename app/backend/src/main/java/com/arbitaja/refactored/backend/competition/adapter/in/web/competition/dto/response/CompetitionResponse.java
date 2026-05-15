@@ -1,12 +1,15 @@
 package com.arbitaja.refactored.backend.competition.adapter.in.web.competition.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
 import java.util.Set;
 
 public record CompetitionResponse(
+    @NotNull
     Integer id,
+    @NotNull
     String name,
     @JsonProperty("start_time")
     Timestamp startTime,
@@ -20,6 +23,7 @@ public record CompetitionResponse(
     Set<CompetitorResponse> competitors
 ) {
     public record OrganizerResponse(
+        @NotNull
         Integer id,
         @JsonProperty("full_name")
         String fullName,
@@ -28,6 +32,7 @@ public record CompetitionResponse(
     }
 
     public record CompetitorResponse(
+        @NotNull
         Integer id,
         @JsonProperty("full_name")
         String fullName,

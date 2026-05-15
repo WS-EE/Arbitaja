@@ -1,10 +1,8 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.time.Instant;
 
@@ -15,8 +13,8 @@ import java.time.Instant;
 @Builder
 public class SignupResponse {
 
-    long userId;
-    String username;
+    @NotBlank @NotNull Long userId;
+    @NotBlank @NotNull String username;
     String email;
     String fullName;
     Integer schoolId;

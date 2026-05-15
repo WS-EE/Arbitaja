@@ -139,7 +139,8 @@ export interface paths {
         /** Update role */
         put: operations["updateRole"];
         post?: never;
-        delete?: never;
+        /** Delete role */
+        delete: operations["deleteRole"];
         options?: never;
         head?: never;
         patch?: never;
@@ -223,6 +224,26 @@ export interface paths {
          * @description Create a new user
          */
         post: operations["createUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/user/admin-create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admin direct user creation
+         * @description Create a new user directly as an admin
+         */
+        post: operations["adminCreateUser"];
         delete?: never;
         options?: never;
         head?: never;
@@ -315,7 +336,7 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["linkToCompetition"];
-        delete?: never;
+        delete: operations["unlinkFromCompetition"];
         options?: never;
         head?: never;
         patch?: never;
@@ -933,7 +954,7 @@ export interface components {
              * @description Personal data id
              * @example 1
              */
-            id: number;
+            id?: number;
             /**
              * @description Full name of the user
              * @example John Doe
@@ -943,7 +964,7 @@ export interface components {
         RoleResponse: {
             /** Format: int32 */
             id: number;
-            name?: string;
+            name: string;
             permissions: ("ADMIN" | "BASIC" | "VIEW_DASHBOARD" | "VIEW_USERS" | "EDIT_USERS" | "VIEW_SIGNUPS" | "ACCEPT_SIGNUPS" | "VIEW_ROLES" | "CREATE_UPDATE_ROLES" | "VIEW_PERMISSIONS" | "CREATE_UPDATE_PERMISSIONS" | "VIEW_COMPETITIONS" | "CREATE_UPDATE_COMPETITIONS" | "VIEW_COMPETITORS" | "CREATE_UPDATE_COMPETITORS" | "VIEW_SCHOOLS" | "CREATE_UPDATE_SCHOOLS" | "VIEW_SCORING_DASHBOARD" | "MANAGE_SCORING_CRITERIA" | "RECORD_SCORING_RESULTS")[];
         };
         SchoolResponse: {
@@ -956,7 +977,7 @@ export interface components {
              * @description School name
              * @example Springfield High School
              */
-            name?: string;
+            name: string;
         };
         /** @description Response for user profile data */
         UserProfileResponse: {
@@ -965,7 +986,7 @@ export interface components {
              * @description User ID
              * @example 12345
              */
-            id: number;
+            id?: number;
             /**
              * @description Username of the user
              * @example john_doe
@@ -1009,11 +1030,11 @@ export interface components {
         ScoringCriterionResponse: {
             /** Format: int32 */
             id: number;
-            name?: string;
+            name: string;
             description?: string;
             is_manual?: boolean;
             /** Format: double */
-            total_points?: number;
+            total_points: number;
             is_generalized?: boolean;
             expected_result?: string;
             is_template?: boolean;
@@ -1025,17 +1046,17 @@ export interface components {
             criteria_template_id?: number;
         };
         SchoolUpsertRequest: {
-            name?: string;
+            name: string;
         };
         AddPermissionToRoleRequest: {
-            permissionIds?: number[];
+            permissionIds: number[];
         };
         CreateRoleRequest: {
             name?: string;
             permissionIds?: number[];
         };
         CreatePermissionRequest: {
-            name?: string;
+            name: string;
             key?: string;
         };
         PermissionResponse: {
@@ -1082,13 +1103,13 @@ export interface components {
             id: number;
             name: string;
             /** Format: date-time */
-            start_time: string;
+            start_time?: string;
             /** Format: date-time */
-            end_time: string;
+            end_time?: string;
             /** Format: date-time */
             score_showtime?: string;
             publish_scores?: boolean;
-            organizer: components["schemas"]["OrganizerResponse"];
+            organizer?: components["schemas"]["OrganizerResponse"];
             competitors?: components["schemas"]["CompetitorResponse"][];
         };
         OrganizerResponse: {
@@ -1101,10 +1122,10 @@ export interface components {
             competitorIds?: number[];
         };
         SignupRequest: {
-            username?: string;
-            password?: string;
+            username: string;
+            password: string;
             email?: string;
-            full_name?: string;
+            full_name: string;
             /** Format: int32 */
             school_id?: number;
         };
@@ -1158,11 +1179,20 @@ export interface components {
         SignupResponse: {
             /** Format: int64 */
             userId: number;
-            username?: string;
+            username: string;
             email?: string;
             fullName?: string;
             /** Format: int32 */
             schoolId?: number;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        ApproveSignupRequest: {
+            username?: string;
+            email?: string;
+            full_name?: string;
+            /** Format: int32 */
+            school_id?: number;
         };
         AddScoringHistoryRequest: {
             /** Format: int32 */
@@ -1182,18 +1212,47 @@ export interface components {
             /** Format: int32 */
             competitor_id: number;
             /** Format: int32 */
-            criteria_id?: number;
-            criteria_name?: string;
+            criteria_id: number;
+            criteria_name: string;
             /** Format: double */
-            points_given?: number;
+            points_given: number;
             /** Format: date-time */
-            created_at?: string;
+            created_at: string;
+        };
+        Pageable: {
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            sort?: string[];
+        };
+        PagedResponseUserProfileResponse: {
+            content?: components["schemas"]["UserProfileResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PagedResponseSignupResponse: {
+            content?: components["schemas"]["SignupResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
         };
         CompetitorDashboardResponse: {
-            name?: string;
+            name: string;
             /** Format: double */
-            total_score?: number;
-            results?: components["schemas"]["DashboardResultPointResponse"][];
+            total_score: number;
+            results: components["schemas"]["DashboardResultPointResponse"][];
         };
         DashboardResultPointResponse: {
             /** Format: date-time */
@@ -1202,30 +1261,85 @@ export interface components {
             point_amount: number;
         };
         ScoringDashboardResponse: {
-            competitors?: components["schemas"]["CompetitorDashboardResponse"][];
+            competitors: components["schemas"]["CompetitorDashboardResponse"][];
         };
         CompetitionScoringCriteriaResultsResponse: {
             /** Format: int32 */
             competition_id: number;
-            competition_name?: string;
-            competitors?: components["schemas"]["CompetitorCriteriaResultsResponse"][];
+            competition_name: string;
+            competitors: components["schemas"]["CompetitorCriteriaResultsResponse"][];
         };
         CompetitorCriteriaResultsResponse: {
             /** Format: int32 */
-            competitor_id?: number;
-            name?: string;
-            criteria?: components["schemas"]["CriterionResultResponse"][];
+            competitor_id: number;
+            name: string;
+            criteria: components["schemas"]["CriterionResultResponse"][];
         };
         CriterionResultResponse: {
             /** Format: int32 */
             criterion_id: number;
-            criterion_name?: string;
+            criterion_name: string;
             /** Format: double */
-            points?: number;
+            points: number;
+        };
+        PagedResponseScoringCriterionResponse: {
+            content?: components["schemas"]["ScoringCriterionResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PagedResponseSchoolResponse: {
+            content?: components["schemas"]["SchoolResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PagedResponseRoleResponse: {
+            content?: components["schemas"]["RoleResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PagedResponseCompetitorResponse: {
+            content?: components["schemas"]["CompetitorResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PagedResponseCompetitionResponse: {
+            content?: components["schemas"]["CompetitionResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
         };
         Role: {
             /** Format: int32 */
-            id: number;
+            id?: number;
             name?: string;
         };
         SimpleGrantedAuthority: {
@@ -1670,6 +1784,37 @@ export interface operations {
             };
         };
     };
+    deleteRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully deleted role */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GeneralMessageResponse"];
+                };
+            };
+            /** @description Role not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntityNotFoundException"];
+                };
+            };
+        };
+    };
     updatePermission: {
         parameters: {
             query?: never;
@@ -1873,6 +2018,39 @@ export interface operations {
             };
         };
     };
+    adminCreateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignupRequest"];
+            };
+        };
+        responses: {
+            /** @description User created */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserProfileResponse"];
+                };
+            };
+            /** @description User with username already exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DuplicateEntityException"];
+                };
+            };
+        };
+    };
     signupUser: {
         parameters: {
             query?: never;
@@ -1917,7 +2095,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SignupRequest"];
+                "application/json": components["schemas"]["ApproveSignupRequest"];
             };
         };
         responses: {
@@ -1970,7 +2148,10 @@ export interface operations {
     };
     getAll: {
         parameters: {
-            query?: never;
+            query: {
+                search?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1983,7 +2164,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ScoringCriterionResponse"][];
+                    "*/*": components["schemas"]["PagedResponseScoringCriterionResponse"];
                 };
             };
         };
@@ -2035,9 +2216,35 @@ export interface operations {
             };
         };
     };
-    getAllSchools: {
+    unlinkFromCompetition: {
         parameters: {
             query?: never;
+            header?: never;
+            path: {
+                criterionId: number;
+                competitionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GeneralMessageResponse"];
+                };
+            };
+        };
+    };
+    getAllSchools: {
+        parameters: {
+            query: {
+                search?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2050,7 +2257,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SchoolResponse"][];
+                    "*/*": components["schemas"]["PagedResponseSchoolResponse"];
                 };
             };
         };
@@ -2138,7 +2345,10 @@ export interface operations {
     };
     getAllCompetitors: {
         parameters: {
-            query?: never;
+            query: {
+                search?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2151,7 +2361,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["CompetitorResponse"][];
+                    "*/*": components["schemas"]["PagedResponseCompetitorResponse"];
                 };
             };
         };
@@ -2182,7 +2392,11 @@ export interface operations {
     };
     getAllCompetitions: {
         parameters: {
-            query?: never;
+            query: {
+                search?: string;
+                status?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2195,7 +2409,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["CompetitionResponse"][];
+                    "*/*": components["schemas"]["PagedResponseCompetitionResponse"];
                 };
             };
         };
@@ -2272,7 +2486,10 @@ export interface operations {
     };
     getAllUsers: {
         parameters: {
-            query?: never;
+            query: {
+                search?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2285,7 +2502,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["UserProfileResponse"][];
+                    "*/*": components["schemas"]["PagedResponseUserProfileResponse"];
                 };
             };
             /** @description Forbidden */
@@ -2330,7 +2547,10 @@ export interface operations {
     };
     getAllSignupUsers: {
         parameters: {
-            query?: never;
+            query: {
+                search?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2343,7 +2563,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SignupResponse"][];
+                    "*/*": components["schemas"]["PagedResponseSignupResponse"];
                 };
             };
             /** @description Forbidden */
@@ -2448,7 +2668,10 @@ export interface operations {
     };
     getAllRoles: {
         parameters: {
-            query?: never;
+            query: {
+                search?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2461,7 +2684,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RoleResponse"][];
+                    "*/*": components["schemas"]["PagedResponseRoleResponse"];
                 };
             };
             /** @description Forbidden */

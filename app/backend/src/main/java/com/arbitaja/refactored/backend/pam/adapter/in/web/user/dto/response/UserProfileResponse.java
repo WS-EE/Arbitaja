@@ -4,6 +4,7 @@ import com.arbitaja.refactored.backend.pam.adapter.in.web.role.dto.response.Role
 import com.arbitaja.refactored.backend.pam.core.domain.enums.PermissionCode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
@@ -18,19 +19,24 @@ import java.util.Set;
 public class UserProfileResponse {
 
     @Schema(description = "User ID", example = "12345")
-    private int id;
+    @NotNull
+    private Integer id;
 
     @Schema(description = "Username of the user", example = "john_doe")
+    @NotNull
     private String username;
 
+    @NotNull
     @Schema(description = "List of user roles")
     private List<RoleResponse> roles;
 
     @Schema(description = "Set of user permissions")
+    @NotNull
     private Set<PermissionCode> permissions;
 
     @Schema(description = "Personal data of the user")
     @JsonProperty("personal_data")
+    @NotNull
     private PersonalDataResponse personalData;
 
 
@@ -41,6 +47,7 @@ public class UserProfileResponse {
     public static class PersonalDataResponse {
         @Schema(description = "Personal data id", example = "1")
         @JsonProperty("id")
+        @NotNull
         private Integer id;
 
         @Schema(description = "Full name of the user", example = "John Doe")
@@ -59,7 +66,7 @@ public class UserProfileResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SchoolResponse {
-        @Schema(description = "School ID", example = "101")
+        @NotNull
         private Integer id;
 
         @Schema(description = "School name", example = "Springfield High School")

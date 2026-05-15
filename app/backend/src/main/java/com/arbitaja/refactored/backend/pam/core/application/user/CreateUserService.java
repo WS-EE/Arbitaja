@@ -6,6 +6,7 @@ import com.arbitaja.refactored.backend.pam.core.domain.model.*;
 import com.arbitaja.refactored.backend.pam.core.port.in.user.CreateUserUseCase;
 import com.arbitaja.refactored.backend.pam.core.port.out.personaldata.PersonalDataRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.role.RoleRepositoryPort;
+import com.arbitaja.refactored.backend.pam.core.port.out.role.UserRoleRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.school.SchoolRepositoryPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.security.PasswordEncoderPort;
 import com.arbitaja.refactored.backend.pam.core.port.out.user.SignupUserRepositoryPort;
@@ -39,6 +40,7 @@ public class CreateUserService implements CreateUserUseCase {
     private final RoleRepositoryPort roleRepository;
     private final SchoolRepositoryPort schoolRepository;
     private final PersonalDataRepositoryPort personalDataRepository;
+    private final UserRoleRepositoryPort userRoleRepository;
     private final PasswordEncoderPort passwordEncoder;
 
     @Override
@@ -170,12 +172,12 @@ public class CreateUserService implements CreateUserUseCase {
                 .build();
 
         User savedUser = userRepository.save(user);
-        System.out.println("User created with id: " + savedUser.getId());
 
         Role userRole = roleRepository.findByName(DEFAULT_USER_ROLE)
             .orElseThrow(() -> EntityNotFoundException.roleByName(DEFAULT_USER_ROLE));
 
         UserRole userRoleAssignment = UserRole.createNew(savedUser, userRole);
+        userRoleAssignment = userRoleRepository.saveUserRole(userRoleAssignment);
         savedUser.addRole(userRoleAssignment);
 
         savedUser = userRepository.save(savedUser);

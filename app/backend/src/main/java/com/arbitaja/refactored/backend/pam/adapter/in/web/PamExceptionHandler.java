@@ -77,7 +77,7 @@ public class PamExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<Map<String, String>> handleNullPointerException(NullPointerException ex) {
-        log.error("Null pointer exception: {}", ex.toString());
+        log.error("Null pointer exception:", ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of(
                 "error", "Required field is null",

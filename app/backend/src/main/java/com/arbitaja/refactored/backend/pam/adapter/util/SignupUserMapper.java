@@ -1,5 +1,6 @@
 package com.arbitaja.refactored.backend.pam.adapter.util;
 
+import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.ApproveSignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.SignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.response.SignupResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.model.SignupUser;
@@ -18,5 +19,5 @@ public interface SignupUserMapper {
 
     CreateUserUseCase.SignupCommand toSignupCommand(SignupRequest signupRequest);
 
-    CreateUserUseCase.ApproveSignupCommand toApproveSignupCommand(Integer signupUserId, SignupRequest signupRequest);
+    CreateUserUseCase.ApproveSignupCommand toApproveSignupCommand(Integer signupUserId, ApproveSignupRequest request);
 }

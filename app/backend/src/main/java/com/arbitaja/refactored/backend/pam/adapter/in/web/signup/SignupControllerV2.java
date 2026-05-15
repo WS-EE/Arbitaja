@@ -3,6 +3,7 @@ package com.arbitaja.refactored.backend.pam.adapter.in.web.signup;
 import com.arbitaja.refactored.backend.common.PagedResponse;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.annotations.RequiresPermission;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.shared.dto.response.GeneralMessageResponse;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.ApproveSignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.SignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.response.SignupResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
@@ -69,7 +70,7 @@ public class SignupControllerV2 {
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/signup/{id}/approve")
     @RequiresPermission(ACCEPT_SIGNUPS)
-    public ResponseEntity<GeneralMessageResponse> approveSignup(@PathVariable Integer id, @RequestBody @Valid SignupRequest request) {
+    public ResponseEntity<GeneralMessageResponse> approveSignup(@PathVariable Integer id, @RequestBody @Valid ApproveSignupRequest request) {
         log.info("Approving signup: {}", id);
 
         createUserUseCase.approveSignupUser(signupUserMapper.toApproveSignupCommand(id, request));

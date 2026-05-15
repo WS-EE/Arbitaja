@@ -33,6 +33,8 @@ export type ChangePasswordRequest = components['schemas']['ChangePasswordRequest
 export type SignupRequest = components['schemas']['SignupRequest'];
 export type SignupResponse = components['schemas']['SignupResponse'];
 
+export type ApproveSignupRequest = components['schemas']["ApproveSignupRequest"]
+
 export type SchoolResponse = components['schemas']['SchoolResponse'];
 export type SchoolUpsertRequest = components['schemas']['SchoolUpsertRequest'];
 
@@ -99,7 +101,7 @@ export const apiClient = {
     adminCreate: (payload: SignupRequest): Promise<ApiResponse<UserProfileResponse>> => unwrap(api.post('/v2/user/admin-create', payload)),
     signup: (payload: SignupRequest): Promise<ApiResponse<SignupResponse>> => unwrap(api.post('/v2/signup', payload)),
     signupList: (params: PageParams = {}): Promise<ApiResponse<PagedResponse<SignupResponse>>> => unwrap(api.get(`/v2/signup/signup${toQueryString(params)}`)),
-    approveSignup: (id: number, payload: SignupRequest): Promise<ApiResponse<SignupResponse>> => unwrap(api.post(`/v2/signup/signup/${id}/approve`, payload)),
+    approveSignup: (id: number, payload: ApproveSignupRequest): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.post(`/v2/signup/signup/${id}/approve`, payload)),
     declineSignup: (id: number): Promise<ApiResponse<GeneralMessageResponse>> => unwrap(api.delete(`/v2/signup/signup/${id}`)),
   },
   schools: {

@@ -1,6 +1,7 @@
 package com.arbitaja.refactored.backend.pam.adapter.in.web.signup;
 
 import com.arbitaja.refactored.backend.pam.adapter.in.web.PamExceptionHandler;
+import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.ApproveSignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.SignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.response.SignupResponse;
 import com.arbitaja.refactored.backend.pam.adapter.util.SignupUserMapper;
@@ -79,7 +80,12 @@ class SignupControllerV2IT {
 
     @Test
     void approveSignupReturnsSuccessMessage() throws Exception {
-        SignupRequest request = signupRequest("approved-user", "pass", "Approved User", "approved@example.com", 1);
+        ApproveSignupRequest request = ApproveSignupRequest.builder()
+            .username("approved-user")
+            .fullName("Approved User")
+            .email("approved@example.com")
+            .schoolId(1)
+            .build();
         CreateUserUseCase.ApproveSignupCommand command = CreateUserUseCase.ApproveSignupCommand.builder()
             .signupUserId(8)
             .username("approved-user")
@@ -88,7 +94,7 @@ class SignupControllerV2IT {
             .schoolId(1)
             .build();
 
-        when(signupUserMapper.toApproveSignupCommand(eq(8), any(SignupRequest.class))).thenReturn(command);
+        when(signupUserMapper.toApproveSignupCommand(eq(8), any(ApproveSignupRequest.class))).thenReturn(command);
 
         mockMvc.perform(post("/v2/signup/signup/8/approve")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -101,12 +107,17 @@ class SignupControllerV2IT {
 
     @Test
     void approveSignupMapsEntityNotFoundTo404() throws Exception {
-        SignupRequest request = signupRequest("missing", "pass", "Missing User", "missing@example.com", 1);
+        ApproveSignupRequest request = ApproveSignupRequest.builder()
+            .username("missing")
+            .fullName("Missing User")
+            .email("missing@example.com")
+            .schoolId(1)
+            .build();
         CreateUserUseCase.ApproveSignupCommand command = CreateUserUseCase.ApproveSignupCommand.builder()
             .signupUserId(33)
             .build();
 
-        when(signupUserMapper.toApproveSignupCommand(eq(33), any(SignupRequest.class))).thenReturn(command);
+        when(signupUserMapper.toApproveSignupCommand(eq(33), any(ApproveSignupRequest.class))).thenReturn(command);
         doThrow(new EntityNotFoundException("SignupUser not found with id: 33"))
             .when(createUserUseCase).approveSignupUser(command);
 

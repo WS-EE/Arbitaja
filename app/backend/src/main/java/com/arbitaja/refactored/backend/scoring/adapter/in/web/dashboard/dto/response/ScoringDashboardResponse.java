@@ -1,27 +1,28 @@
 package com.arbitaja.refactored.backend.scoring.adapter.in.web.dashboard.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
 public record ScoringDashboardResponse(
-    Set<CompetitorDashboardResponse> competitors
+    @NotNull Set<CompetitorDashboardResponse> competitors
 ) {
 
     public record CompetitorDashboardResponse(
-        String name,
+        @NotNull String name,
         @JsonProperty("total_score")
-        Double totalScore,
-        List<DashboardResultPointResponse> results
+        @NotNull Double totalScore,
+        @NotNull List<DashboardResultPointResponse> results
     ) {
     }
 
     public record DashboardResultPointResponse(
-        Timestamp timestamp,
+        @NotNull Timestamp timestamp,
         @JsonProperty("point_amount")
-        Double pointAmount
+        @NotNull Double pointAmount
     ) {
     }
 }

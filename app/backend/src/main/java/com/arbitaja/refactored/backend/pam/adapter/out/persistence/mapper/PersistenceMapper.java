@@ -28,7 +28,7 @@ public class PersistenceMapper {
             .personalData(entity.getPersonalData() != null ? toDomain(entity.getPersonalData()) : null)
             .build();
 
-        if (entity.getUserRoles() != null) {
+        if (entity.getUserRoles() != null && !entity.getUserRoles().isEmpty()) {
             user.setUserRoles(entity.getUserRoles().stream()
                 .map(ur -> toDomainUserRole(ur, user))
                 .collect(Collectors.toSet()));
@@ -130,11 +130,13 @@ public class PersistenceMapper {
         LinkedHashMap<String, RolePermission> aggregatedPermissions = new LinkedHashMap<>();
 
         if (currentRole.getRolePermissions() != null) {
-            currentRole.getRolePermissions().forEach(rolePermissionJpa -> {
-                RolePermission mappedPermission = toDomainRolePermission(rolePermissionJpa, mappedRole);
-                String dedupeKey = getPermissionDedupeKey(mappedPermission);
-                aggregatedPermissions.putIfAbsent(dedupeKey, mappedPermission);
-            });
+            currentRole.getRolePermissions().stream()
+                .filter(rp -> rp.getPermission() != null)
+                .forEach(rolePermissionJpa -> {
+                    RolePermission mappedPermission = toDomainRolePermission(rolePermissionJpa, mappedRole);
+                    String dedupeKey = getPermissionDedupeKey(mappedPermission);
+                    aggregatedPermissions.putIfAbsent(dedupeKey, mappedPermission);
+                });
         }
 
         if (currentRole.getChildRoleRelations() != null) {
@@ -240,7 +242,7 @@ public class PersistenceMapper {
             .id(entity.getId())
             .username(entity.getUsername())
             .saltedPassword(entity.getSaltedPassword())
-            .personalData(toDomain(entity.getPersonalData()))
+            .personalData(entity.getPersonalData() != null ? toDomain(entity.getPersonalData()) : null)
             .isApproved(entity.getIsApproved())
             .createdAt(entity.getCreatedAt())
             .build();
@@ -251,7 +253,7 @@ public class PersistenceMapper {
             .id(domain.getId())
             .username(domain.getUsername())
             .saltedPassword(domain.getSaltedPassword())
-            .personalData(toEntity(domain.getPersonalData()))
+            .personalData(domain.getPersonalData() != null ? toEntity(domain.getPersonalData()) : null)
             .isApproved(domain.getIsApproved())
             .createdAt(domain.getCreatedAt())
             .build();

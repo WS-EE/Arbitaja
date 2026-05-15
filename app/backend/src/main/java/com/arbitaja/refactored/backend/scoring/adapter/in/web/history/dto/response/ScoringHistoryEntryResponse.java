@@ -1,22 +1,23 @@
 package com.arbitaja.refactored.backend.scoring.adapter.in.web.history.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
 
 public record ScoringHistoryEntryResponse(
-    Integer id,
+    @NotNull Integer id,
     @JsonProperty("competition_id")
-    Integer competitionId,
+    @NotNull Integer competitionId,
     @JsonProperty("competitor_id")
-    Integer competitorId,
+    @NotNull Integer competitorId,
     @JsonProperty("criteria_id")
-    Integer criteriaId,
+    @NotNull Integer criteriaId,
     @JsonProperty("criteria_name")
-    String criteriaName,
+    @NotNull String criteriaName,
     @JsonProperty("points_given")
-    Double pointsGiven,
+    @NotNull Double pointsGiven,
     @JsonProperty("created_at")
-    Timestamp createdAt
+    @NotNull Timestamp createdAt
 ) {
 }

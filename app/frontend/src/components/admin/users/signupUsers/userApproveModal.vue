@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { DateTime } from 'luxon'
-import { apiClient, SignupResponse, SignupRequest, SchoolResponse } from '@/services/api'
+import { apiClient, SignupResponse, ApproveSignupRequest, SchoolResponse } from '@/services/api'
 import displayAlert from '@/components/generic/displayAlert.vue'
 
 const props = defineProps<{
@@ -55,7 +55,7 @@ const formatDate = (iso?: string) => {
   return DateTime.fromISO(iso).toFormat('dd MMM yyyy HH:mm')
 }
 
-const buildSignupPayload = (): SignupRequest => {
+const buildSignupPayload = (): ApproveSignupRequest => {
   if (!commitedUserData.value) {
     throw new Error('No user data to build payload')
   }

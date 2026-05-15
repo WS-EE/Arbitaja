@@ -16,7 +16,6 @@ public class School {
 
     private Integer id;
 
-    @NonNull
     private String name;
 
     /**

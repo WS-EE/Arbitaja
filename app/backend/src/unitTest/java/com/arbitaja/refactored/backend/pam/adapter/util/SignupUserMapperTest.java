@@ -1,5 +1,6 @@
 package com.arbitaja.refactored.backend.pam.adapter.util;
 
+import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.ApproveSignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.request.SignupRequest;
 import com.arbitaja.refactored.backend.pam.adapter.in.web.signup.dto.response.SignupResponse;
 import com.arbitaja.refactored.backend.pam.core.domain.model.PersonalData;
@@ -57,9 +58,8 @@ class SignupUserMapperTest {
 
     @Test
     void toApproveSignupCommandMapsSignupIdAndRequestFields() {
-        SignupRequest request = SignupRequest.builder()
+        ApproveSignupRequest request = ApproveSignupRequest.builder()
             .username("approved")
-            .password("ignored")
             .fullName("Approved User")
             .email("approved@example.com")
             .schoolId(3)

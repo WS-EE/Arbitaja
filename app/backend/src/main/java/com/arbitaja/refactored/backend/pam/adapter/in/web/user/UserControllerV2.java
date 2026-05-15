@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.NonNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -233,7 +233,7 @@ public class UserControllerV2 {
     })
     @SecurityRequirement(name = "basicAuth")
     ResponseEntity<GeneralMessageResponse> changePassword(
-        @NonNull @PathVariable Integer id,
+        @NotNull @PathVariable Integer id,
         @RequestBody @Valid ChangePasswordRequest request,
         Authentication authentication) {
 
