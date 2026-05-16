@@ -4,7 +4,7 @@ COPY ./pom.xml /app
 COPY ./src /app/src
 RUN mvn clean install -DskipTests
 
-FROM openjdk:23
+FROM eclipse-temurin:23-jre
 WORKDIR /opt/arbitaja/
 COPY --from=build /app/target/*.jar /opt/arbitaja/backend.jar
 CMD ["java", "-jar", "backend.jar"]
