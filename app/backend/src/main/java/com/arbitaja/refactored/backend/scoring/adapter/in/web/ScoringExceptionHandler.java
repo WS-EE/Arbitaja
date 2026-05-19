@@ -26,36 +26,43 @@ public class ScoringExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.warn("Entity not found: {}", ex.toString());
+        log.error("Entity not found: ", ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(Map.of("error", "Object not found", "message", ex.getMessage()));
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
-        log.warn("Validation failed: {}", ex.toString());
+        log.error("Validation failed: ", ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of("error", "Invalid input", "message", ex.getMessage()));
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<Map<String, String>> handleForbiddenException(ForbiddenException ex) {
-        log.warn("Forbidden: {}", ex.toString());
+        log.error("Forbidden: ", ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(Map.of("error", "Forbidden", "message", ex.getMessage()));
     }
 
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<Map<String, String>> handleDomainException(DomainException ex) {
-        log.error("Domain exception: {}", ex.toString());
+        log.error("Domain exception: ", ex);
         return ResponseEntity.status(ex.getStatus())
             .body(Map.of("error", "Domain error", "message", ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.warn("Invalid input: {}", ex.toString());
+        log.error("Invalid input: ", ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of("error", "Invalid input", "message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
+        log.error("Unexpected error: ", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("error", "Internal server error", "message", "An unexpected error occurred"));
     }
 }

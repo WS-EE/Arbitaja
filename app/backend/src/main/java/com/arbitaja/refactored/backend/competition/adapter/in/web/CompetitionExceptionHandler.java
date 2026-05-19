@@ -25,30 +25,37 @@ public class CompetitionExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.warn("Entity not found: {}", ex.toString());
+        log.error("Entity not found: ", ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(Map.of("error", "Object not found", "message", ex.getMessage()));
     }
 
     @ExceptionHandler(DuplicateEntityException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateEntityException(DuplicateEntityException ex) {
-        log.warn("Duplicate entity: {}", ex.toString());
+        log.error("Duplicate entity: ", ex);
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(Map.of("error", "Duplicate entry", "message", ex.getMessage()));
     }
 
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<Map<String, String>> handleDomainException(DomainException ex) {
-        log.error("Domain exception: {}", ex.toString());
+        log.error("Domain exception: ", ex);
         return ResponseEntity.status(ex.getStatus())
             .body(Map.of("error", "Domain error", "message", ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.warn("Invalid input: {}", ex.toString());
+        log.error("Invalid input: ", ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of("error", "Invalid input", "message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
+        log.error("Unexpected error: ", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("error", "Internal server error", "message", "An unexpected error occurred"));
     }
 }
 

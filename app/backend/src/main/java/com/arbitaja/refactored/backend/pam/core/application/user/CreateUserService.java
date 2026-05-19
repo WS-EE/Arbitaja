@@ -124,6 +124,7 @@ public class CreateUserService implements CreateUserUseCase {
             .orElseThrow(() -> EntityNotFoundException.roleByName(DEFAULT_USER_ROLE));
 
         UserRole userRoleAssignment = UserRole.createNew(savedUser, userRole);
+        userRoleAssignment = userRoleRepository.saveUserRole(userRoleAssignment);
         savedUser.addRole(userRoleAssignment);
 
         // Update user with role
